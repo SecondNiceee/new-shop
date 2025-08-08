@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     categories: Category;
+    products: Product;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -79,6 +80,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -166,6 +168,10 @@ export interface Media {
  */
 export interface Category {
   id: number;
+  /**
+   * Уникальное значение (английское) для категории. Используется внутри кода. ДОЛЖНО БЫТЬ ОДНО СЛОВО! НЕЛЬЗЯ ПРОБЕЛОВ
+   */
+  value: string;
   title: string;
   /**
    * Если не выбрано — это основная категория
@@ -175,6 +181,48 @@ export interface Category {
    * Иконка нужна только для основных категорий
    */
   icon?: (number | null) | Media;
+  /**
+   * Загрузите обложку для подкатегории (видны в каталоге)
+   */
+  coverImage?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  title: string;
+  price: number;
+  weight: {
+    value: number;
+    unit: 'кг' | 'г' | 'л' | 'мл';
+  };
+  /**
+   * Выберите только категорию, без подкатегорий
+   */
+  category?: (number | Category)[] | null;
+  /**
+   * Выберите подкатегорию
+   */
+  subCategory?: (number | null) | Category;
+  /**
+   * Загрузите основное изображение продукта
+   */
+  image: number | Media;
+  description?: string | null;
+  storageConditions?: string | null;
+  ingredients?: string | null;
+  recommendedProducts?: (number | Product)[] | null;
+  nutritionalValue?: {
+    calories?: number | null;
+    proteins?: number | null;
+    carbohydrates?: number | null;
+    fats?: number | null;
+    fiber?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -196,6 +244,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -286,9 +338,43 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
+  value?: T;
   title?: T;
   parent?: T;
   icon?: T;
+  coverImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  price?: T;
+  weight?:
+    | T
+    | {
+        value?: T;
+        unit?: T;
+      };
+  category?: T;
+  subCategory?: T;
+  image?: T;
+  description?: T;
+  storageConditions?: T;
+  ingredients?: T;
+  recommendedProducts?: T;
+  nutritionalValue?:
+    | T
+    | {
+        calories?: T;
+        proteins?: T;
+        carbohydrates?: T;
+        fats?: T;
+        fiber?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

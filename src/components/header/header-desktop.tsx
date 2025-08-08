@@ -1,37 +1,24 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { useRef } from 'react'
 import { Button } from '../ui/button'
-import { MapPin, Menu, Search, User } from 'lucide-react'
-import { Input } from '../ui/input'
+import { MapPin, Menu, User } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet'
+import ProductSearch from '../product-search/ProductSearch'
+import CatalogButton from '../catalog-button/CatalogButton'
 
 const HeaderDesktop = () => {
+  const logoRef = useRef<HTMLDivElement>(null);
   return (
     <div className="hidden md:flex items-center justify-between gap-6">
-      <div className="flex items-center flex-shrink-0">
+      <div ref={logoRef} className="flex items-center flex-shrink-0">
         <h1 className="text-xl lg:text-2xl font-bold ml-2 lg:ml-3">ГрандБАЗАР</h1>
       </div>
 
       <div className="flex-1 max-w-sm lg:max-w-md">
-        <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 lg:w-5 lg:h-5"
-          />
-          <Input type="text" placeholder="Поиск по товарам" className="pl-10 h-10 lg:h-11 w-full" />
-        </div>
+        <ProductSearch  />
       </div>
 
-      <Button variant="outline" className="flex items-center gap-2 bg-transparent h-10 lg:h-11">
-        <Image
-          alt="ГрандБАЗАР магазин"
-          width={24}
-          height={24}
-          src={'/catalog.svg'}
-          className="lg:w-[30px] lg:h-[30px]"
-        />
-        <span className="text-sm font-medium">Каталог</span>
-      </Button>
+      <CatalogButton />
 
       {/* Address info - hidden on tablet, shown on desktop */}
       <div className="hidden lg:flex items-center space-x-2 min-w-0">

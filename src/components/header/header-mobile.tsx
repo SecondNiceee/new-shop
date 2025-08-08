@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '../ui/button';
-import { MapPin, Menu, Search, ShoppingCart, User } from 'lucide-react';
+import { MapPin, Menu, ShoppingCart, User } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import Image from 'next/image';
-import { Input } from '../ui/input';
+import ProductSearch from '../product-search/ProductSearch';
+import CatalogButton from '../catalog-button/CatalogButton';
 
 const HeaderMobile = () => {
     return (
@@ -34,10 +35,7 @@ const HeaderMobile = () => {
                   </SheetTrigger>
                   <SheetContent side="right" className="w-80 bg-white">
                     <div className="space-y-4 mt-6">
-                      <Button variant="outline" className="w-full justify-start gap-2 bg-transparent">
-                        <Image alt="ГрандБАЗАР магазин" width={20} height={20} src={"/catalog.svg"} />
-                        <span className="text-sm font-medium">Каталог</span>
-                      </Button>
+                      <CatalogButton />
 
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
@@ -58,10 +56,7 @@ const HeaderMobile = () => {
             </div>
 
             {/* Search bar for mobile */}
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-              <Input type="text" placeholder="Поиск по товарам" className="pl-10 h-10 w-full" />
-            </div>
+            <ProductSearch onProductSelect={() => {}}   />
           </div>
 
     );

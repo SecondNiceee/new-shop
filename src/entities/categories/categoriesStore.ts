@@ -1,9 +1,9 @@
-import { Category } from "@/payload-types";
-import { request, RequestError } from "@/utils/request";
+import { CategoryWithSubs, getCategoriesWithSubs } from "@/actions/server/getCategorysWithSubs";
+import { RequestError } from "@/utils/request";
 import { create } from "zustand";
 
 interface CategoriesStore{
-    categories : Category[],
+    categories : CategoryWithSubs[],
     isLoading : boolean,
     getCategories : () => Promise<void>,
     error : RequestError | null
@@ -14,20 +14,13 @@ export const useCategoriesStore = create<CategoriesStore>((set) => ({
     error : null,
     isLoading : false,
     getCategories : async () => {
-        try{
-            set({isLoading : true, error : null})
-            const categories = await request({
-                method : "GET",
-                url : "/api/categories",
-                credentials : true
-            })
-            set({categories : categories.docs, isLoading : false})
+        set({isLoading : true, error : null})
+        const categories = await getCategoriesWithSubs();
+        if (!categories){
+            set({isLoading : false, error : {message : "Internal Error", status : 500}})
         }
-        catch(e){
-            const error = e as RequestError;
-            console.log(error.status);
-            console.log(error.message);
-            set({isLoading : false, error : {message : error.message, status : error.status}})
+        else{
+            set({isLoading : false, categories})
         }
     }
 }))

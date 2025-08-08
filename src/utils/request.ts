@@ -1,10 +1,13 @@
-import { isRequestError } from "./isRequestError";
+// src/shared/utils/request.ts
 
 // === Типы ===
 export interface RequestError {
   status?: number;
   message: string;
 }
+
+// Импорт type guard
+import { isRequestError } from './isRequestError';
 
 // === Конфиг ===
 const PAYLOAD_URL = process.env.PAYLOAD_PUBLIC_URL || 'http://localhost:3000';
@@ -19,15 +22,15 @@ interface IRequest {
   headers?: Record<string, string>;
 }
 
-// === Основная функция запроса ===
-export const request = async ({
+// === Основная функция запроса с дженериком ===
+export const request = async <T,>({
   url,
   method,
   body,
   query,
   credentials = false,
   headers = {},
-}: IRequest): Promise<any> => {
+}: IRequest): Promise<T> => {
   // Собираем URL
   const baseUrl = url.startsWith('http') ? url : `${PAYLOAD_URL}${url}`;
   const finalUrl = query
@@ -50,6 +53,7 @@ export const request = async ({
       credentials: credentials ? 'include' : 'omit',
     });
 
+    // Если ответ не успешный — парсим ошибку
     if (!response.ok) {
       let errorData;
       try {
@@ -66,14 +70,16 @@ export const request = async ({
       throw error;
     }
 
-    return await response.json();
+    // Парсим успешный ответ
+    const data: T = await response.json();
+    return data;
   } catch (e) {
-    // Если это уже RequestError — пробрасываем дальше
+    // Если это уже RequestError — пробрасываем
     if (isRequestError(e)) {
       throw e;
     }
 
-    // Все остальные ошибки — превращаем в Internal Server Error
+    // Все остальные — внутренняя ошибка
     const internalError: RequestError = {
       status: 500,
       message: 'Internal server error',

@@ -18,9 +18,7 @@ const ErrorAlert:FC<IErrorAlert> = ({buttonAction, errorMessage}) => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogAction
-                onClick={() => {
-
-                }}
+                onClick={buttonAction}
               >
                 Перезагрузить
               </AlertDialogAction>
