@@ -1,11 +1,11 @@
 'use client'
-
 import { getFilteredProducts, ProductsWithSubCategory } from '@/actions/server/getFilterProducts'
 import CategoryPopup from '@/components/category-popup/CategoryPopup'
 import ErrorAlert from '@/components/error-alert/ErrorAlert'
 import { ProductCard } from '@/components/product-card/ProductCard'
 import ProductPopup from '@/components/product-popup/product-popup'
-import { Badge } from '@/components/ui/badge'
+import SubCategories from '@/components/sub-categories/SubCategories'
+import { useCatalogStore } from '@/entities/catalog/catalogStore'
 import { useProductsStore } from '@/entities/products/productsStore'
 import { Loader2 } from 'lucide-react'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -23,12 +23,14 @@ const FilterPage = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null)
 
-  const {setProductsPopup} = useProductsStore();
+  const {setProductsPopup, isProductsPopupOpened} = useProductsStore();
+  const {isCatalogPopupOpened} = useCatalogStore();
 
   const badgesRef = useRef<(HTMLDivElement | null)[]>([])
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([])
   const badgesContainerRef = useRef<HTMLDivElement | null>(null)
 
+  // Получение с сервера всех подкатегорий
   const getSortedCategories = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -46,16 +48,16 @@ const FilterPage = () => {
     getSortedCategories()
   }, [getSortedCategories])
 
+  // Открытие попапа в случае изменения URl
   useEffect( () => {
     if (productValue){
       setProductsPopup(true);
     }
   }, [productValue] )
 
-  // 🔹 Наблюдение за секциями
+  //  Наблюдение за секциями
   useEffect(() => {
     if (sortedProducts.length === 0) return
-
     let timeoutId: NodeJS.Timeout
     const observer = new IntersectionObserver(
       (entries) => {
@@ -78,19 +80,17 @@ const FilterPage = () => {
         rootMargin: '-70% 0px -20% 0px',
       },
     )
-
     sectionsRef.current.forEach((el) => {
       if (el) observer.observe(el)
     })
-
     return () => {
       observer.disconnect()
       clearTimeout(timeoutId)
     }
   }, [sortedProducts])
 
-  // 🔹 Скролл бейджей при изменении активной подкатегории
-  useEffect(() => {
+  // Скролл бейджей при изменении активной подкатегории
+useEffect(() => {
     if (!activeSubCategory || !badgesContainerRef.current) return
 
     const activeIndex = sortedProducts.findIndex(
@@ -105,16 +105,10 @@ const FilterPage = () => {
       const containerWidth = container.offsetWidth
       const maxScroll = container.scrollWidth - containerWidth
 
-      let scrollPosition: number
+      // Вычисляем позицию для центрирования активного бейджа
+      let scrollPosition = badgeOffsetLeft - containerWidth / 2 + badgeWidth / 2
 
-      if (activeIndex === 0) {
-        scrollPosition = 0
-      } else if (activeIndex >= sortedProducts.length - 2) {
-        scrollPosition = maxScroll
-      } else {
-        scrollPosition = badgeOffsetLeft - containerWidth / 2 + badgeWidth / 2
-      }
-
+      // Ограничиваем позицию
       scrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll))
 
       container.scrollTo({
@@ -124,10 +118,9 @@ const FilterPage = () => {
     }
   }, [activeSubCategory, sortedProducts])
 
-  // 🔹 Прокрутка к секции при загрузке страницы, если есть параметр sub
+  // Прокрутка к секции при загрузке страницы, если есть параметр sub
   useEffect(() => {
     if (!subCategoryValue || sortedProducts.length === 0) return
-
     const index = sortedProducts.findIndex((item) => item.subCategory.value === subCategoryValue)
     if (index !== -1) {
       const section = sectionsRef.current[index]
@@ -142,20 +135,6 @@ const FilterPage = () => {
       }
     }
   }, [subCategoryValue, sortedProducts])
-
-  // 🔹 Прокрутка к секции при клике на бейдж
-  const scrollToSection = (value: string) => {
-    const index = sortedProducts.findIndex((item) => item.subCategory.value === value)
-    const section = sectionsRef.current[index]
-    if (section) {
-      const sectionRect = section.getBoundingClientRect()
-      const scrollTop = window.pageYOffset + sectionRect.top - 305
-      window.scrollTo({
-        top: scrollTop,
-        behavior: 'smooth',
-      })
-    }
-  }
 
   if (error) {
     return <ErrorAlert buttonAction={() => getSortedCategories()} errorMessage={error} />
@@ -172,39 +151,9 @@ const FilterPage = () => {
   return (
     <>
     <section className="products-sub bg-gray-50">
-      <div
-        ref={badgesContainerRef}
-        className="flex sticky z-20 top-[225px] pb-3 pt-3 md:top-[185px] lg:top-[220px] mx-auto bg-white "
-      >
-        <div className='max-w-7xl w-full px-4 mx-auto'>
-          <div className="flex gap-4 overflow-x-scroll hide-scrollbar">
-            {sortedProducts.map((item, index) => {
-              const isActive = activeSubCategory === item.subCategory.value
-
-              return (
-                <div
-                  key={item.subCategory.id}
-                  ref={(el) => {
-                    badgesRef.current[index] = el
-                  }}
-                  onClick={() => scrollToSection(item.subCategory.value)}
-                  className="rounded-2xl cursor-pointer flex-shrink-0 whitespace-nowrap"
-                >
-                  <Badge
-                    className={`${isActive ? 'bg-black' : 'bg-gray-200'} flex justify-center items-center`}
-                  >
-                    <p className={`${isActive ? 'text-white' : 'text-black'} text-sm`}>
-                      {item.subCategory.title}
-                    </p>
-                  </Badge>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-      <div className="max-w-7xl px-4 flex flex-col mx-auto pb-5">
-        <div className="flex flex-col gap-5 mt-4">
+      <SubCategories ref={badgesContainerRef} activeSubCategory={activeSubCategory} badgesRef={badgesRef} sectionsRef={sectionsRef} sortedProducts={sortedProducts} />
+      <div className="max-w-7xl px-4 flex flex-col mx-auto pb-16">
+        <div className="flex flex-col gap-5 mt-2">
           {sortedProducts.map((item, index) => (
             <div
               key={item.subCategory.id}
@@ -227,10 +176,10 @@ const FilterPage = () => {
             </div>
           ))}
         </div>
-        <CategoryPopup />
       </div>
     </section>
-    <ProductPopup />
+    {isCatalogPopupOpened && <CategoryPopup />}
+    {isProductsPopupOpened && <ProductPopup />}
     </>
   )
 }

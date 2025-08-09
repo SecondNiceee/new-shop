@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useCatalogStore } from '@/entities/catalog/catalogStore'
 import { useCategoriesStore } from '@/entities/categories/categoriesStore'
@@ -10,16 +10,12 @@ import { Media } from '@/payload-types'
 import { CategoryWithSubs } from '@/actions/server/getCategorysWithSubs'
 import { X } from 'lucide-react'
 import Link from 'next/link'
+import { useMobileStore } from '@/entities/mobileMenu/mobileMenuStore'
 
 const CategoryPopup = () => {
-  const { isCatalogPopupOpened, setPopupCatalogOpened } = useCatalogStore()
-  
-  const handleSubCategoryClick = (categoryId: string, subCategoryId: string) => {
-    setPopupCatalogOpened(false)
-  }
-
-  const categories = useCategoriesStore().categories
-
+  const { isCatalogPopupOpened, setPopupCatalogOpened } = useCatalogStore();
+  const categories = useCategoriesStore().categories;
+  const {setOpened} = useMobileStore();
   return (
     <Dialog
       open={isCatalogPopupOpened}
@@ -36,7 +32,7 @@ const CategoryPopup = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setPopupCatalogOpened(false)}
+            onClick={() => {setPopupCatalogOpened(false) }}
             className="h-8 w-8 p-0 hover:bg-gray-100"
           >
             <X className="h-4 w-4" />
@@ -57,7 +53,9 @@ const CategoryPopup = () => {
                       {category.subCategories.map((subCategory) => (
                         <Link
                           href={`/${category.value}?sub=${subCategory.value}`}
-                          onClick={() => setPopupCatalogOpened(false)}
+                          onClick={() => {setPopupCatalogOpened(false)
+                            setOpened(false);
+                          }}
                           className="w-full cursor-pointer p-2 relative rounded-xl h-[100px] flex justify-center items-center transition-transform duration-200 hover:scale-105 hover:shadow-lg"
                           key={subCategory.id}
                         >

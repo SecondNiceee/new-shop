@@ -2,6 +2,7 @@
 import Image from "next/image"
 import HeaderMobile from "./header-mobile"
 import HeaderDesktop from "./header-desktop"
+import CartDrawer from "../cart-drawer/cart-drawer"
 
 export function Header() {
   return (
@@ -14,6 +15,7 @@ export function Header() {
           <HeaderDesktop />
         </div>
       </div>
+      <CartDrawer />
     </header>
   )
 }

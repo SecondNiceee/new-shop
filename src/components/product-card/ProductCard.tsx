@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Minus, Plus } from "lucide-react"
 import Image from "next/image"
 import { Media, Product } from "@/payload-types"
-import { useProductsStore } from "@/entities/products/productsStore"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useCartStore } from "@/entities/cart/cartStore"
 
 interface IProductCard{
     product : Product
@@ -15,17 +14,9 @@ interface IProductCard{
 
 export function ProductCard({ product}: IProductCard) {
   const router = useRouter();
-  const [quantity, setQuantity] = useState(1);
-  const searchParams = useSearchParams()
-
-  const handleDecrease = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1)
-    }
-  }
-  const handleIncrease = () => {
-    setQuantity(quantity + 1)
-  }
+  const searchParams = useSearchParams();
+  const {increment, dicrement, items} = useCartStore();
+  const qty = items.find( (item) => item.product.id === product.id )?.quantity ?? 0;
   const onProductClick = () => {
     const newParams = new URLSearchParams(searchParams?.toString());
     if (newParams.get("product")){
@@ -51,17 +42,24 @@ export function ProductCard({ product}: IProductCard) {
 
       {/* Actions */}
       <div className="mt-auto">
-        {product.price ? (
-          <div className="bg-gray-50 rounded-lg p-2 text-center">
+        {qty === 0 ? (
+          <div onClick={(e) => {
+            increment(product)
+            e.stopPropagation();
+          }} className="bg-gray-50 rounded-lg p-2 text-center">
             <span className="text-lg font-semibold text-gray-900">{product.price} ₽</span>
           </div>
         ) : (
           <div className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-200" onClick={handleDecrease}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-200" onClick={(e) => {dicrement(product.id)
+              e.stopPropagation();
+            }}>
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="text-sm font-medium px-2">{quantity} шт</span>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-200" onClick={handleIncrease}>
+            <span className="text-sm font-medium px-2">{qty} шт</span>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-200" onClick={(e) => {increment(product)
+              e.stopPropagation();
+            }}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>

@@ -1,10 +1,11 @@
 'use client'
 
+import CategoryPopup from '@/components/category-popup/CategoryPopup'
 import ErrorAlert from '@/components/error-alert/ErrorAlert'
 import { ProductCard } from '@/components/product-card/ProductCard'
 import ProductPopup from '@/components/product-popup/product-popup'
 import { Badge } from '@/components/ui/badge'
-import { products } from '@/data/products'
+import { useCatalogStore } from '@/entities/catalog/catalogStore'
 import { useProductsStore } from '@/entities/products/productsStore'
 import { Category, Product } from '@/payload-types'
 import { request, RequestError } from '@/utils/request'
@@ -24,14 +25,19 @@ export default function EcomarketApp() {
   >()
   const [error, setError] = useState<RequestError | null>(null)
   const [isLoading, setLoading] = useState<boolean>(false);
-  const {setProductsPopup} = useProductsStore();
+  const {setProductsPopup, isProductsPopupOpened} = useProductsStore();
+  const {isCatalogPopupOpened} = useCatalogStore();
   const params = useSearchParams();
   const productParam = params?.get("product");
+
+  // Открытие попапа в случае изменения URL
   useEffect( () => {
     if (productParam){
       setProductsPopup(true);
     }
-  }, [productParam] )
+  }, [productParam] );
+  
+  // Функция получение данных с сервреа
   const getProductsWithCategories = useCallback(async () => {
     setLoading(true)
     setError(null);
@@ -52,10 +58,13 @@ export default function EcomarketApp() {
     }
     setLoading(false)
   }, [setLoading, setError, setProductsWithCategories])
+
+  // Получение данных с сервреа
   useEffect(() => {
     getProductsWithCategories()
   }, [getProductsWithCategories])
 
+  // UI ошибки в случае ошибки загрузка с сервера
   if (error) {
     console.log(error)
     return (
@@ -65,6 +74,8 @@ export default function EcomarketApp() {
       />
     )
   }
+
+  // UI загрузки 
   if (isLoading || !productsAndCategories) {
     return (
       <div className="flex justify-center py-8">
@@ -75,7 +86,7 @@ export default function EcomarketApp() {
   return (
     <>
     <section className='products bg-gray-50'>
-      <div className="flex mt-4 flex-col rounded-md bg-gray-50 px-4 mx-auto max-w-7xl gap-3">
+      <div className="flex mt-1 mb-4 flex-col rounded-md bg-gray-50 px-4 mx-auto max-w-7xl gap-3">
         {productsAndCategories.map((item) => (
           <div key={item.category.id} className="flex flex-col gap-4">
             {item.products.length ? (
@@ -102,7 +113,8 @@ export default function EcomarketApp() {
         ))}
       </div>
     </section>
-    <ProductPopup />
+    {isCatalogPopupOpened && <CategoryPopup />}
+    {isProductsPopupOpened && <ProductPopup />}
     </>
   )
 }

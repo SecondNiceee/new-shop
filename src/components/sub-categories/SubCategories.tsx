@@ -1,0 +1,59 @@
+import { Category, Product } from '@/payload-types';
+import React, { forwardRef } from 'react';
+import { Badge } from '../ui/badge';
+ 
+interface ISubCategories{
+    sortedProducts : Product[],
+    activeSubCategory : string|null;
+    badgesRef : React.RefObject<(HTMLDivElement | null)[]>;
+    sectionsRef : React.RefObject<(HTMLDivElement | null)[]>;
+}
+const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(({sortedProducts, activeSubCategory, badgesRef, sectionsRef}, ref) => {
+    //  Прокрутка к секции при клике на бейдж
+    const scrollToSection = (value: string) => {
+        const index = sortedProducts.findIndex((item) => (item.subCategory as Category).value === value)
+        const section = sectionsRef.current[index]
+        if (section) {
+        const sectionRect = section.getBoundingClientRect()
+        const scrollTop = window.pageYOffset + sectionRect.top - 305
+        window.scrollTo({
+            top: scrollTop,
+            behavior: 'smooth',
+        })
+        }
+    }
+    return (
+      <div
+      
+        className="flex sticky z-20 top-[225px] pb-3 pt-3 md:top-[185px] lg:top-[190px] mx-auto bg-white "
+      >
+        <div className='max-w-7xl w-full px-4 mx-auto'>
+          <div ref={ref} className="flex gap-4 overflow-x-scroll hide-scrollbar">
+            {sortedProducts.map((item : Product, index) => {
+              const isActive = activeSubCategory === (item.subCategory as Category).value
+              return (
+                <div
+                  key={(item.subCategory as Category).id}
+                  ref={(el) => {
+                    badgesRef.current[index] = el
+                  }}
+                  onClick={() => scrollToSection((item.subCategory as Category).value)}
+                  className="rounded-2xl cursor-pointer flex-shrink-0 whitespace-nowrap"
+                >
+                  <Badge
+                    className={`${isActive ? 'bg-black hover:bg-black' : 'bg-gray-200 hover:bg-gray-200'} py-1 rounded-3xl flex justify-center items-center`}
+                  >
+                    <p className={`${isActive ? 'text-white hover:text-white' : 'text-black hover:text-black'} text-sm`}>
+                      {(item.subCategory as Category).title}
+                    </p>
+                  </Badge>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    );
+})
+
+export default SubCategories;

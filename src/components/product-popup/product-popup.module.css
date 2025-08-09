@@ -1,0 +1,3 @@
+.breadcrumbLink{
+    @apply sm:text-sm text-xs;
+}

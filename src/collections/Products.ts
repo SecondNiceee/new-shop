@@ -78,6 +78,7 @@ const Products: CollectionConfig = {
       type: 'relationship',
       label: 'Категория',
       relationTo: 'categories',
+      required : true,
       hasMany: true,
       admin: {
         description: 'Выберите только категорию, без подкатегорий',
@@ -93,6 +94,7 @@ const Products: CollectionConfig = {
       type: 'relationship',
       label: 'Подкатегория',
       relationTo: 'categories',
+      required : true,
       hasMany: false,
       admin: {
         description: 'Выберите подкатегорию',

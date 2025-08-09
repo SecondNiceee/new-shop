@@ -1,12 +1,17 @@
 import React from 'react';
 import { Button } from '../ui/button';
 import { MapPin, Menu, ShoppingCart, User } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../ui/sheet';
 import Image from 'next/image';
 import ProductSearch from '../product-search/ProductSearch';
 import CatalogButton from '../catalog-button/CatalogButton';
+import { useCartStore } from '@/entities/cart/cartStore';
+import MobileAdressButton from '../mobile-adress-button/MobileAdressButton';
+import { useMobileStore } from '@/entities/mobileMenu/mobileMenuStore';
 
 const HeaderMobile = () => {
+    const { open, totalCount } = useCartStore();
+    const {isOpened, setOpened, toggle} = useMobileStore();
     return (
           <div className="md:hidden">
             <div className="flex items-center justify-between mb-3">
@@ -23,33 +28,26 @@ const HeaderMobile = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="p-2 bg-transparent">
+                <Button variant="outline" size="sm" className="relative p-2 bg-transparent" onClick={open} aria-label="Открыть корзину">
                   <ShoppingCart className="h-4 w-4" />
+                  {totalCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] rounded-full px-1.5 py-0.5">
+                      {totalCount}
+                    </span>
+                  )}
                 </Button>
 
-                <Sheet >
-                  <SheetTrigger asChild>
+                <Sheet onOpenChange={setOpened} open = {isOpened} >
+                  <SheetTrigger onClick={() => setOpened(true)} asChild>
                     <Button variant="outline" size="sm" className="p-2 bg-transparent">
                       <Menu className="h-4 w-4" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="right" className="w-80 bg-white">
-                    <div className="space-y-4 mt-6">
+                    <SheetTitle className="space-y-4 mt-6">
                       <CatalogButton />
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-gray-600" />
-                          <span className="text-sm font-medium">Адрес доставки</span>
-                        </div>
-                        <p className="text-xs text-gray-500 pl-6">И мы рассчитаем время и стоимость доставки</p>
-                      </div>
-
-                      <div className="p-3 rounded-lg bg-white border">
-                        <p className="text-sm font-medium">Мин. сумма заказа 2000 ₽</p>
-                        <p className="text-xs text-gray-500">Доставим за 299 ₽</p>
-                      </div>
-                    </div>
+                      <MobileAdressButton />
+                    </SheetTitle>
                   </SheetContent>
                 </Sheet>
               </div>
