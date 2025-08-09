@@ -1,9 +1,10 @@
 import { Category, Product } from '@/payload-types';
 import React, { forwardRef } from 'react';
 import { Badge } from '../ui/badge';
+import { ProductsWithSubCategory } from '@/actions/server/getFilterProducts';
  
 interface ISubCategories{
-    sortedProducts : Product[],
+    sortedProducts : ProductsWithSubCategory[],
     activeSubCategory : string|null;
     badgesRef : React.RefObject<(HTMLDivElement | null)[]>;
     sectionsRef : React.RefObject<(HTMLDivElement | null)[]>;
@@ -29,7 +30,7 @@ const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(({sortedProduct
       >
         <div className='max-w-7xl w-full px-4 mx-auto'>
           <div ref={ref} className="flex gap-4 overflow-x-scroll hide-scrollbar">
-            {sortedProducts.map((item : Product, index) => {
+            {sortedProducts.map((item, index) => {
               const isActive = activeSubCategory === (item.subCategory as Category).value
               return (
                 <div

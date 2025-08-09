@@ -1,8 +1,8 @@
+"use client"
 import React from 'react';
 import { Button } from '../ui/button';
-import { MapPin, Menu, ShoppingCart, User } from 'lucide-react';
+import { Menu, ShoppingCart, User } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../ui/sheet';
-import Image from 'next/image';
 import ProductSearch from '../product-search/ProductSearch';
 import CatalogButton from '../catalog-button/CatalogButton';
 import { useCartStore } from '@/entities/cart/cartStore';

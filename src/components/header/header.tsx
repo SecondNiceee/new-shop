@@ -1,5 +1,3 @@
-"use client"
-import Image from "next/image"
 import HeaderMobile from "./header-mobile"
 import HeaderDesktop from "./header-desktop"
 import CartDrawer from "../cart-drawer/cart-drawer"

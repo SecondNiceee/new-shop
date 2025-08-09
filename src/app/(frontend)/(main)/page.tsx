@@ -1,5 +1,4 @@
 'use client'
-
 import CategoryPopup from '@/components/category-popup/CategoryPopup'
 import ErrorAlert from '@/components/error-alert/ErrorAlert'
 import { ProductCard } from '@/components/product-card/ProductCard'

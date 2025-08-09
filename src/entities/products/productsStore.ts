@@ -1,3 +1,4 @@
+"use client"
 import { getProductById } from "@/actions/server/getProductById";
 import { Product } from "@/payload-types";
 import { RequestError } from "@/utils/request";

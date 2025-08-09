@@ -1,6 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import { refresh } from '@payloadcms/next/auth';
-import config from '@payload-config'
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
