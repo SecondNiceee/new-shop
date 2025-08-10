@@ -61,12 +61,10 @@ export const request = async <T,>({
       } catch {
         errorData = {};
       }
-
       const error: RequestError = {
         status: response.status,
         message: errorData?.message || response.statusText || 'Request failed',
       };
-
       throw error;
     }
 
@@ -78,13 +76,11 @@ export const request = async <T,>({
     if (isRequestError(e)) {
       throw e;
     }
-
     // Все остальные — внутренняя ошибка
     const internalError: RequestError = {
       status: 500,
       message: 'Internal server error',
     };
-
     console.error('Network or unexpected error:', e);
     throw internalError;
   }

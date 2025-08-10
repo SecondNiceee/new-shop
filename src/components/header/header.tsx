@@ -1,6 +1,7 @@
 import HeaderMobile from "./header-mobile"
 import HeaderDesktop from "./header-desktop"
 import CartDrawer from "../cart-drawer/cart-drawer"
+import AuthDialog from "../auth/auth-modal"
 
 export function Header() {
   return (
@@ -14,6 +15,7 @@ export function Header() {
         </div>
       </div>
       <CartDrawer />
+      <AuthDialog />
     </header>
   )
 }

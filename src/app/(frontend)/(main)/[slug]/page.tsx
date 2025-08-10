@@ -23,9 +23,8 @@ const FilterPage = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null)
 
-  const {setProductsPopup, isProductsPopupOpened} = useProductsStore();
-  const {isCatalogPopupOpened} = useCatalogStore();
-
+  const {setProductsPopup} = useProductsStore();
+  
   const badgesRef = useRef<(HTMLDivElement | null)[]>([])
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([])
   const badgesContainerRef = useRef<HTMLDivElement | null>(null)
@@ -178,8 +177,6 @@ useEffect(() => {
         </div>
       </div>
     </section>
-    {isCatalogPopupOpened && <CategoryPopup />}
-    {isProductsPopupOpened && <ProductPopup />}
     </>
   )
 }

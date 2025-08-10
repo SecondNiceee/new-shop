@@ -7,14 +7,28 @@ import ProductSearch from '../product-search/ProductSearch'
 import CatalogButton from '../catalog-button/CatalogButton'
 import Cart from '../cart/cart'
 import MobileAdressButton from '../mobile-adress-button/MobileAdressButton'
+import { useAuthDialogStore } from '@/entities/auth/authDialogStore'
+import { useAuthStore } from '@/entities/auth/authStore'
+import { useRouter } from 'next/navigation'
+import { routerConfig } from '@/config/router.config'
+import Link from 'next/link'
 
 const HeaderDesktop = () => {
-  const logoRef = useRef<HTMLDivElement>(null)
+  const {openDialog} = useAuthDialogStore();
+  const {user} = useAuthStore();
+  const router = useRouter();
+  const userClickHandler = () => {
+    if (user){
+      router.push(routerConfig.profile);
+    }else{
+      openDialog("login");
+    }
+  }
   return (
     <div className="hidden md:flex items-center justify-between gap-6">
-      <div ref={logoRef} className="flex items-center flex-shrink-0">
+      <Link href={routerConfig.home} className="flex items-center flex-shrink-0">
         <h1 className="text-xl lg:text-2xl font-bold ml-2 lg:ml-3">ГрандБАЗАР</h1>
-      </div>
+      </Link>
 
       <div className="flex-1 max-w-sm lg:max-w-md">
         <ProductSearch />
@@ -51,7 +65,7 @@ const HeaderDesktop = () => {
       <Button
         variant="default"
         size="sm"
-        onClick={() => {open("login")}}
+        onClick={userClickHandler}
         className="p-2 bg-green-400 hover:bg-green-300 rounded-full"
       >
         <User className="h-4 w-4 text-white" />

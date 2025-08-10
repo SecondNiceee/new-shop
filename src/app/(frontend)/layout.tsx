@@ -1,5 +1,8 @@
 import React from 'react'
 import '../globals.css'
+import AppInit from '@/components/app-init/app-init'
+import { Header } from '@/components/header/header'
+import { PopupProvider } from '@/components/popup/PopupProvider'
 
 export const metadata = {
   description: 'A blank template using Payload in a Next.js app.',
@@ -12,7 +15,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-background">
+        <PopupProvider>
+        <AppInit />
+        <Header />
         <main className="mx-auto">{children}</main>
+        </PopupProvider>
       </body>
     </html>
   )

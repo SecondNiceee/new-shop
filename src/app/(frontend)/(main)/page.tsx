@@ -112,8 +112,6 @@ export default function EcomarketApp() {
         ))}
       </div>
     </section>
-    {isCatalogPopupOpened && <CategoryPopup />}
-    {isProductsPopupOpened && <ProductPopup />}
     </>
   )
 }
