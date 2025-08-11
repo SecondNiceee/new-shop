@@ -1,5 +1,5 @@
 "use client"
-import { getProductById } from "@/actions/server/getProductById";
+import { getProductById } from "@/actions/server/products/getProductById";
 import { Product } from "@/payload-types";
 import { RequestError } from "@/utils/request";
 import { create } from "zustand";

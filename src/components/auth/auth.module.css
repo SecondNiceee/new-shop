@@ -1,0 +1,9 @@
+.input{
+    @apply select-text h-12 md:h-12 text-base  rounded-xl placeholder:text-gray-400;
+}
+.formError{
+    @apply text-base text-red-500 ml-2
+}
+.input::selection {
+    @apply bg-gray-900 text-white;
+}

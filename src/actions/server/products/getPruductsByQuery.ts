@@ -1,7 +1,7 @@
 // src/lib/searchProducts.ts
 'use server';
 import { getPayload } from 'payload';
-import config from '../../payload.config'; // путь к payload.config.ts
+import config from '../../../payload.config'; // путь к payload.config.ts
 import { Product } from '@/payload-types'; // если сгенерирован
 
 export const searchProducts = async (query: string): Promise<Product[] > => {

@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Product } from '@/payload-types'
-import { searchProducts } from '@/actions/server/getPruductsByQuery'
+import { searchProducts } from '@/actions/server/products/getPruductsByQuery'
 import { ProductCard } from '../product-card/ProductCard'
 
 interface ProductSearchProps {

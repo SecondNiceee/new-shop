@@ -1,7 +1,7 @@
 import { Category, Product } from '@/payload-types';
 import React, { forwardRef } from 'react';
 import { Badge } from '../ui/badge';
-import { ProductsWithSubCategory } from '@/actions/server/getFilterProducts';
+import { ProductsWithSubCategory } from '@/actions/server/products/getFilterProducts';
  
 interface ISubCategories{
     sortedProducts : ProductsWithSubCategory[],

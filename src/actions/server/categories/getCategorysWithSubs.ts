@@ -2,7 +2,7 @@
 'use server';
 
 import { getPayload } from 'payload';
-import config from '../../payload.config';
+import config from '../../../payload.config';
 import { Category } from '@/payload-types';
 
 export type CategoryWithSubs = {

@@ -1,5 +1,5 @@
 'use client'
-import { getFilteredProducts, ProductsWithSubCategory } from '@/actions/server/getFilterProducts'
+import { getFilteredProducts, ProductsWithSubCategory } from '@/actions/server/products/getFilterProducts'
 import CategoryPopup from '@/components/category-popup/CategoryPopup'
 import ErrorAlert from '@/components/error-alert/ErrorAlert'
 import { ProductCard } from '@/components/product-card/ProductCard'
@@ -24,7 +24,7 @@ const FilterPage = () => {
   const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null)
 
   const {setProductsPopup} = useProductsStore();
-  
+
   const badgesRef = useRef<(HTMLDivElement | null)[]>([])
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([])
   const badgesContainerRef = useRef<HTMLDivElement | null>(null)

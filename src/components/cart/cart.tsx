@@ -1,4 +1,4 @@
-import { DELIVERY_FEE, MIN_ORDER } from '@/dynamic-constants/dynamic-constants';
+import { DELIVERY_FEE, MIN_ORDER } from '@/constants/dynamic-constants';
 import { useCartStore } from '@/entities/cart/cartStore';
 import { Loader2, ShoppingCart } from 'lucide-react';
 import React, { FC } from 'react';

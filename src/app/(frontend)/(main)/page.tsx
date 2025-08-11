@@ -1,13 +1,10 @@
 'use client'
-import CategoryPopup from '@/components/category-popup/CategoryPopup'
+import { getCategoriesWithProducts } from '@/actions/server/categories/getCategoriesWithProducts'
 import ErrorAlert from '@/components/error-alert/ErrorAlert'
 import { ProductCard } from '@/components/product-card/ProductCard'
-import ProductPopup from '@/components/product-popup/product-popup'
 import { Badge } from '@/components/ui/badge'
-import { useCatalogStore } from '@/entities/catalog/catalogStore'
 import { useProductsStore } from '@/entities/products/productsStore'
 import { Category, Product } from '@/payload-types'
-import { request, RequestError } from '@/utils/request'
 import { Loader2, MoveRight } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -22,10 +19,9 @@ export default function EcomarketApp() {
   const [productsAndCategories, setProductsWithCategories] = useState<
     TCategoryWithProducts[] | null
   >()
-  const [error, setError] = useState<RequestError | null>(null)
+  const [error, setError] = useState<Error|null>(null)
   const [isLoading, setLoading] = useState<boolean>(false);
-  const {setProductsPopup, isProductsPopupOpened} = useProductsStore();
-  const {isCatalogPopupOpened} = useCatalogStore();
+  const {setProductsPopup} = useProductsStore();
   const params = useSearchParams();
   const productParam = params?.get("product");
 
@@ -41,19 +37,15 @@ export default function EcomarketApp() {
     setLoading(true)
     setError(null);
     try {
-      const rezult = await request<TCategoryWithProducts[]>({
-        method: 'GET',
-        url: '/api/categories-with-products',
-        credentials: true,
-        headers: {
-          'Content-Type': 'Application/json',
-        },
-      })
+      const rezult = await getCategoriesWithProducts();
       setProductsWithCategories(rezult)
     } catch (e) {
-      console.log(e)
-      const error = e as RequestError
-      setError(error)
+      if (e instanceof Error){
+        setError(e)
+      }
+      else{
+        setError({message : "Internal Server Error", name : "Uncaught Error"});
+      }
     }
     setLoading(false)
   }, [setLoading, setError, setProductsWithCategories])

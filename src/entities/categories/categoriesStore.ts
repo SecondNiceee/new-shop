@@ -1,5 +1,5 @@
 "use client"
-import { CategoryWithSubs, getCategoriesWithSubs } from "@/actions/server/getCategorysWithSubs";
+import { CategoryWithSubs, getCategoriesWithSubs } from "@/actions/server/categories/getCategorysWithSubs";
 import { RequestError } from "@/utils/request";
 import { create } from "zustand";
 

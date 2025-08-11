@@ -6,18 +6,20 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
-
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import Categories from './collections/Categories'
-import Products from './collections/Products'
-import { CategoriesWithProductsEndpoint } from './endpoint/categories-with-products'
-import Carts from './collections/Carts'
+import Products from './collections/Products';
+import Carts from './collections/Carts';
+import nodemailer from "nodemailer";
+import { MAIL_NAME, MAIL_PASSWORD, MAIL_USER } from './constants/dynamic-constants'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  serverURL : process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000',
   admin: {
     user: Users.slug,
     importMap: {
@@ -40,5 +42,20 @@ export default buildConfig({
     payloadCloudPlugin(),
     // storage-adapter-placeholder
   ],
-  endpoints : [CategoriesWithProductsEndpoint]
+  endpoints : [],
+  email: nodemailerAdapter({
+    defaultFromAddress: MAIL_NAME,
+    defaultFromName: 'Payload',
+    transport: nodemailer.createTransport({
+      service: 'Mail.ru', // ✅ Работает стабильно,
+      host: 'smtp.mail.ru',
+      port: 587,
+      secure: false, // ❌ не используй true для порта 587
+      requireTLS: true, // ✅ обязателен для Mail.ru
+      auth: {
+        user: MAIL_USER,
+        pass: MAIL_PASSWORD,
+      },
+    }),
+  })
 })

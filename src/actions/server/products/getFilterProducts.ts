@@ -1,7 +1,7 @@
 'use server'
 
 import { getPayload } from 'payload'
-import config from '../../payload.config' // путь к payload.config.ts
+import config from '../../../payload.config' // путь к payload.config.ts
 import { Category, Product } from '@/payload-types'
 
 type CategoryValue = string

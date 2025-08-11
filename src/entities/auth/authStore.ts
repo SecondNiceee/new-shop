@@ -1,27 +1,23 @@
 "use client"
 import { create } from "zustand"
-import { request } from "@/utils/request"
+import { request, RequestError } from "@/utils/request"
 import type { User } from "@/payload-types"
-
 export type TUserResponse = {user : User | null}
-
 type AuthState = {
   user: User | null
   loading: boolean
-  error: string | null
+  error: RequestError | null,
   fetchMe: () => Promise<TUserResponse>
   login: (email: string, password: string) => Promise<void>
   register: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  logout: () => Promise<void>,
 }
-
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: false,
   error: null,
-
   fetchMe: async () => {
-    set({ loading: true, error: null })
+    set({ loading: true, error : null })
     try {
       const me = await request<TUserResponse>({
         method: "GET",
@@ -29,53 +25,44 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         credentials: true,
       })
       set({ user: me.user, loading : false });
-      console.log(me);
       return me;
     } catch (e) {
-      set({ user: null, error : "Не удалось загрузить пользователя" , loading : false });
+      // Не нужно этого делать, потому что мы используем это для проверки зарегестрирован ли пользователь
+      // поэтому просто выкидываем ошибку на клиент, тем самым редирекнув там на другую страничку
+      // А если и интернета нет, то мы получим так и так это уведомление
+      const error = e as RequestError;
+      set({error, loading : false })
       throw e
     }
   },
 
   login: async (email, password) => {
-    set({ loading: true, error: null })
     try {
-      const rezult = await request({url : "/api/users/login", 
+      const rezult = await request<User>({url : "/api/auth/login", 
         method : "POST",
         credentials : true,
         headers : {"Content-Type" : "application/json"},
         body : {email, password}
       })
-      console.log(rezult);
-    //   await useAuthStore.getState().fetchMe()
+      set({user:rezult})
     } catch (err: any) {
-      set({ error: err?.message || "Ошибка авторизации" })
-      throw err
-    } finally {
-      set({ loading: false })
-    }
+        throw err;
+    } 
   },
 
   register: async (email, password) => {
-    set({ loading: true, error: null })
     try {
-      const rezult = await request({url : "/api/users/register", method : "POST", 
+      await request<User>({url : "/api/auth/register", method : "POST", 
         body : {email, password},  credentials : true, headers : {
             "Content-Type" : "application/json"
         }
-      })
-      console.log(rezult);
-    //   await get().login(email, password);
+      });
     } catch (err: any) {
-      set({ error: err?.message || "Ошибка регистрации" })
-      throw err
-    } finally {
-      set({ loading: false })
+        throw err
     }
   },
 
   logout: async () => {
-    set({ loading: true, error: null })
     try {
       await fetch("/api/users/logout", {
         method: "POST",
@@ -84,8 +71,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user: null })
     } catch (e) {
       // ignore
-    } finally {
-      set({ loading: false })
-    }
+    } 
   },
 }))

@@ -1,6 +1,5 @@
 "use client"
 
-import type React from "react"
 import { useEffect } from "react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -15,39 +14,42 @@ import RegisterSection from "./registerSection"
 export default function AuthDialog() {
   const router = useRouter()
   const { open, closeDialog, mode, setMode } = useAuthDialogStore()
-  const { user, loading, error, fetchMe } = useAuthStore();
+  const { user } = useAuthStore()
+
   useEffect(() => {
     if (user && open) {
       closeDialog()
-      router.push(routerConfig.profile);
+      router.push(routerConfig.profile)
     }
   }, [user, open, closeDialog, router])
 
   return (
-    <Dialog  open={open} onOpenChange={(val) => (!val ? closeDialog() : undefined)}>
-      <DialogContent className="p-0 max-w-md w-full bg-white rounded-2xl overflow-hidden">
-        <DialogTitle className="sr-only">Авторизация</DialogTitle>
+    <Dialog open={open} onOpenChange={(val) => (!val ? closeDialog() : undefined)}>
+      <DialogContent className="p-0 w-full bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg md:max-w-xl">
+        <DialogTitle className="sr-only">Аккаунт</DialogTitle>
+
         <div className="relative">
           <Button
             onClick={closeDialog}
             variant="ghost"
             size="sm"
-            className="absolute top-3 right-3 h-8 w-8 p-0 rounded-full hover:bg-gray-100"
+            className="absolute top-4 right-4 h-9 w-9 p-0 rounded-full hover:bg-gray-100"
+            aria-label="Закрыть"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </Button>
 
-          <div className="p-6 border-b bg-gray-50">
-            <h2 className="text-xl font-semibold">Аккаунт</h2>
-            <div className="mt-3 inline-flex rounded-lg border overflow-hidden">
+          <div className="px-8 py-6 md:px-10 md:py-8 border-b bg-gray-50">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Вход в аккаунт</h2>
+            <div className="mt-4 inline-flex items-center rounded-full bg-white border p-1">
               <button
-                className={`px-4 py-2 text-sm ${mode === "login" ? "bg-white font-medium" : "bg-gray-100 text-gray-600"}`}
+                className={`px-5 py-2 rounded-full text-sm md:text-base transition-colors ${mode === "login" ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100"}`}
                 onClick={() => setMode("login")}
               >
                 Вход
               </button>
               <button
-                className={`px-4 py-2 text-sm ${mode === "register" ? "bg-white font-medium" : "bg-gray-100 text-gray-600"}`}
+                className={`px-5 py-2 rounded-full text-sm md:text-base transition-colors ${mode === "register" ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100"}`}
                 onClick={() => setMode("register")}
               >
                 Регистрация
@@ -55,11 +57,11 @@ export default function AuthDialog() {
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="px-8 py-6 md:px-10 md:py-8">
             {mode === "login" ? (
-              <LoginSection loading={loading} error={error} />
+              <LoginSection  />
             ) : (
-              <RegisterSection loading={loading} error={error} />
+              <RegisterSection />
             )}
           </div>
         </div>

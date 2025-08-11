@@ -1,67 +1,124 @@
-import { useAuthStore } from "@/entities/auth/authStore";
-import { useState } from "react";
-import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+"use client"
 
-export default function RegisterSection({ loading, error }: { loading: boolean; error: string | null }) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+import { useAuthStore } from "@/entities/auth/authStore"
+import { useForm, type SubmitHandler } from "react-hook-form"
+import { Alert, AlertTitle, AlertDescription } from "../ui/alert"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { useState } from "react"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { emailRegex } from "@/constants/email-schema";
+import cl from "./auth.module.css";
+import { RequestError } from "@/utils/request"
+
+type RegisterInputs = {
+  email: string
+  password: string
+}
+
+export default function RegisterSection() {
+  const { register: registerUser } = useAuthStore()
+  
+  // Состояния для информаирования пользователя
   const [success, setSuccess] = useState<string | null>(null)
-  const { register } = useAuthStore()
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<RequestError|null>(null);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const form = useForm<RegisterInputs>({
+    mode: "onBlur",
+    defaultValues: { email: "", password: "" },
+  })
+  
+  // Хэндлер для входа
+  const onSubmit: SubmitHandler<RegisterInputs> = async (values) => {
     setSuccess(null)
-    await register(email, password)
-    // If no error set by store — assume success
-    if (!useAuthStore.getState().error) {
-      setSuccess("Регистрация прошла успешно. Проверьте почту и подтвердите аккаунт перед входом.")
+    setLoading(true);
+    try{
+        await registerUser(values.email, values.password)
+        setSuccess("Регистрация прошла успешно. Проверьте почту и подтвердите аккаунт перед входом.")
+        form.reset()
+    }
+    catch(e){
+        const err = e as RequestError;
+        setError(err);
+    }
+    finally{
+        setLoading(false);
     }
   }
-
   return (
-    <form className="space-y-4" onSubmit={onSubmit}>
-      {error && (
-        <Alert variant="destructive">
-          <AlertTitle>Ошибка</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert>
-          <AlertTitle>Готово</AlertTitle>
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Почта</label>
-        <Input
-          type="email"
-          placeholder="you@example.com"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+    <Form {...form}>
+      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        {error && (
+          <Alert variant="destructive">
+            <AlertTitle>Ошибка</AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+          </Alert>
+        )}
+        {success && (
+          <Alert>
+            <AlertTitle>Готово</AlertTitle>
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+
+        <FormField
+          control={form.control}
+          name="email"
+          rules={{
+            required: "Укажите e-mail",
+            pattern: { value: emailRegex, message: "Введите корректный e-mail" },
+          }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm md:text-base font-medium text-gray-900">Почта</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className={cl.input}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className={cl.formError} />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Пароль</label>
-        <Input
-          type="password"
-          placeholder="Минимум 8 символов"
-          autoComplete="new-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+
+        <FormField
+          control={form.control}
+          name="password"
+          rules={{
+            required: "Укажите пароль",
+            minLength: { value: 8, message: "Пароль должен быть не менее 8 символов" },
+          }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm md:text-base font-medium text-gray-900">Пароль</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Минимум 8 символов"
+                  className={cl.input}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className={cl.formError} />
+            </FormItem>
+          )}
         />
-      </div>
-      <Button className="w-full bg-green-500 hover:bg-green-600" type="submit" disabled={loading}>
-        {loading ? "Регистрируем..." : "Зарегистрироваться"}
-      </Button>
-      <p className="text-xs text-gray-500">
-        Подтверждение почты включено. Настройте SMTP, чтобы получать письма с подтверждением.
-      </p>
-    </form>
+
+        <Button
+          className="w-full h-12 text-base rounded-xl text-white bg-green-500 hover:bg-green-600"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Регистрируем..." : "Зарегистрироваться"}
+        </Button>
+      </form>
+    </Form>
   )
 }
