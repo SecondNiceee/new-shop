@@ -10,7 +10,7 @@ export const Users: CollectionConfig = {
   },
   auth: {
     forgotPassword: {
-      expiration: 20,
+      expiration: 1000 * 60 * 20,
       generateEmailHTML: (args) => {
         const typedArgs = args as {
           req?: PayloadRequest | undefined

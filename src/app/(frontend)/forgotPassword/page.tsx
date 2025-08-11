@@ -1,24 +1,20 @@
-import { getPayload } from 'payload';
-import React, { FC } from 'react';
-import config from "@payload-config";
+"use client"
 
-interface IForgotPassword{
-    searchParams : {
-        token : string
-    }
-}
-const ForgotPasswordPage:FC<IForgotPassword> = async ({searchParams}) => {
-    const token = (await searchParams).token;
-    if (!token) {
-        return (
-        <div>
-            ❌ Неверная ссылка: отсутствует токен.
+import { useSearchParams } from "next/navigation"
+import PasswordResetRequest from "@/components/auth/password-reset-request"
+import PasswordResetForm from "@/components/auth/password-reset-form"
+
+export default function ForgotPasswordPage() {
+  const params = useSearchParams()
+  const token = params?.get("token")
+
+  return (
+    <main className="min-h-[90vh] bg-gray-50">
+      <div className="max-w-7xl h-full mx-auto px-4 py-10 md:py-16">
+        <div className="w-full h-[70vh] flex items-center justify-center">
+          {!token ? <PasswordResetRequest /> : <PasswordResetForm token={token} />}
         </div>
-        );
-    }
-    return (
-        <ForgotPasswordPage searchParams={searchParams} />
-    );
-};
-
-export default ForgotPasswordPage;
+      </div>
+    </main>
+  )
+}
