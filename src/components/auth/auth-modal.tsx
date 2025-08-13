@@ -1,6 +1,5 @@
 "use client"
-
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
@@ -8,8 +7,9 @@ import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { useAuthDialogStore } from "@/entities/auth/authDialogStore"
 import { routerConfig } from "@/config/router.config"
-import LoginSection from "./loginSection"
-import RegisterSection from "./registerSection"
+import LoginSection from "./login/loginSection"
+import RegisterSection from "./registration/registerSection"
+
 
 export default function AuthDialog() {
   const router = useRouter()
@@ -39,31 +39,12 @@ export default function AuthDialog() {
             <X className="h-5 w-5" />
           </Button>
 
-          <div className="px-8 py-6 md:px-10 md:py-8 border-b bg-gray-50">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Вход в аккаунт</h2>
-            <div className="mt-4 inline-flex items-center rounded-full bg-white border p-1">
-              <button
-                className={`px-5 py-2 rounded-full text-sm md:text-base transition-colors ${mode === "login" ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100"}`}
-                onClick={() => setMode("login")}
-              >
-                Вход
-              </button>
-              <button
-                className={`px-5 py-2 rounded-full text-sm md:text-base transition-colors ${mode === "register" ? "bg-gray-900 text-white" : "text-gray-700 hover:bg-gray-100"}`}
-                onClick={() => setMode("register")}
-              >
-                Регистрация
-              </button>
-            </div>
-          </div>
-
-          <div className="px-8 py-6 md:px-10 md:py-8">
             {mode === "login" ? (
-              <LoginSection  />
+              <LoginSection mode={mode} setMode={setMode}  />
             ) : (
-              <RegisterSection />
+              <RegisterSection mode={mode} setMode={setMode}/>
             )}
-          </div>
+
         </div>
       </DialogContent>
     </Dialog>

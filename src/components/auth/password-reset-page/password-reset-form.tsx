@@ -11,7 +11,7 @@ import { CheckCircle2, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { request, type RequestError } from "@/utils/request"
 import Link from "next/link"
 import { useRouter } from "next/navigation";
-import cl from "./auth.module.css";
+import cl from "../auth.module.css";
 
 type ResetPasswordInputs = {
   password: string

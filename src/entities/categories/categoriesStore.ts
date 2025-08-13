@@ -7,10 +7,12 @@ interface CategoriesStore{
     categories : CategoryWithSubs[],
     isLoading : boolean,
     getCategories : () => Promise<void>,
-    error : RequestError | null
+    error : RequestError | null,
+    currentCategory : CategoryWithSubs | null
 }
 
 export const useCategoriesStore = create<CategoriesStore>((set) => ({
+    currentCategory : null,
     categories : [],
     error : null,
     isLoading : false,

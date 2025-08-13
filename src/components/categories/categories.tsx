@@ -87,7 +87,7 @@ export function Categories() {
   }
 
   return (
-    <div className="bg-white z-30 relative py-4">
+    <div className="bg-white  py-4">
       <div className="max-w-7xl mx-auto px-4 relative">
         {/* Кнопка прокрутки влево */}
         {canScrollLeft && (

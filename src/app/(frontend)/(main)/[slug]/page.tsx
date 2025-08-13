@@ -6,9 +6,10 @@ import { ProductCard } from '@/components/product-card/ProductCard'
 import ProductPopup from '@/components/product-popup/product-popup'
 import SubCategories from '@/components/sub-categories/SubCategories'
 import { useCatalogStore } from '@/entities/catalog/catalogStore'
+import { useCategoriesStore } from '@/entities/categories/categoriesStore'
 import { useProductsStore } from '@/entities/products/productsStore'
-import { Loader2 } from 'lucide-react'
-import { useParams, useSearchParams } from 'next/navigation'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 const FilterPage = () => {
@@ -21,13 +22,25 @@ const FilterPage = () => {
   const [sortedProducts, setSortedProducts] = useState<ProductsWithSubCategory[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setLoading] = useState<boolean>(false)
-  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null)
+  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
 
   const {setProductsPopup} = useProductsStore();
 
   const badgesRef = useRef<(HTMLDivElement | null)[]>([])
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([])
-  const badgesContainerRef = useRef<HTMLDivElement | null>(null)
+  const badgesContainerRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
+  const {categories} = useCategoriesStore();
+
+  const currentCategoryIndex = categories.findIndex((category) => category.value === slug);
+
+  const toNextCategory = () => {
+    if (currentCategoryIndex === categories.length - 1){
+      return null
+    }
+    router.replace(`/${categories[currentCategoryIndex + 1].value}`)
+  }
 
   // Получение с сервера всех подкатегорий
   const getSortedCategories = useCallback(async () => {
@@ -175,6 +188,20 @@ useEffect(() => {
             </div>
           ))}
         </div>
+          {
+            currentCategoryIndex !== categories.length - 1 &&
+            (
+          <div className="flex items-center justify-center mt-8">
+            <button
+              onClick={toNextCategory}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+             <p className='text-white font-semibold'>К разделу "{categories[currentCategoryIndex + 1].title}"</p> 
+            <ArrowRight color='white' size={20} />
+            </button>
+          </div>
+            )
+          }
       </div>
     </section>
     </>

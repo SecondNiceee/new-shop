@@ -1,8 +1,8 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import PasswordResetRequest from "@/components/auth/password-reset-request"
-import PasswordResetForm from "@/components/auth/password-reset-form"
+import PasswordResetRequest from "@/components/auth/password-reset-page/password-reset-request"
+import PasswordResetForm from "@/components/auth/password-reset-page/password-reset-form"
 
 export default function ForgotPasswordPage() {
   const params = useSearchParams()
