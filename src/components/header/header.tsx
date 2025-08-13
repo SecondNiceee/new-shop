@@ -1,7 +1,7 @@
-import HeaderMobile from "./header-mobile"
-import HeaderDesktop from "./header-desktop"
+import HeaderMobile from "./ui/header-mobile/header-mobile"
 import CartDrawer from "../cart-drawer/cart-drawer"
 import AuthDialog from "../auth/auth-modal"
+import HeaderDesktop from "./ui/header-desktop/header-desktop"
 
 export function Header() {
   return (
