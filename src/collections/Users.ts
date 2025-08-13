@@ -1,9 +1,10 @@
-import { createEmail } from '@/utils/createEmail'
-import type { CollectionConfig, PayloadRequest } from 'payload'
+import { createEmail } from "@/utils/createEmail"
+import type { CollectionConfig, PayloadRequest } from "payload"
+
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: "users",
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: "email",
   },
   access: {
     create: () => true,
@@ -17,21 +18,25 @@ export const Users: CollectionConfig = {
           token?: string
           user?: any
         }
-        const {token, user} = typedArgs
+        const { token, user } = typedArgs
         const url = `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/forgotPassword?token=${token}`
-        return createEmail({ mode: 'forgetPassword', url, userEmail: user.email }).html;
+        return createEmail({ mode: "forgetPassword", url, userEmail: user.email }).html
       },
     },
-    tokenExpiration: 604800,
+    tokenExpiration: 604800, // 7 дней в секундах
     verify: {
       generateEmailHTML: ({ token, user }) => {
         const url = `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/verify?token=${token}`
-        return createEmail({ mode: 'verify', url: url, userEmail: user?.email }).html
+        return createEmail({ mode: "verify", url: url, userEmail: user?.email }).html
       },
     },
     maxLoginAttempts: 5,
     lockTime: 6000,
-    cookies: { sameSite: 'Lax', secure: true },
+    cookies: {
+      sameSite: "Lax",
+      secure: false, // Отключаем для разработки
+      domain: undefined, // Убираем domain для localhost
+    },
   },
   hooks: {},
   fields: [

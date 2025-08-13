@@ -1,9 +1,8 @@
 "use client"
 import React from 'react'
-import { MapPin, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { routerConfig } from '@/config/router.config'
 import Link from 'next/link'
-import { useAddressStore } from '@/entities/address/addressStore'
 import Cart from '@/components/cart/cart'
 import CatalogButton from '@/components/catalog-button/CatalogButton'
 import ProductSearch from '@/components/product-search/ProductSearch'
@@ -13,7 +12,6 @@ import UserLink from '../user-link/user-link'
 import AddressButton from '../address-button/address-button'
 
 const HeaderDesktop = () => {
-  const { openDialog: openAddressDialog } = useAddressStore();
   return (
     <div className="hidden md:flex items-center justify-between gap-6">
       <Link href={routerConfig.home} className="flex items-center flex-shrink-0">
@@ -42,7 +40,7 @@ const HeaderDesktop = () => {
 
       {/* Address info - hidden on tablet, shown on desktop */}
 
-      <AddressButton className='hidden lg-flex' />
+      <AddressButton className='hidden lg:flex' />
       {/* Mini cart summary (dynamic) */}
       <Cart />
       <UserLink />

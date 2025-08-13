@@ -11,7 +11,7 @@ import AddressButton from "../address-button/address-button"
 
 const HeaderMobile = () => {
   const { open, totalCount } = useCartStore()
-  const { isOpened, setOpened, toggle } = useMobileStore()
+  const { isOpened, setOpened } = useMobileStore()
   return (
     <div className="md:hidden">
       <div className="flex items-center justify-between mb-3">

@@ -24,6 +24,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         url: "/api/users/me",
         credentials: true,
       })
+      console.log(me);
       set({ user: me.user, loading : false });
       return me;
     } catch (e) {
@@ -31,6 +32,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // поэтому просто выкидываем ошибку на клиент, тем самым редирекнув там на другую страничку
       // А если и интернета нет, то мы получим так и так это уведомление
       const error = e as RequestError;
+      console.log(e);
       set({error, loading : false })
       throw e
     }
@@ -44,6 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         headers : {"Content-Type" : "application/json"},
         body : {email, password}
       })
+      console.log(rezult);
       set({user:rezult})
     } catch (err: any) {
         throw err;

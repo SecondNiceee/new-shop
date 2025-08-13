@@ -17,9 +17,12 @@ export async function POST(req: NextRequest) {
       if (password.length < 8) {
         return NextResponse.json({ message : 'Пароль должен быть не менее 8 символов' }, { status: 400 })
       }
+
+    // Создаём пустой NextResponse, который будем передавать в payload
       const payload = await getPayload({ config });
       const user = await payload.login({collection : "users", 
-        data : {email,password}
+        data : {email,password},
+        req : req
       });
       if (!user.user){
         return NextResponse.json({message:"Пользователь с такими данными не найден."}, {status : 500})

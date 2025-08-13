@@ -1,3 +1,4 @@
+'use client'
 import React, { FC } from 'react';
 import { Button } from '../../../ui/button';
 import { User } from 'lucide-react';
@@ -15,7 +16,7 @@ const UserLink:FC<IUserLink> = ({className = ""}) => {
     const router = useRouter();
     const clickHandler = () => {
         if (user){
-            router.replace(`/${routerConfig.profile}`)
+            router.push(`${routerConfig.profile}`)
         }
         else{
             openDialog("login");

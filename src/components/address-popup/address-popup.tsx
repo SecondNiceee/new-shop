@@ -9,8 +9,10 @@ import { X, Search, Loader2 } from "lucide-react"
 import { useAddressStore } from "@/entities/address/addressStore"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import dynamic from "next/dynamic"
+import { AddressFormData, addressSchema } from "./schemas/addressSchema"
+import { formatAddress } from "./utils/formateAddress";
+
 
 // Динамический импорт карты для избежания SSR проблем
 const LeafletMap = dynamic(() => import("./leaflet-map"), {
@@ -25,48 +27,9 @@ const LeafletMap = dynamic(() => import("./leaflet-map"), {
   ),
 })
 
-// Схема валидации
-const addressSchema = z.object({
-  street: z.string().min(1, "Это поле обязательное").min(5, "Адрес должен содержать минимум 5 символов"),
-  apartment: z.string().optional(),
-  entrance: z.string().optional(),
-  floor: z.string().optional(),
-  comment: z.string().optional(),
-})
-
-type AddressFormData = z.infer<typeof addressSchema>
-
-// Типы для адреса
-export interface Address {
-  street: string
-  apartment?: string
-  entrance?: string
-  floor?: string
-  comment?: string
-  coordinates?: {
-    lat: number
-    lng: number
-  }
-}
-
-// Функция для форматирования адреса
-const formatAddress = (displayName: string): string => {
-  // Разбиваем адрес на части
-  const parts = displayName.split(", ")
-
-  // Убираем лишние части (федеральный округ, почтовый индекс, страну)
-  const filteredParts = parts.filter((part) => {
-    const lowerPart = part.toLowerCase()
-    return !lowerPart.includes("федеральный округ") && !lowerPart.includes("россия") && !/^\d{6}$/.test(part.trim()) // убираем почтовые индексы
-  })
-
-  // Берем только первые 4-5 частей для краткости
-  const shortParts = filteredParts.slice(0, Math.min(5, filteredParts.length))
-
-  return shortParts.join(", ")
-}
 
 const AddressPopup = () => {
+
   const { isOpen, closeDialog, setAddress, currentAddress } = useAddressStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [isSearching, setIsSearching] = useState(false)
@@ -76,7 +39,6 @@ const AddressPopup = () => {
     register,
     handleSubmit,
     setValue,
-    watch,
     reset,
     trigger,
     formState: { errors, isValid },
@@ -91,8 +53,6 @@ const AddressPopup = () => {
       comment: "",
     },
   })
-
-  const watchedStreet = watch("street")
 
   // Загружаем текущий адрес при открытии
   useEffect(() => {
@@ -109,7 +69,6 @@ const AddressPopup = () => {
 
   const searchAddress = async () => {
     if (!searchQuery.trim()) return
-
     setIsSearching(true)
     try {
       // Используем Nominatim API для геокодирования (бесплатный)
@@ -129,10 +88,8 @@ const AddressPopup = () => {
 
         // Форматируем адрес
         const formattedAddress = formatAddress(result.display_name)
-
         setValue("street", formattedAddress)
         setCoordinates(coords)
-
         // Обновляем карту через событие (только на клиенте)
         if (typeof window !== "undefined") {
           window.dispatchEvent(
@@ -175,19 +132,16 @@ const AddressPopup = () => {
   }
 
   const onSubmit = async (data: AddressFormData) => {
-    // Принудительно запускаем валидацию всех полей
     const isFormValid = await trigger()
-
-    if (!isFormValid) {
-      return // Останавливаем отправку, ошибки уже показаны
-    }
+    if (!isFormValid) return
 
     if (!coordinates) {
       alert("Пожалуйста, выберите адрес на карте")
       return
     }
 
-    const addressData: Address = {
+    const addressData:Address = {
+      id: currentAddress?.id,
       street: data.street,
       apartment: data.apartment,
       entrance: data.entrance,
@@ -196,8 +150,12 @@ const AddressPopup = () => {
       coordinates,
     }
 
-    setAddress(addressData)
-    closeDialog()
+    try {
+      await setAddress(addressData)
+      closeDialog()
+    } catch (error) {
+      console.error("Ошибка сохранения адреса:", error)
+    }
   }
 
   const handleClose = () => {

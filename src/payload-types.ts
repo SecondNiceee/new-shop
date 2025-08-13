@@ -72,6 +72,7 @@ export interface Config {
     categories: Category;
     products: Product;
     carts: Cart;
+    addresses: Address;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -83,6 +84,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
+    addresses: AddressesSelect<false> | AddressesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -253,6 +255,31 @@ export interface Cart {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses".
+ */
+export interface Address {
+  id: number;
+  /**
+   * Address owner (auto-assigned)
+   */
+  user?: (number | null) | User;
+  /**
+   * Полный адрес улицы
+   */
+  street: string;
+  apartment?: string | null;
+  entrance?: string | null;
+  floor?: string | null;
+  comment?: string | null;
+  coordinates?: {
+    lat?: number | null;
+    lng?: number | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -277,6 +304,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'carts';
         value: number | Cart;
+      } | null)
+    | ({
+        relationTo: 'addresses';
+        value: number | Address;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -419,6 +450,26 @@ export interface CartsSelect<T extends boolean = true> {
         product?: T;
         quantity?: T;
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "addresses_select".
+ */
+export interface AddressesSelect<T extends boolean = true> {
+  user?: T;
+  street?: T;
+  apartment?: T;
+  entrance?: T;
+  floor?: T;
+  comment?: T;
+  coordinates?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
       };
   updatedAt?: T;
   createdAt?: T;
