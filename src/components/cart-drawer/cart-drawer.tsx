@@ -1,131 +1,122 @@
-'use client'
+"use client"
 
-import React, { useEffect } from 'react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
-import { Minus, Plus, Trash2 } from 'lucide-react'
-import { useCartStore } from '@/entities/cart/cartStore'
-import { Media } from '@/payload-types'
+import { useEffect } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
+import { useCartStore } from "@/entities/cart/cartStore"
+import type { Media } from "@/payload-types"
+import { useRouter } from "next/navigation"
+import { routerConfig } from "@/config/router.config"
 
 export default function CartDrawer() {
-  const {
-    isOpen,
-    toggle,
-    items,
-    totalCount,
-    totalPrice,
-    remove,
-    clear,
-    loadServer,
-  } = useCartStore()
+  const router = useRouter()
+  const { isOpen, toggle, items, totalCount, totalPrice, remove, clear, loadServer, increment, dicrement } =
+    useCartStore()
 
   useEffect(() => {
-    // Надо это делать только если есть юзер
     loadServer().catch(() => {})
   }, [loadServer])
 
-  return (
-    <Sheet open={isOpen} onOpenChange={toggle}>
-      <SheetContent side="right" className="w-full sm:max-w-md bg-white">
-        <SheetHeader>
-          <SheetTitle>Корзина</SheetTitle>
-        </SheetHeader>
+  const handleCheckout = () => {
+    toggle() // Close cart
+    router.push(routerConfig.checkout)
+  }
 
-        <div className="mt-4 flex flex-col h-[calc(100vh-8rem)]">
+  return (
+    <Dialog open={isOpen} onOpenChange={toggle}>
+      <DialogContent className="max-w-md mx-auto bg-gradient-to-br from-white to-gray-50 border-0 shadow-2xl p-6">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="flex items-center gap-3 text-xl font-bold">
+            <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full">
+              <ShoppingBag className="h-5 w-5 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Корзина</span>
+            {totalCount > 0 && (
+              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{totalCount}</span>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col h-[70vh]">
           {/* Items */}
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
             {items.length === 0 ? (
-              <div className="text-sm text-gray-500">Ваша корзина пуста</div>
+              <div className="flex flex-col items-center justify-center h-full text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingBag className="h-8 w-8 text-gray-400" />
+                </div>
+                <p className="text-gray-500 text-lg font-medium">Ваша корзина пуста</p>
+                <p className="text-gray-400 text-sm mt-1">Добавьте товары для оформления заказа</p>
+              </div>
             ) : (
               items.map((it) => {
                 const media = it.product.image as Media
                 const price = it.product.price || 0
-                const sum = price * it.quantity
 
                 return (
                   <div
                     key={it.product.id}
-                    className="grid grid-cols-[64px,1fr,auto] gap-3 border rounded-lg p-3 bg-gray-50 items-start"
+                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
                   >
-                    {/* Image */}
-                    <div className="relative w-16 h-16 overflow-hidden rounded-md bg-white">
-                      <Image
-                        width={64}
-                        height={64}
-                        src={
-                          media?.url ||
-                          '/placeholder.svg?height=64&width=64&query=product-thumbnail' ||
-                          '/placeholder.svg'
-                        }
-                        alt={media?.alt || it.product.title}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <div className="min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div className="flex flex-col gap-1">
-                          <div
-                            className="text-sm font-medium break-words whitespace-normal"
-                            title={it.product.title}
-                          >
-                            {it.product.title}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {it.product.weight?.value} {it.product.weight?.unit}
-                          </div>
-                        </div>
+                    <div className="flex gap-3">
+                      {/* Image */}
+                      <div className="relative w-16 h-16 overflow-hidden rounded-lg bg-gray-50 flex-shrink-0">
+                        <Image
+                          width={64}
+                          height={64}
+                          src={media?.url || "/placeholder.svg?height=64&width=64&query=product-thumbnail"}
+                          alt={media?.alt || it.product.title}
+                          className="object-cover w-full h-full"
+                        />
                       </div>
 
-                      {/* Price + Qty controls */}
-                      <div className="mt-auto flex items-center justify-between gap-2">
-                        <div className="text-sm font-semibold">{price} ₽</div>
-                        <div className="flex items-center gap-5">
-                          <div
-                            className="flex items-center gap-2"
-                            role="group"
-                            aria-label="Изменить количество в корзине"
-                          >
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm text-gray-900 mb-1 line-clamp-2">{it.product.title}</h3>
+                        <p className="text-xs text-gray-500 mb-2">
+                          {it.product.weight?.value} {it.product.weight?.unit}
+                        </p>
+
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-green-600">{price} ₽</span>
+
+                          <div className="flex items-center gap-2">
+                            {/* Quantity controls */}
+                            <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 hover:bg-gray-200"
+                                onClick={() => dicrement(it.product.id as number)}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="w-8 text-center text-sm font-medium">{it.quantity}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 hover:bg-gray-200"
+                                onClick={() => increment(it.product)}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+
+                            {/* Delete button */}
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 rounded-full shadow-lg"
-                              onClick={() => {}}
-                              aria-label="Уменьшить количество"
+                              className="h-7 w-7 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
+                              onClick={() => remove(it.product.id)}
                             >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="w-6 text-center text-sm">{it.quantity}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 rounded-full shadow-xl"
-                              onClick={() => {}}
-                              aria-label="Увеличить количество"
-                            >
-                              <Plus className="h-4 w-4" />
+                              <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-red-500 rounded-full shadow-xl"
-                            onClick={() => remove(it.product.id)}
-                            aria-label="Удалить из корзины"
-                            title="Удалить"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       </div>
                     </div>
-
-                    {/* Actions (right) */}
-                    {/* <div className="flex flex-col justify-between items-end gap-2">
-                      <div className="text-sm font-semibold whitespace-nowrap">{sum} ₽</div>
-                    </div> */}
                   </div>
                 )
               })
@@ -133,20 +124,47 @@ export default function CartDrawer() {
           </div>
 
           {/* Footer */}
-          <div className="border-t pt-3 mt-3 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Товары ({totalCount})</span>
-              <span className="text-base font-semibold">{totalPrice} ₽</span>
+          {items.length > 0 && (
+            <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
+              {/* Total */}
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Товары ({totalCount})</span>
+                  <span className="font-semibold">{totalPrice} ₽</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <span>Доставка</span>
+                  <span>199 ₽</span>
+                </div>
+                <div className="border-t border-gray-200 mt-2 pt-2">
+                  <div className="flex items-center justify-between text-lg font-bold">
+                    <span>Итого</span>
+                    <span className="text-green-600">{totalPrice + 199} ₽</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={clear}
+                  className="flex-1 border-gray-200 hover:bg-gray-50 bg-transparent"
+                >
+                  Очистить
+                </Button>
+                <Button
+                  onClick={handleCheckout}
+                  className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-semibold shadow-lg"
+                >
+                  Оформить заказ
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => clear()}>
-                Очистить
-              </Button>
-              <Button className="bg-green-500 hover:bg-green-600 text-white">Оформить заказ</Button>
-            </div>
-          </div>
+          )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }
