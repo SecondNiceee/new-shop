@@ -14,7 +14,8 @@ export async function POST(req:NextRequest) {
     try{
         const payload = await getPayload({config});
         const rez = await payload.find({collection : "users", 
-            where : {email : {equals : email}}
+            where : {email : {equals : email}},
+            req
         })
         const user = rez.docs[0];
         if (!user){

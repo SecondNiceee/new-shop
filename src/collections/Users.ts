@@ -1,6 +1,5 @@
 import { createEmail } from "@/utils/createEmail"
-import type { CollectionConfig, PayloadRequest } from "payload"
-
+import { CollectionConfig, type PayloadRequest } from "payload";
 export const Users: CollectionConfig = {
   slug: "users",
   admin: {
@@ -23,7 +22,7 @@ export const Users: CollectionConfig = {
         return createEmail({ mode: "forgetPassword", url, userEmail: user.email }).html
       },
     },
-    tokenExpiration: 604800, // 7 дней в секундах
+    tokenExpiration: Number(process.env.AUTH_TOKEN_EXPIRATION) || 60*60*24*7, // 7 дней в секундах
     verify: {
       generateEmailHTML: ({ token, user }) => {
         const url = `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/verify?token=${token}`
@@ -38,7 +37,9 @@ export const Users: CollectionConfig = {
       domain: undefined, // Убираем domain для localhost
     },
   },
-  hooks: {},
+  hooks: {
+
+  },
   fields: [
     // Email added by default
     // Add more fields as needed

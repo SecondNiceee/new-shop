@@ -40,16 +40,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   login: async (email, password) => {
     try {
-      const rezult = await request<User>({url : "/api/auth/login", 
+      const rezult = await request<{user : User}>({url : "/api/users/login", 
         method : "POST",
         credentials : true,
         headers : {"Content-Type" : "application/json"},
         body : {email, password}
       })
-      console.log(rezult);
-      set({user:rezult})
+      set({user : rezult.user})
     } catch (err: any) {
-        throw err;
+        const requestError:RequestError = {message : "Не удалось зайти", status : 404}
+        throw requestError;
     } 
   },
 

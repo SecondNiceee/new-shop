@@ -10,7 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Mail, ArrowLeft } from "lucide-react"
 import { emailRegex } from "@/constants/email-schema"
 import { request, type RequestError } from "@/utils/request"
-import Link from "next/link"
+import Link from "next/link";
+import cl from "../auth.module.css";
 
 type ResetRequestInputs = {
   email: string
@@ -99,7 +100,7 @@ export default function PasswordResetRequest() {
                       inputMode="email"
                       autoComplete="email"
                       placeholder="you@example.com"
-                      className="h-12 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-500"
+                      className={cl.input}
                       {...field}
                     />
                   </FormControl>

@@ -12,6 +12,9 @@ import { request, type RequestError } from "@/utils/request"
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 import cl from "../auth.module.css";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { resetPasswordSchema } from "../validation/schemas"
+import { routerConfig } from "@/config/router.config"
 
 type ResetPasswordInputs = {
   password: string
@@ -21,6 +24,7 @@ type ResetPasswordInputs = {
 interface PasswordResetFormProps {
   token: string
 }
+
 
 export default function PasswordResetForm({ token }: PasswordResetFormProps) {
   const router = useRouter()
@@ -33,6 +37,7 @@ export default function PasswordResetForm({ token }: PasswordResetFormProps) {
   const form = useForm<ResetPasswordInputs>({
     mode: "onBlur",
     defaultValues: { password: "", confirmPassword: "" },
+    resolver : zodResolver(resetPasswordSchema)
   })
 
   const onSubmit: SubmitHandler<ResetPasswordInputs> = async (values) => {
@@ -54,7 +59,7 @@ export default function PasswordResetForm({ token }: PasswordResetFormProps) {
       setSuccess(true)
       // Перенаправляем на главную через 3 секунды
       setTimeout(() => {
-        router.push("/")
+        router.replace(routerConfig.home)
       }, 3000)
     } catch (e) {
       setError(e as RequestError)
@@ -104,10 +109,6 @@ export default function PasswordResetForm({ token }: PasswordResetFormProps) {
             <FormField
               control={form.control}
               name="password"
-              rules={{
-                required: "Укажите пароль",
-                minLength: { value: 8, message: "Пароль должен быть не менее 8 символов" },
-              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-gray-900">Новый пароль</FormLabel>
@@ -137,10 +138,6 @@ export default function PasswordResetForm({ token }: PasswordResetFormProps) {
             <FormField
               control={form.control}
               name="confirmPassword"
-              rules={{
-                required: "Подтвердите пароль",
-                validate: (value) => value === form.getValues("password") || "Пароли не совпадают",
-              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-gray-900">Подтвердите пароль</FormLabel>
@@ -176,7 +173,7 @@ export default function PasswordResetForm({ token }: PasswordResetFormProps) {
             </Button>
 
             <div className="text-center">
-              <Link href="/" className="inline-flex flex items-center items-center gap-2 text-gray-600 hover:text-gray-800 text-sm">
+              <Link href="/" className="gap-2 text-center mx-auto justify-center text-gray-600 flex items-center hover:text-gray-800 text-sm">
                 <ArrowLeft className="w-4 h-4" />
                 Вернуться на главную
               </Link>

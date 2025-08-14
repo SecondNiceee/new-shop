@@ -12,7 +12,6 @@ type RegisterBody = {
 }
 
 export async function POST(req: NextRequest) {
-  let payload
 
   try {
     // 1. Получаем тело запроса
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Подключаем Payload
-    payload = await getPayload({ config })
+    const payload = await getPayload({ config })
 
     // 4. Проверяем, существует ли пользователь
     const existingUsers = await payload.find({
@@ -45,7 +44,8 @@ export async function POST(req: NextRequest) {
         email: { equals: email },
       },
       limit: 1,
-      showHiddenFields : true
+      showHiddenFields : true,
+      req
     })
 
     const candidate = existingUsers.docs[0]
@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
         email,
         password, // Payload сам хэширует
       },
+      req
     })
 
     // 6. Возвращаем успешный ответ

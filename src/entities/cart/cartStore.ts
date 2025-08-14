@@ -6,6 +6,7 @@ import { Cart, Product} from '@/payload-types'
 import { request } from '@/utils/request'
 import { calcTotal } from './helpers/calcTotal'
 import { toPayloadItems } from './helpers/toPayloadItems'
+import { useAuthStore } from '../auth/authStore'
 
 // Local types for cart (avoid relying on generated types)
 export type CartItem = {
@@ -68,6 +69,12 @@ export const useCartStore = create<CartState>()(
             items.push(newProduct);
         }
         set({items, totalCount : previousTotalCount + 1, totalPrice : previousTotalSumm + product.price});
+        try{
+          await get().upsertServer()
+        }
+        catch{
+
+        }
       },
       
       dicrement: async (prodcutId) => {
@@ -82,6 +89,12 @@ export const useCartStore = create<CartState>()(
         }
         const {totalCount, totalPrice} = calcTotal(items);
         set({items, totalCount, totalPrice});
+        try{
+          await get().upsertServer()
+        }
+        catch{
+          
+        }
       },
 
       remove: async (productId) => {
@@ -91,6 +104,7 @@ export const useCartStore = create<CartState>()(
         try {
           await get().upsertServer()
         } catch {}
+        
       },
 
       clear: async () => {
@@ -118,6 +132,7 @@ export const useCartStore = create<CartState>()(
             credentials: true,
           })
           const userId = me?.user?.id
+          console.log(me);
           if (!userId) {
             set({isCartLoaded : true})
             return;
@@ -132,6 +147,7 @@ export const useCartStore = create<CartState>()(
             },
             credentials: true,
           })
+          console.log(res);
           if (res.totalDocs > 0) {
             const doc = res.docs[0]
             const items: CartItem[] =
@@ -172,13 +188,13 @@ export const useCartStore = create<CartState>()(
               credentials: true,
             })
           } else {
-            const created = await request<Cart>({
+            const created = await request<{doc : Cart}>({
               method: 'POST',
               url: '/api/carts',
               body: { user: userId, items: payloadItems },
               credentials: true,
             })
-            set({ serverCartId: created.id })
+            set({ serverCartId: created.doc.id })
           }
         } catch {
           // Guest or no session
@@ -190,20 +206,15 @@ export const useCartStore = create<CartState>()(
       // Merge local items into server cart (on login)
       mergeLocalIntoServer: async () => {
         try {
-          const me = await request<{ user: { id: number } }>({
-            method: 'GET',
-            url: '/api/users/me',
-            credentials: true,
-          })
-          const userId = me?.user?.id
-          if (!userId) return
+          const user = useAuthStore().user;
+          if (!user) return
           set({ syncing: true })
           // Get existing server cart
           const res = await request<CartListResponse>({
             method: 'GET',
             url: '/api/carts',
             query: {
-              'where[user][equals]': String(userId),
+              'where[user][equals]': String(user.id),
               depth: '2',
               limit: '1',
             },
@@ -249,17 +260,17 @@ export const useCartStore = create<CartState>()(
             set({ items: mergedItems, serverCartId: doc.id, totalCount, totalPrice })
           } else {
             // No server cart yet -> create with local items
-            const created = await request<Cart>({
+            const created = await request<{doc : Cart}>({
               method: 'POST',
               url: '/api/carts',
               body: {
-                user: userId,
+                user: user.id,
                 items: toPayloadItems(localItems),
               },
               credentials: true,
             })
             const { totalCount, totalPrice } = calcTotal(localItems)
-            set({ serverCartId: created.id, totalCount, totalPrice })
+            set({ serverCartId: created.doc.id, totalCount, totalPrice })
           }
         } catch {
           // Ignore if not logged in

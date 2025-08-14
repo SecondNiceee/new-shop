@@ -20,10 +20,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       </head>
       <body className="min-h-screen bg-background">
         <PopupProvider>
-          <Script
-            src={`https://api-maps.yandex.ru/2.1/?apikey=${process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY}&lang=ru_RU`}
-            strategy="beforeInteractive"
-          />
         <AppInit />
         <Header />
         <main className="mx-auto">{children}</main>

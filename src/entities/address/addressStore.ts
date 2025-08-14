@@ -31,6 +31,10 @@ interface AddressStore {
   loadAddress: () => Promise<void>
 }
 
+type TChangeResponse = {
+    doc : Address
+}
+
 export const useAddressStore = create<AddressStore>()(
   persist(
     (set, get) => ({
@@ -50,14 +54,13 @@ export const useAddressStore = create<AddressStore>()(
           // Проверяем, авторизован ли пользователь
           const authStore = useAuthStore.getState()
           const user = authStore.user
-
           if (user) {
             // Пользователь авторизован - сохраняем в БД
             const currentAddress = get().currentAddress
 
             if (currentAddress?.id) {
               // Обновляем существующий адрес
-              const updatedAddress = await request<Address>({
+              const updatedAddress = await request<TChangeResponse>({
                 url: `/api/addresses/${currentAddress.id}`,
                 method: "PATCH",
                 body: {
@@ -70,11 +73,12 @@ export const useAddressStore = create<AddressStore>()(
                 },
                 credentials: true,
               })
+              console.log(updatedAddress)
 
-              set({ currentAddress: updatedAddress })
+              set({ currentAddress: updatedAddress.doc })
             } else {
               // Создаем новый адрес
-              const newAddress = await request<Address>({
+              const newAddress = await request<TChangeResponse>({
                 url: "/api/addresses",
                 method: "POST",
                 body: {
@@ -87,8 +91,7 @@ export const useAddressStore = create<AddressStore>()(
                 },
                 credentials: true,
               })
-
-              set({ currentAddress: newAddress })
+              set({ currentAddress: newAddress.doc })
             }
           } else {
             // Пользователь не авторизован - сохраняем в localStorage
@@ -141,7 +144,6 @@ export const useAddressStore = create<AddressStore>()(
               },
               credentials: true,
             })
-
             const address = response.docs[0] || null
             set({ currentAddress: address })
           }
