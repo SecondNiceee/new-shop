@@ -1,20 +1,65 @@
 "use client"
-import { ChevronRight, MapPin, UserIcon, Clock } from "lucide-react"
+import { ChevronRight, MapPin, UserIcon, Clock, Phone, Save } from "lucide-react"
+import type React from "react"
+
 import useAuth from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { routerConfig } from "@/config/router.config"
 import { useAddressStore } from "@/entities/address/addressStore"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import AddressPopup from "@/components/address-popup/address-popup"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/entities/auth/authStore"
+import { toast } from "sonner"
+import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
 
 export default function ProfilePage() {
   const { loading, logout, user } = useAuth()
+  const { updateProfile } = useAuthStore()
   const router = useRouter()
   const { currentAddress, openDialog, loadAddress, getFullAddress } = useAddressStore()
+
+  const [phone, setPhone] = useState("")
+  const [originalPhone, setOriginalPhone] = useState("")
+  const [isUpdatingPhone, setIsUpdatingPhone] = useState(false)
 
   useEffect(() => {
     loadAddress()
   }, [loadAddress])
+
+  useEffect(() => {
+    if (user?.phone) {
+      setPhone(formatPhoneNumber(user.phone))
+      setOriginalPhone(user.phone)
+    }
+  }, [user])
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value)
+    setPhone(formatted)
+  }
+
+  const handleSavePhone = async () => {
+    const validation = validatePhone(phone)
+    if (!validation.isValid) {
+      toast.error(validation.error || "Неверный номер телефона")
+      return
+    }
+
+    setIsUpdatingPhone(true)
+    try {
+      await updateProfile({ phone : normalizePhone(phone) })
+      setOriginalPhone(phone)
+      toast.success("Номер телефона обновлен")
+    } catch (error) {
+      toast.error("Не удалось обновить номер телефона")
+    } finally {
+      setIsUpdatingPhone(false)
+    }
+  }
+
+  const isPhoneChanged = normalizePhone(phone) !== originalPhone
 
   if (loading || user === null) {
     return (
@@ -92,6 +137,49 @@ export default function ProfilePage() {
                     Email
                   </h3>
                   <p className="text-gray-700 text-base font-medium">{user?.email || "Не указан"}</p>
+                </div>
+              </div>
+
+              <div className="mb-10">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                    Телефон
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <Input
+                          type="tel"
+                          placeholder="+7 (___) ___-__-__"
+                          value={phone}
+                          onChange={handlePhoneChange}
+                          className="bg-white/70 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 text-base"
+                          maxLength={18}
+                        />
+                      </div>
+                      {isPhoneChanged && (
+                        <Button
+                          onClick={handleSavePhone}
+                          disabled={isUpdatingPhone}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-6"
+                        >
+                          {isUpdatingPhone ? (
+                            <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              Сохранить
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-sm text-blue-600 flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      Будьте внимательны, телефон нужен чтобы мы могли связаться с вами при доставке
+                    </p>
+                  </div>
                 </div>
               </div>
 

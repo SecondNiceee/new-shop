@@ -11,69 +11,56 @@ import { useAddressStore } from "@/entities/address/addressStore"
 import AddressPopup from "@/components/address-popup/address-popup"
 import Image from "next/image"
 import type { Media } from "@/payload-types"
-import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Sparkles } from "lucide-react"
+import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save } from "lucide-react"
 import { useRouter } from "next/navigation"
+import useAuth from "@/hooks/useAuth"
+import { useAuthStore } from "@/entities/auth/authStore"
+import { toast } from "sonner"
+import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, totalPrice, totalCount } = useCartStore()
   const { currentAddress, getFullAddress, loadAddress, openDialog } = useAddressStore()
+  const { user } = useAuth()
+  const { updateProfile } = useAuthStore()
   const [phone, setPhone] = useState("")
+  const [originalPhone, setOriginalPhone] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     loadAddress()
   }, [loadAddress])
 
-  const formatPhoneNumber = (value: string) => {
-    // Удаляем все нецифровые символы
-    const phoneNumber = value.replace(/\D/g, "")
-
-    // Ограничиваем до 11 цифр (с учетом 7 или 8 в начале)
-    const match = phoneNumber.match(/^(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})$/)
-
-    if (!match) return value
-
-    const [, country, area, first, second, third] = match
-
-    let formatted = ""
-
-    if (country) {
-      if (country === "8") {
-        formatted = "+7"
-      } else if (country === "7") {
-        formatted = "+7"
-      } else {
-        formatted = `+7${country}`
-      }
-    } else {
-      formatted = "+7"
+  useEffect(() => {
+    if (user?.phone) {
+      setPhone(formatPhoneNumber(user.phone))
+      setOriginalPhone(user.phone)
     }
-
-    if (area) {
-      formatted += ` (${area}`
-      if (area.length === 3) formatted += ")"
-    }
-
-    if (first) {
-      if (!formatted.includes("(")) formatted += " ("
-      if (!formatted.includes(")")) formatted += ")"
-      formatted += ` ${first}`
-    }
-
-    if (second) {
-      formatted += `-${second}`
-    }
-
-    if (third) {
-      formatted += `-${third}`
-    }
-
-    return formatted
-  }
+  }, [user])
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value)
     setPhone(formatted)
+  }
+
+  const handleSavePhone = async () => {
+    const validation = validatePhone(phone)
+    if (!validation.isValid) {
+      toast.error(validation.error || "Неверный номер телефона")
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      await updateProfile({ phone : normalizePhone(phone) })
+      setOriginalPhone(phone)
+      toast.success("Телефон успешно сохранен")
+    } catch (error) {
+      toast.error("Ошибка при сохранении телефона")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handlePayment = () => {
@@ -84,6 +71,13 @@ export default function CheckoutPage() {
   const handleEditAddress = () => {
     openDialog()
   }
+
+  const isPhoneValid = () => {
+    const validation = validatePhone(phone)
+    return validation.isValid
+  }
+
+  const hasPhoneChanged = normalizePhone(phone) !== originalPhone && phone.trim() !== ""
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 p-4">
@@ -99,21 +93,19 @@ export default function CheckoutPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
+            <div className="p-2 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse"></div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
               Оформление заказа
             </h1>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 lg:grid-rows-[auto_1fr] lg:items-start">
           {/* Left Column - Order Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 grid gap-6 lg:grid-rows-subgrid lg:row-span-2">
             {/* Cart Items */}
-            <Card className="shadow-xl border-0 gap-3 bg-white/90 backdrop-blur-md overflow-hidden">
-              <CardHeader className="">
+            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden flex flex-col">
+              <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse"></div>
                   Ваш заказ
@@ -122,7 +114,7 @@ export default function CheckoutPage() {
                   </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 pt-3">
+              <CardContent className="space-y-4 pt-3 flex-1">
                 {items.map((item) => {
                   const media = item.product.image as Media
                   const price = item.product.price || 0
@@ -163,17 +155,17 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Address */}
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden">
-              <CardHeader className="flex items-center gap-3 text-xl">
+            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden flex flex-col">
+              <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <MapPin className="h-6 w-6 text-blue-500" />
                   Адрес доставки
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-3">
+              <CardContent className="pt-3 flex-1">
                 <div
                   onClick={handleEditAddress}
-                  className="group bg-gradient-to-r from-blue-50/80 to-purple-50/50 p-5 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-200 border border-blue-100/50 hover:border-blue-200"
+                  className="group bg-gradient-to-r from-blue-50/80 to-purple-50/50 p-5 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-200 border border-blue-100/50 hover:border-blue-200 h-full flex flex-col justify-between min-h-[120px]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -203,41 +195,64 @@ export default function CheckoutPage() {
           </div>
 
           {/* Right Column - Payment */}
-          <div className="space-y-6">
+          <div className="grid gap-6 lg:grid-rows-subgrid lg:row-span-2">
             {/* Phone Input */}
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden">
-              <CardHeader className="flex items-center gap-3 text-xl">
+            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden flex flex-col">
+              <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <Phone className="h-6 w-6 text-emerald-500" />
                   Контакты
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-3">
-                <div className="space-y-3">
-                  <label className="text-sm text-gray-600 font-medium">
-                    Введите телефон по которому мы можем с вами связаться
-                  </label>
-                  <Input
-                    type="tel"
-                    placeholder="+7 (___) ___-__-__"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    className="bg-white/70 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 text-lg py-3 rounded-xl"
-                    maxLength={18}
-                  />
+              <CardContent className="pt-3 flex-1">
+                <div className="space-y-3 h-full flex flex-col justify-between min-h-[120px]">
+                  <div className="space-y-3">
+                    <label className="text-sm text-gray-600 font-medium">
+                      По телефону мы сможем связаться с вами при доставке
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="tel"
+                        placeholder="+7 (___) ___-__-__"
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        className="bg-white/70 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 text-lg py-3 rounded-xl flex-1"
+                        maxLength={18}
+                      />
+                      {hasPhoneChanged && (
+                        <Button
+                          onClick={handleSavePhone}
+                          disabled={isSaving || !isPhoneValid()}
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-3 rounded-xl transition-all duration-200 disabled:opacity-50"
+                        >
+                          {isSaving ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  {!isPhoneValid() && (
+                    <p className="text-sm text-red-600 flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      Укажите номер телефона для оформления заказа
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Order Summary */}
-            <Card className="shadow-2xl border-0 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600 text-white overflow-hidden">
+            <Card className="shadow-2xl border-0 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600 text-white overflow-hidden flex flex-col">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <CreditCard className="h-6 w-6" />
                   Итого к оплате
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 pt-3">
+              <CardContent className="space-y-6 pt-3 flex-1 flex flex-col justify-between">
                 <div className="space-y-3">
                   <div className="flex justify-between text-white/90 text-lg">
                     <span>Товары ({totalCount})</span>
@@ -257,10 +272,10 @@ export default function CheckoutPage() {
 
                 <Button
                   onClick={handlePayment}
-                  disabled={!phone.trim() || items.length === 0}
-                  className="w-full bg-white text-emerald-600 hover:bg-gray-50 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200  hover:scale-[1.02]"
+                  disabled={!isPhoneValid() || items.length === 0}
+                  className="w-full bg-white text-emerald-600 hover:bg-gray-50 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 hover:scale-[1.02] mt-4"
                 >
-                    Оплатить {totalPrice + 199} ₽
+                  Оплатить {totalPrice + 199} ₽
                 </Button>
               </CardContent>
             </Card>
