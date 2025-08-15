@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import L from "leaflet"
+import L, { LatLngTuple } from "leaflet"
 import "leaflet/dist/leaflet.css"
 
 // Исправление иконок (обязательно для Webpack/Vite)
@@ -71,10 +71,12 @@ const LeafletMap = ({ onMapClick, initialCoords, className }: LeafletMapProps) =
 
     // Создаём карту только один раз
     const map = L.map(mapRef.current, {
-      center: initialCoords ? [initialCoords.lat, initialCoords.lng] : stavropol,
+      center: (initialCoords
+        ? [initialCoords.lat, initialCoords.lng]
+        : stavropol) as [number, number],
       zoom: initialCoords ? 15 : 10,
       zoomControl: false,
-    })
+    });
 
     // Добавляем контрол зума (в правый верхний угол)
     L.control.zoom({ position: "topright" }).addTo(map)
@@ -191,10 +193,13 @@ const LeafletMap = ({ onMapClick, initialCoords, className }: LeafletMapProps) =
     }
 
     // Создаём маркер
-    const marker = L.marker(initialCoords ? [initialCoords.lat, initialCoords.lng] : stavropol, {
-      icon: createCustomIcon(),
-      draggable: true,
-    }).addTo(map)
+    const marker = L.marker(
+      (initialCoords ? [initialCoords.lat, initialCoords.lng] : stavropol) as [number, number],
+      {
+        icon: createCustomIcon(),
+        draggable: true,
+      }
+    ).addTo(map);
 
     // Обработчик клика по карте
     const onClick = (e: L.LeafletMouseEvent) => {

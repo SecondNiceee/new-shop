@@ -13,6 +13,7 @@ import dynamic from "next/dynamic"
 import { AddressFormData, addressSchema } from "./schemas/addressSchema"
 import { formatAddress } from "./utils/formateAddress";
 import { Address } from "@/payload-types"
+import { toast } from "sonner"
 
 
 // Динамический импорт карты для избежания SSR проблем
@@ -27,7 +28,6 @@ const LeafletMap = dynamic(() => import("./leaflet-map"), {
     </div>
   ),
 })
-
 
 const AddressPopup = () => {
 
@@ -101,6 +101,7 @@ const AddressPopup = () => {
         }
       }
     } catch (error) {
+
       console.error("Ошибка поиска адреса:", error)
     } finally {
       setIsSearching(false)
@@ -141,7 +142,7 @@ const AddressPopup = () => {
       return
     }
 
-    const addressData:Address = {
+    const addressData = {
       id: currentAddress?.id,
       street: data.street,
       apartment: data.apartment,
@@ -155,6 +156,7 @@ const AddressPopup = () => {
       await setAddress(addressData)
       closeDialog()
     } catch (error) {
+      toast.error("Не удалось сохранить адресс, попробуйте еще раз.")
       console.error("Ошибка сохранения адреса:", error)
     }
   }

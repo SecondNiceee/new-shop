@@ -6,15 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { routerConfig } from "@/config/router.config";
 import { Button } from "@/components/ui/button";
 
-type PageProps = {
-  searchParams: {
-    token?: string
-  }
-}
 
-const VerifyEmailPage = async ({ searchParams }: PageProps) => {
+const VerifyEmailPage = async ({ searchParams } : {searchParams : Promise<any> | undefined} ) => {
   const payload = await getPayload({ config })
-  const token = searchParams?.token;
+  const token = (await searchParams)?.token;
 
   // Нет токена
   if (!token) {
