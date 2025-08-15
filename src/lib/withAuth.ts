@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { routerConfig } from '@/config/router.config';
 
 // Тип для Server Component (асинхронная функция, возвращающая JSX)
-type ServerComponent = () => Promise<JSX.Element>;
+type ServerComponent = () => Promise<React.ReactNode>;
 
 /**
  * Обёртка для страниц, требующих авторизации
