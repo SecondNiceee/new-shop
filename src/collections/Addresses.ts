@@ -33,7 +33,7 @@ const Addresses: CollectionConfig = {
           throw new Error("Not authorized")
         }
         if (!data.user) {
-          data.user = req.user
+          data.user = req.user.id
         } else {
           const userId = typeof data.user === "number" ? data.user : data.user?.id
           if (userId !== req.user.id) {
@@ -50,9 +50,6 @@ const Addresses: CollectionConfig = {
         }
         if (operation === "update") {
           const originalUserId = typeof originalDoc.user === "number" ? originalDoc.user : originalDoc.user?.id
-          if (originalUserId !== req.user.id) {
-            throw new Error("You can update only your address")
-          }
           const newUserId = typeof data.user === "number" ? data.user : data.user?.id
           if (newUserId && newUserId !== originalUserId) {
             throw new Error("Cannot change address owner")

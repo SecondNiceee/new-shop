@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button'
 import { SheetTrigger, SheetContent, SheetTitle, Sheet } from '@/components/ui/sheet'
 import UserLink from '../user-link/user-link'
 import AddressButton from '../address-button/address-button'
+import HeaderLogo from '../header-logo/header-logo'
 
 const HeaderDesktop = () => {
   return (
     <div className="hidden md:flex items-center justify-between gap-6">
-      <Link href={routerConfig.home} className="flex items-center flex-shrink-0">
-        <h1 className="text-xl lg:text-2xl font-bold ml-2 lg:ml-3">ГрандБАЗАР</h1>
-      </Link>
+      
+      <HeaderLogo />
 
       <div className="flex-1 max-w-sm lg:max-w-md">
         <ProductSearch />

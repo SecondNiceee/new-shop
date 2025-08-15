@@ -51,6 +51,7 @@ export const request = async <T,>({
       },
       body: method === 'GET' ? undefined : JSON.stringify(body),
       credentials: credentials ? 'include' : 'omit',
+      cache : "force-cache"
     });
 
     // Если ответ не успешный — парсим ошибку

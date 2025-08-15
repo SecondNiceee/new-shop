@@ -1,24 +1,46 @@
-import { routerConfig } from '@/config/router.config';
-import { useAuthDialogStore } from '@/entities/auth/authDialogStore';
-import { TUserResponse, useAuthStore } from '@/entities/auth/authStore';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+"use client"
+
+import { routerConfig } from "@/config/router.config"
+import { useAuthDialogStore } from "@/entities/auth/authDialogStore"
+import { type TUserResponse, useAuthStore } from "@/entities/auth/authStore"
+import { useCartStore } from "@/entities/cart/cartStore"
+import { useAddressStore } from "@/entities/address/addressStore"
+import { useOrdersStore } from "@/entities/orders/ordersStore"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 const useAuth = () => {
-  const router = useRouter();
-  const { user, loading, logout, fetchMe } = useAuthStore();
-  const openDialog = useAuthDialogStore((s) => s.openDialog);
-  // Этого достаточно, юзер загружается сразу в init-app, если он не заггрузился там, он ниоткуда не появится.
+  const router = useRouter()
+  const { user, loading, logout: authLogout, fetchMe } = useAuthStore()
+  const openDialog = useAuthDialogStore((s) => s.openDialog)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const logout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await authLogout()
+      useCartStore.getState().clear()
+      useAddressStore.getState().clearAddress()
+      useOrdersStore.getState().clearOrders()
+      router.push(routerConfig.home)
+    } catch (error) {
+      console.error("Ошибка при выходе:", error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
   useEffect(() => {
     if (user === null) {
-        fetchMe().then((user : TUserResponse) => {
-            if (!user.user){
-                router.replace(routerConfig.home);
-            }
-        })
+      fetchMe().then((user: TUserResponse) => {
+        if (!user.user) {
+          router.replace(routerConfig.home)
+        }
+      })
     }
   }, [user, fetchMe, openDialog, router])
-  return {user, loading, logout}
-};
 
-export default useAuth;
+  return { user, loading, logout, isLoggingOut }
+}
+
+export default useAuth

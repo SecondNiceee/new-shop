@@ -73,6 +73,7 @@ export interface Config {
     products: Product;
     carts: Cart;
     addresses: Address;
+    orders: Order;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -85,6 +86,7 @@ export interface Config {
     products: ProductsSelect<false> | ProductsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -131,6 +133,7 @@ export interface User {
    * Phone number for delivery contact
    */
   phone?: string | null;
+  role?: ('admin' | 'user' | 'manager') | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -284,6 +287,59 @@ export interface Address {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  /**
+   * Unique order identifier (auto-generated)
+   */
+  orderNumber: string;
+  /**
+   * Order owner (auto-assigned)
+   */
+  user: number | User;
+  status: 'pending' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
+  /**
+   * Order items
+   */
+  items: {
+    product: number | Product;
+    quantity: number;
+    /**
+     * Price at the time of order
+     */
+    price: number;
+    id?: string | null;
+  }[];
+  deliveryAddress: {
+    address: string;
+    apartment?: string | null;
+    entrance?: string | null;
+    floor?: string | null;
+    comment?: string | null;
+  };
+  /**
+   * Customer phone number
+   */
+  customerPhone: string;
+  /**
+   * Total order amount including delivery
+   */
+  totalAmount: number;
+  /**
+   * Delivery fee
+   */
+  deliveryFee: number;
+  /**
+   * Additional notes or comments
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -312,6 +368,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'addresses';
         value: number | Address;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -361,6 +421,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   phone?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -476,6 +537,38 @@ export interface AddressesSelect<T extends boolean = true> {
         lat?: T;
         lng?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  user?: T;
+  status?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        quantity?: T;
+        price?: T;
+        id?: T;
+      };
+  deliveryAddress?:
+    | T
+    | {
+        address?: T;
+        apartment?: T;
+        entrance?: T;
+        floor?: T;
+        comment?: T;
+      };
+  customerPhone?: T;
+  totalAmount?: T;
+  deliveryFee?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -25,7 +25,7 @@ interface AddressStore {
   isHydrated: boolean
   openDialog: () => void
   closeDialog: () => void
-  setAddress: (address: Address) => Promise<void>
+  setAddress: (address: any) => Promise<void>
   clearAddress: () => Promise<void>
   getFullAddress: () => string
   loadAddress: () => Promise<void>
@@ -47,7 +47,7 @@ export const useAddressStore = create<AddressStore>()(
       openDialog: () => set({ isOpen: true }),
       closeDialog: () => set({ isOpen: false }),
 
-      setAddress: async (address: Address) => {
+      setAddress: async (address: any) => {
         set({ syncing: true })
 
         try {

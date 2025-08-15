@@ -79,7 +79,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       })
       set({ user: null })
     } catch (e) {
-      // ignore
+      console.log(e);
+      throw e
     }
   },
 

@@ -8,6 +8,7 @@ import { useCartStore } from "@/entities/cart/cartStore"
 import { useMobileStore } from "@/entities/mobileMenu/mobileMenuStore"
 import UserLink from "../user-link/user-link"
 import AddressButton from "../address-button/address-button"
+import HeaderLogo from "../header-logo/header-logo"
 
 const HeaderMobile = () => {
   const { open, totalCount } = useCartStore()
@@ -15,9 +16,9 @@ const HeaderMobile = () => {
   return (
     <div className="md:hidden">
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold">ГрандБАЗАР</h1>
-        </div>
+
+
+        <HeaderLogo />
 
         <div className="flex items-center gap-2">
           <UserLink />

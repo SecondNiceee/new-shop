@@ -15,6 +15,7 @@ import Carts from './collections/Carts';
 import nodemailer from "nodemailer";
 import { MAIL_NAME, MAIL_PASSWORD, MAIL_USER } from './constants/dynamic-constants'
 import Addresses from './collections/Addresses'
+import Orders from './collections/Orders'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -27,7 +28,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Carts, Addresses],
+  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -46,7 +47,7 @@ export default buildConfig({
   endpoints : [],
   email: nodemailerAdapter({
     defaultFromAddress: MAIL_NAME,
-    defaultFromName: 'Payload',
+    defaultFromName: 'ГРАНДБАЗАР',
     transport: nodemailer.createTransport({
       service: 'Mail.ru', // ✅ Работает стабильно,
       host: 'smtp.mail.ru',

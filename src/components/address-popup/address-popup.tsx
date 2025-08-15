@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import dynamic from "next/dynamic"
 import { AddressFormData, addressSchema } from "./schemas/addressSchema"
 import { formatAddress } from "./utils/formateAddress";
+import { Address } from "@/payload-types"
 
 
 // Динамический импорт карты для избежания SSR проблем

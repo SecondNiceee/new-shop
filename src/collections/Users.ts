@@ -7,6 +7,9 @@ export const Users: CollectionConfig = {
   },
   access: {
     create: () => true,
+    admin : ({req : {user}}) => {
+      return Boolean(user?.role === "admin")
+    }
   },
   auth: {
     forgotPassword: {
@@ -38,6 +41,7 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {},
+  
   fields: [
     // Email added by default
     {
@@ -68,6 +72,24 @@ export const Users: CollectionConfig = {
 
         return true;
       }
+    },
+    {
+      name: 'role',
+      type: 'select',
+      options: [
+        { label: 'Admin', value: 'admin' },
+        { label: 'User', value: 'user' },
+        { label: 'Manager', value: 'manager' },
+      ],
+      defaultValue: 'user',
+      access: {
+        read: () => true,
+        create: () => false,
+        update: () => true, // только админ может менять роли
+      },
+      admin: {
+        position: 'sidebar',
+      },
     },
     // Add more fields as needed
   ],

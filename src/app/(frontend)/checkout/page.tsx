@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCartStore } from "@/entities/cart/cartStore"
 import { useAddressStore } from "@/entities/address/addressStore"
+import { useOrdersStore } from "@/entities/orders/ordersStore"
 import AddressPopup from "@/components/address-popup/address-popup"
 import Image from "next/image"
 import type { Media } from "@/payload-types"
@@ -17,16 +18,20 @@ import useAuth from "@/hooks/useAuth"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { toast } from "sonner"
 import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
+import { DELIVERY_FEE } from "@/constants/dynamic-constants"
+import { routerConfig } from "@/config/router.config"
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, totalPrice, totalCount } = useCartStore()
+  const { items, totalPrice, totalCount, clear } = useCartStore()
   const { currentAddress, getFullAddress, loadAddress, openDialog } = useAddressStore()
+  const { addOrder } = useOrdersStore()
   const { user } = useAuth()
   const { updateProfile } = useAuthStore()
   const [phone, setPhone] = useState("")
   const [originalPhone, setOriginalPhone] = useState("")
   const [isSaving, setIsSaving] = useState(false)
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false)
 
   useEffect(() => {
     loadAddress()
@@ -50,10 +55,9 @@ export default function CheckoutPage() {
       toast.error(validation.error || "Неверный номер телефона")
       return
     }
-
     setIsSaving(true)
     try {
-      await updateProfile({ phone : normalizePhone(phone) })
+      await updateProfile({ phone: normalizePhone(phone) })
       setOriginalPhone(phone)
       toast.success("Телефон успешно сохранен")
     } catch (error) {
@@ -63,9 +67,49 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePayment = () => {
-    // Здесь будет логика оплаты
-    console.log("Processing payment...")
+  const handlePayment = async () => {
+    if (!isPhoneValid() || !currentAddress || items.length === 0) {
+      toast.error("Заполните все обязательные поля")
+      return
+    }
+
+    setIsProcessingOrder(true)
+
+    try {
+      // Создаем заказ
+      const orderData = {
+        items: items.map((item) => ({
+          product: item.product.id,
+          quantity: item.quantity,
+          price: item.product.price || 0,
+        })),
+        deliveryAddress: {
+          address: currentAddress.street,
+          apartment: currentAddress.apartment || "",
+          entrance: currentAddress.entrance || "",
+          floor: currentAddress.floor || "",
+          comment: currentAddress.comment || "",
+        },
+        customerPhone: normalizePhone(phone),
+        totalAmount: totalPrice + DELIVERY_FEE,
+        deliveryFee: DELIVERY_FEE, // По умолчанию наличными
+        status: "pending",
+      }
+      await addOrder(orderData);
+      await clear()
+
+      toast.success("Заказ успешно оформлен!")
+
+      router.push(routerConfig.orders);
+      
+    }
+      catch(e){
+        console.error("Ошибка при создании заказа:", e)
+        toast.error("Ошибка при оформлении заказа. Попробуйте еще раз.")
+      }
+      finally{
+        setIsProcessingOrder(false);
+      }
   }
 
   const handleEditAddress = () => {
@@ -78,6 +122,8 @@ export default function CheckoutPage() {
   }
 
   const hasPhoneChanged = normalizePhone(phone) !== originalPhone && phone.trim() !== ""
+
+  const isOrderValid = isPhoneValid() && currentAddress && items.length > 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 p-4">
@@ -272,10 +318,17 @@ export default function CheckoutPage() {
 
                 <Button
                   onClick={handlePayment}
-                  disabled={!isPhoneValid() || items.length === 0}
+                  disabled={!isOrderValid || isProcessingOrder}
                   className="w-full bg-white text-emerald-600 hover:bg-gray-50 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 hover:scale-[1.02] mt-4"
                 >
-                  Оплатить {totalPrice + 199} ₽
+                  {isProcessingOrder ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                      Оформляем заказ...
+                    </div>
+                  ) : (
+                    `Оформить заказ ${totalPrice + 199} ₽`
+                  )}
                 </Button>
               </CardContent>
             </Card>
