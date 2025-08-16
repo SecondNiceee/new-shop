@@ -22,6 +22,7 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   serverURL : process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  cors : [process.env.PAYLOAD_PUBLIC_URL || 'http://localhost:3000'],
   admin: {
     user: Users.slug,
     importMap: {

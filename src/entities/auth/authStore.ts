@@ -50,6 +50,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       })
       set({ user: rezult.user })
     } catch (err: any) {
+      console.log(err);
       const requestError: RequestError = { message: "Не удалось зайти", status: 404 }
       throw requestError
     }
