@@ -9,9 +9,6 @@ export interface RequestError {
 // Импорт type guard
 import { isRequestError } from './isRequestError';
 
-// === Конфиг ===
-const PAYLOAD_URL = process.env.PAYLOAD_PUBLIC_URL || 'http://localhost:3000';
-
 // === Интерфейс запроса ===
 interface IRequest {
   url: string;
@@ -32,10 +29,9 @@ export const request = async <T,>({
   headers = {},
 }: IRequest): Promise<T> => {
   // Собираем URL
-  const baseUrl = url.startsWith('http') ? url : `${PAYLOAD_URL}${url}`;
   const finalUrl = query
-    ? `${baseUrl}?${new URLSearchParams(query)}`
-    : baseUrl;
+    ? `${url}?${new URLSearchParams(query)}`
+    : url;
 
   // GET-запросы не должны иметь тела
   if (method === 'GET' && body) {
