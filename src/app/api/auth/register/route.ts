@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   } catch (error: unknown) {
     // Логируем ошибку на сервере
     console.error('Ошибка при регистрации:', error)
-
+    console.log("Ошибка" + error)
     // Если ошибка от Payload (например, валидация)
     if (error instanceof Error && 'data' in error) {
       return NextResponse.json({ message: 'Ошибка валидации данных' }, { status: 400 })

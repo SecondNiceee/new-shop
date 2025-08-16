@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // А если и интернета нет, то мы получим так и так это уведомление
       const error = e as RequestError
       console.log(e)
-      set({ error, loading: false })
+      set({ error, loading: false, user:null })
       throw e
     }
   },
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       })
       set({ user: rezult.user })
     } catch (err: any) {
-      console.log(err);
+      console.log(err, JSON.stringify(err));
       const requestError: RequestError = { message: "Не удалось зайти", status: 404 }
       throw requestError
     }
@@ -68,6 +68,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         },
       })
     } catch (err: any) {
+      console.log(err, JSON.stringify(err));
       throw err
     }
   },

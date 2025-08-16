@@ -36,8 +36,8 @@ export const Users: CollectionConfig = {
     lockTime: 6000,
     cookies: {
       sameSite: "Lax",
-      secure: false, // Отключаем для разработки
-      domain: undefined, // Убираем domain для localhost
+      secure: false,
+      domain : process.env.DOMAIN // Отключаем для разработки
     },
   },
   hooks: {},
