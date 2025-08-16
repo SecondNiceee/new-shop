@@ -37,7 +37,7 @@ export const Users: CollectionConfig = {
     cookies: {
       sameSite: "Lax",
       secure: false,
-      domain : process.env.DOMAIN // Отключаем для разработки
+      domain : process.env.DOMAIN
     },
   },
   hooks: {},
