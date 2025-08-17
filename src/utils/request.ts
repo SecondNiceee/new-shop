@@ -9,6 +9,9 @@ export interface RequestError {
 // Импорт type guard
 import { isRequestError } from './isRequestError';
 
+// === Конфиг ===
+
+
 // === Интерфейс запроса ===
 interface IRequest {
   url: string;
