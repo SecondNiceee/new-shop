@@ -16,6 +16,7 @@ import nodemailer from "nodemailer";
 import { MAIL_NAME, MAIL_PASSWORD, MAIL_USER } from './constants/dynamic-constants'
 import Addresses from './collections/Addresses'
 import Orders from './collections/Orders'
+import Reviews from './collections/Reviews'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,7 +31,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders],
+  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

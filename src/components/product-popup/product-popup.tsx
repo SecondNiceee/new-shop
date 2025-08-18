@@ -1,19 +1,20 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { X, ChevronRight, Loader2, Minus, Plus } from 'lucide-react'
-import Image from 'next/image'
-import { Category, Media, Product } from '@/payload-types'
+import { X, Loader2, Star, MessageCircle, Send, User } from 'lucide-react'
+import { Review } from '@/payload-types'
 import { useProductsStore } from '@/entities/products/productsStore'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ErrorAlert from '../error-alert/ErrorAlert'
-import { ProductCard } from '../product-card/ProductCard'
-import Link from 'next/link'
-import { useCartStore } from '@/entities/cart/cartStore'
-import cl from "./product-popup.module.css";
 import { DialogTitle } from '@radix-ui/react-dialog'
+import NutrientInformation from './ui/NutrientInformation'
+import RelatedProducts from './ui/RelatedProducts'
+import BreadCrumb from './ui/BreadCrumb'
+import ProductImage from './ui/ProductImage'
+import ProductInfo from './ui/ProductInfo'
+import { request } from '@/utils/request'
 
 const ProductPopup = () => {
   const searchParams = useSearchParams()
@@ -22,13 +23,12 @@ const ProductPopup = () => {
 
   const { currentProduct, error, getProduct, isProductsPopupOpened, loading, setProductsPopup } =
     useProductsStore()
-  const { increment, dicrement, items } = useCartStore()
-
-  const qty = items.find((it) => it.product.id === currentProduct?.id)?.quantity ?? 0
-
-  const handleAddToCart = () => {
-    ;() => {}
-  }
+  // State for reviews
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '', name: '' })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [reviewsLoading, setReviewsLoading] = useState(false)
 
   // Эффект закрытия
   useEffect(() => {
@@ -44,9 +44,77 @@ const ProductPopup = () => {
     router.replace(`${window.location.pathname}?${newParams.toString()}`, { scroll: false })
   }
 
+  // Загрузка товара и отзывов
   useEffect(() => {
-    if (isProductsPopupOpened && id) getProduct(String(id))
+    if (isProductsPopupOpened && id) {
+      getProduct(String(id))
+      loadReviews(String(id))
+    }
   }, [getProduct, id, isProductsPopupOpened])
+
+  // Функция загрузки отзывов
+  const loadReviews = async (productId: string) => {
+    setReviewsLoading(true)
+    try {
+      const response = await request<{docs : Review[]}>({
+        url: `/reviews`,
+        method: 'GET',
+        query: {
+          "where[product][equals]" : productId,
+          sort: '-createdAt'
+        }
+      })
+      
+      if (response?.docs) {
+        setReviews(response.docs)
+      } else {
+        setReviews([])
+      }
+    } catch (error) {
+      console.error('Error loading reviews:', error)
+      setReviews([])
+    } finally {
+      setReviewsLoading(false)
+    }
+  }
+
+  // Функция отправки отзыва
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    
+    try {
+      const response = await request<{doc : Review}>({
+        url: '/reviews',
+        method: 'POST',
+        body: {
+          product: currentProduct?.id,
+          rating: newReview.rating,
+          comment: newReview.comment,
+          name: newReview.name || 'Аноним',
+        }
+      })
+
+      if (response?.doc) {
+        setReviews([response.doc, ...reviews])
+        setNewReview({ rating: 5, comment: '', name: '' })
+        setShowReviewForm(false)
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error)
+      // Можно добавить уведомление об ошибке
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleRatingClick = (rating: number) => {
+    setNewReview({ ...newReview, rating })
+  }
+
+  const averageRating = reviews.length > 0 
+    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length 
+    : 0
 
   if (error) {
     return (
@@ -79,229 +147,194 @@ const ProductPopup = () => {
             </Button>
             <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: '90vh' }}>
               {/* Breadcrumb */}
-              <div className="px-6 pt-6 pb-2">
-                <div className="flex items-end text-sm text-orange-500 space-x-1">
-                  <Link className={cl.breadcrumbLink} href={'/'}>Главная</Link>
-                  <ChevronRight className="h-4 w-4" />
-                  {currentProduct.category && (
-                    <>
-                      <Link className={cl.breadcrumbLink} href={`/${(currentProduct.category as Category[])[0].value}`}>
-                        {(currentProduct.category as Category[])[0].title}
-                      </Link>
-                      <ChevronRight className="h-4 w-4" />
-                    </>
-                  )}
-                  {currentProduct.subCategory && (
-                    <>
-                      <Link
-                    className={cl.breadcrumbLink}
-                        href={`/${(currentProduct.category as Category[])[0].value}?sub=${(currentProduct.subCategory as Category).value}`}
-                      >
-                        {(currentProduct.subCategory as Category).title}
-                      </Link>
-                      <ChevronRight className="h-4 w-4" />
-                    </>
-                  )}
-                  <span className={`${cl.breadcrumbLink} text-gray-600`}>{currentProduct.title}</span>
-                </div>
-              </div>
+              <BreadCrumb product={currentProduct} />
 
               {/* Main Product Section */}
               <div className="px-6 py-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Product Image */}
-                  <div className="aspect-square shadow-lg relative overflow-hidden rounded-2xl bg-gray-50">
-                    <Image
-                      src={(currentProduct.image as Media)?.url || '/placeholder.svg'}
-                      alt={(currentProduct.image as Media)?.alt || currentProduct.title}
-                      width={500}
-                      loading="lazy"
-                      height={500}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+                  <ProductImage product={currentProduct} />
 
                   {/* Product Info */}
-                  <div className="space-y-6">
-                    <div>
-                      <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        {currentProduct.title.toUpperCase()}
-                      </h1>
-                      <p className="text-gray-500 text-lg">
-                        {currentProduct.weight.value} {currentProduct.weight.unit}
-                      </p>
-                    </div>
+                  <ProductInfo product={currentProduct} />
+                </div>
+              </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-3xl font-bold text-gray-900">
-                          {currentProduct.price} ₽
-                        </span>
-                        <span className="text-gray-500 ml-2">
-                          за {currentProduct.weight.value} {currentProduct.weight.unit}
-                        </span>
+              {/* Reviews Section */}
+              <div className="px-6 py-8 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <h2 className="text-2xl font-semibold text-gray-900">Отзывы покупателей</h2>
+                    <div className="flex items-center space-x-1">
+                      <div className="text-2xl font-bold text-orange-500">{averageRating.toFixed(1)}</div>
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${
+                              i < Math.floor(averageRating) 
+                                ? 'text-orange-400 fill-current' 
+                                : i < averageRating 
+                                  ? 'text-orange-400 fill-current opacity-50' 
+                                  : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
                       </div>
-
-                      {qty > 0 ? (
-                        <div className="flex items-center gap-3 justify-between bg-white rounded-lg p-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="shadow-xl w-7 h-7 md::w-12 md:h-12  p-4 hover:bg-gray-200"
-                            onClick={(e) => {
-                              dicrement(currentProduct.id)
-                              e.stopPropagation()
-                            }}
-                          >
-                            <Minus className="!w-[25px] !h-[25px]" />
-                          </Button>
-                          <span className="text-lg font-medium px-2">{qty} шт</span>
-                          <Button
-                            variant="ghost"
-                            className="shadow-xl w-7 h-7 md::w-12 md:h-12 p-4 hover:bg-gray-200"
-                            onClick={(e) => {
-                              increment(currentProduct)
-                              e.stopPropagation()
-                            }}
-                          >
-                            <Plus className='!w-[25px] !h-[25px]' />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          onClick={() => increment(currentProduct)}
-                          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg rounded-xl"
-                        >
-                          Добавить в корзину
-                        </Button>
-                      )}
-                    </div>
-
-                    {/* Product Description */}
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-semibold text-gray-900">Описание товара</h3>
-                      <p className="text-gray-700 leading-relaxed">{currentProduct.description}</p>
-                    </div>
-
-                    {/* Storage Conditions */}
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-semibold text-gray-900">Условия хранения</h3>
-                      <p className="text-gray-700">{currentProduct.storageConditions}</p>
-                    </div>
-
-                    {/* Ingredients */}
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-semibold text-gray-900">Состав</h3>
-                      <p className="text-gray-700">{currentProduct.ingredients}</p>
+                      <span className="text-gray-500 text-sm">({reviews.length} отзывов)</span>
                     </div>
                   </div>
+                  
+                  <Button
+                    onClick={() => setShowReviewForm(!showReviewForm)}
+                    className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Написать отзыв</span>
+                  </Button>
+                </div>
+
+                {/* Review Form */}
+                {showReviewForm && (
+                  <div className="bg-gray-50 rounded-xl p-6 mb-6 animate-in slide-in-from-bottom-2 duration-300">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Оставить отзыв</h3>
+                    <form onSubmit={handleReviewSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Ваша оценка
+                        </label>
+                        <div className="flex space-x-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => handleRatingClick(star)}
+                              className={`w-8 h-8 rounded-full transition-all ${
+                                star <= newReview.rating 
+                                  ? 'bg-orange-400 text-white' 
+                                  : 'bg-gray-200 text-gray-400 hover:bg-gray-300'
+                              }`}
+                            >
+                              <Star className="w-5 h-5" />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Ваше имя
+                        </label>
+                        <input
+                          type="text"
+                          value={newReview.name}
+                          onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          placeholder="Введите ваше имя"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Ваш отзыв
+                        </label>
+                        <textarea
+                          value={newReview.comment}
+                          onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                          rows={4}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                          placeholder="Поделитесь своим опытом использования товара..."
+                        />
+                      </div>
+
+                      <div className="flex justify-end space-x-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setShowReviewForm(false)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          Отмена
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting || !newReview.comment.trim()}
+                          className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Отправка...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              <span>Отправить отзыв</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Reviews List */}
+                <div className="space-y-6">
+                  {reviewsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-orange-500 mr-2" />
+                      <span className="text-gray-500">Загрузка отзывов...</span>
+                    </div>
+                  ) : reviews.length === 0 ? (
+                    <div className="text-center py-12">
+                      <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">Пока нет отзывов об этом товаре.</p>
+                      <p className="text-gray-400 text-sm mt-2">Будьте первым, кто оставит отзыв!</p>
+                    </div>
+                  ) : (
+                    reviews.map((review) => (
+                      <div key={review.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-orange-500" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{review.name}</h4>
+                              <p className="text-sm text-gray-500">
+                                {new Date(review.createdAt).toLocaleDateString('ru-RU', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric'
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-5 h-5 ${
+                                  i < review.rating 
+                                    ? 'text-orange-400 fill-current' 
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
               {/* Related Products Section */}
-              {currentProduct.recommendedProducts?.length && (
-                <div className="px-6 py-8 bg-gray-50">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                    С этим товаром берут
-                  </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {currentProduct.recommendedProducts.map((relatedProduct) => (
-                      <ProductCard product={relatedProduct as Product} />
-                    ))}
-                  </div>
-                </div>
-              )}
+              <RelatedProducts product={currentProduct} />
 
               {/* Nutrition Information */}
-              <div className="px-6 py-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Энергетическая и пищевая ценность
-                </h2>
-                <p className="text-gray-500 mb-6">на 100 г продукта</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                  {/* Calories */}
-                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                    <div className="text-3xl font-bold text-gray-900 mb-1">239</div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">Калорийность</div>
-                    <div className="text-xs text-gray-500">кКал</div>
-                  </div>
-
-                  {/* Proteins */}
-                  <div className="bg-blue-50 rounded-xl p-4 text-center">
-                    <div className="text-3xl font-bold text-blue-600 mb-1">2,8</div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">Белки</div>
-                    <div className="text-xs text-gray-500">г</div>
-                  </div>
-
-                  {/* Carbohydrates */}
-                  <div className="bg-orange-50 rounded-xl p-4 text-center">
-                    <div className="text-3xl font-bold text-orange-600 mb-1">57,4</div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">Углеводы</div>
-                    <div className="text-xs text-gray-500">г</div>
-                  </div>
-
-                  {/* Fats */}
-                  <div className="bg-yellow-50 rounded-xl p-4 text-center">
-                    <div className="text-3xl font-bold text-yellow-600 mb-1">0,6</div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">Жиры</div>
-                    <div className="text-xs text-gray-500">г</div>
-                  </div>
-
-                  {/* Fiber */}
-                  <div className="bg-green-50 rounded-xl p-4 text-center">
-                    <div className="text-3xl font-bold text-green-600 mb-1">5,1</div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">Клетчатка</div>
-                    <div className="text-xs text-gray-500">г</div>
-                  </div>
-                </div>
-
-                {/* Optional: Simple bar chart visualization */}
-                <div className="mt-8 space-y-3">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Соотношение питательных веществ
-                  </h3>
-
-                  {/* Carbohydrates bar */}
-                  <div className="flex items-center space-x-3">
-                    <div className="w-20 text-sm font-medium text-gray-700">Углеводы</div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-orange-500 h-3 rounded-full"
-                        style={{ width: '85%' }}
-                      ></div>
-                    </div>
-                    <div className="w-12 text-sm font-semibold text-gray-900">57,4 г</div>
-                  </div>
-
-                  {/* Proteins bar */}
-                  <div className="flex items-center space-x-3">
-                    <div className="w-20 text-sm font-medium text-gray-700">Белки</div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-3">
-                      <div className="bg-blue-500 h-3 rounded-full" style={{ width: '15%' }}></div>
-                    </div>
-                    <div className="w-12 text-sm font-semibold text-gray-900">2,8 г</div>
-                  </div>
-
-                  {/* Fiber bar */}
-                  <div className="flex items-center space-x-3">
-                    <div className="w-20 text-sm font-medium text-gray-700">Клетчатка</div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-3">
-                      <div className="bg-green-500 h-3 rounded-full" style={{ width: '25%' }}></div>
-                    </div>
-                    <div className="w-12 text-sm font-semibold text-gray-900">5,1 г</div>
-                  </div>
-
-                  {/* Fats bar */}
-                  <div className="flex items-center space-x-3">
-                    <div className="w-20 text-sm font-medium text-gray-700">Жиры</div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-3">
-                      <div className="bg-yellow-500 h-3 rounded-full" style={{ width: '5%' }}></div>
-                    </div>
-                    <div className="w-12 text-sm font-semibold text-gray-900">0,6 г</div>
-                  </div>
-                </div>
-              </div>
+              <NutrientInformation />
             </div>
 
             {/* Custom scrollbar styles */}
