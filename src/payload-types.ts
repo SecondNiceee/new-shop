@@ -236,6 +236,11 @@ export interface Product {
     fats?: number | null;
     fiber?: number | null;
   };
+  /**
+   * Обновляется автоматически при добавлении отзыва
+   */
+  averageRating?: number | null;
+  reviewsCount?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -520,6 +525,8 @@ export interface ProductsSelect<T extends boolean = true> {
         fats?: T;
         fiber?: T;
       };
+  averageRating?: T;
+  reviewsCount?: T;
   updatedAt?: T;
   createdAt?: T;
 }

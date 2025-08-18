@@ -50,6 +50,8 @@ export default function EcomarketApp() {
     setLoading(false)
   }, [setLoading, setError, setProductsWithCategories])
 
+  console.log(productsAndCategories);
+
   // Получение данных с сервреа
   useEffect(() => {
     getProductsWithCategories()

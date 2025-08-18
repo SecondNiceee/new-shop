@@ -1,33 +1,36 @@
-// src/collections/Reviews.ts
-import { CollectionConfig } from "payload";
+import { CollectionConfig } from "payload"
 
 const Reviews: CollectionConfig = {
   slug: "reviews",
   admin: {
     useAsTitle: "product",
     defaultColumns: ["product", "user", "rating", "createdAt"],
-    group: "Content", // можно поместить в ту же группу, что и продукты
+    group: "Content", // можно поместить в группу с продуктами
   },
   access: {
     // Все могут читать отзывы
     read: () => true,
 
-    // Только авторизованные пользователи могут создавать
+    // Только авторизованные пользователи могут оставлять
     create: ({ req }) => {
-      return Boolean(req.user);
+      return Boolean(req.user)
     },
 
-    // Обновлять — только админ или владелец отзыва
+    // Редактировать — только автор или админ
     update: ({ req }) => {
+      const user = req.user
+      const docUser = req.data?.user
+
       return Boolean(
-        req.user?.role === "admin" ||
-        req.user?.id === req.data?.user?.id
-      );
+        user?.role === "admin" ||
+        user?.id === docUser?.id ||
+        user?.id === docUser // подстраховка
+      )
     },
 
     // Удалять — только админ
     delete: ({ req }) => {
-      return Boolean(req.user?.role === "admin");
+      return Boolean(req.user?.role === "admin")
     },
   },
   fields: [
@@ -47,7 +50,7 @@ const Reviews: CollectionConfig = {
       required: true,
       defaultValue: ({ user }) => user?.id,
       access: {
-        create: () => false, // автоматически подставляется при создании
+        create: () => false, // автоподстановка, нельзя менять при создании
         read: () => true,
       },
       admin: {
@@ -74,6 +77,9 @@ const Reviews: CollectionConfig = {
       required: false,
       minLength: 10,
       maxLength: 1000,
+      admin: {
+        rows: 4,
+      },
     },
     {
       name: "createdAt",
@@ -86,8 +92,8 @@ const Reviews: CollectionConfig = {
     },
   ],
   hooks: {
+    // ❌ Запрещаем оставлять более одного отзыва на товар от одного пользователя
     beforeChange: [
-      // Запрещаем оставлять более одного отзыва на один товар от одного пользователя
       async ({ operation, data, req }) => {
         if (operation === "create") {
           const existingReview = await req.payload.find({
@@ -99,17 +105,92 @@ const Reviews: CollectionConfig = {
               ],
             },
             limit: 1,
-            overrideAccess: false, // учитываем права доступа
-          });
+            overrideAccess: true, // важно: проверяем даже если access скрывает
+          })
 
           if (existingReview.docs.length > 0) {
-            throw new Error("Вы уже оставили отзыв на этот товар.");
+            throw new Error("Вы уже оставили отзыв на этот товар.")
           }
         }
-        return data;
+        return data
+      },
+    ],
+
+    // ✅ Обновляем рейтинг продукта при создании или обновлении отзыва
+    afterChange: [
+      async ({ doc, operation, req }) => {
+        // Обрабатываем только create и update
+        if (!["create", "update"].includes(operation)) return doc
+
+        const productId = doc.product
+
+        try {
+          // Получаем все отзывы для этого продукта
+          const reviews = await req.payload.find({
+            collection: "reviews",
+            where: { product: { equals: productId } },
+            limit: 0,
+            overrideAccess: true, // получаем все, игнорируя access
+          })
+
+          const count = reviews.docs.length
+          const avg =
+            count > 0
+              ? Math.round((reviews.docs.reduce((sum, r) => sum + r.rating, 0) / count) * 10) / 10
+              : 0
+
+          // Обновляем продукт
+          await req.payload.update({
+            collection: "products",
+            id: productId,
+            data: {
+              averageRating: avg,
+              reviewsCount: count,
+            },
+            overrideAccess: true, // обходим access (иначе может не сработать)
+          })
+        } catch (error) {
+          console.error("Ошибка при обновлении рейтинга продукта:", error)
+        }
+
+        return doc
+      },
+    ],
+
+    // ✅ Обновляем рейтинг при удалении отзыва
+    afterDelete: [
+      async ({ doc, req }) => {
+        const productId = doc.product
+
+        try {
+          const reviews = await req.payload.find({
+            collection: "reviews",
+            where: { product: { equals: productId } },
+            limit: 0,
+            overrideAccess: true,
+          })
+
+          const count = reviews.docs.length
+          const avg =
+            count > 0
+              ? Math.round((reviews.docs.reduce((sum, r) => sum + r.rating, 0) / count) * 10) / 10
+              : 0
+
+          await req.payload.update({
+            collection: "products",
+            id: productId,
+            data: {
+              averageRating: avg,
+              reviewsCount: count,
+            },
+            overrideAccess: true,
+          })
+        } catch (error) {
+          console.error("Ошибка при обновлении продукта после удаления отзыва:", error)
+        }
       },
     ],
   },
-};
+}
 
-export default Reviews;
+export default Reviews

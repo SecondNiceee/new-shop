@@ -177,6 +177,29 @@ const Products: CollectionConfig = {
         },
       ],
     },
+    {
+      name: "averageRating",
+      type: "number",
+      label: "Средний рейтинг",
+      defaultValue: 0,
+      min: 0,
+      max: 5,
+      admin: {
+        readOnly: true,
+        description: "Обновляется автоматически при добавлении отзыва",
+      },
+    },
+    {
+      name: "reviewsCount",
+      type: "number",
+      label: "Количество отзывов",
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        readOnly: true,
+      },
+    },
+
   ],
 };
 
