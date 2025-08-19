@@ -20,6 +20,7 @@ interface IRequest {
   body?: Record<string, any>;
   credentials?: boolean;
   headers?: Record<string, string>;
+  cache?:RequestCache
 }
 
 // === Основная функция запроса с дженериком ===
@@ -30,6 +31,7 @@ export const request = async <T,>({
   query,
   credentials = false,
   headers = {},
+  cache = "force-cache"
 }: IRequest): Promise<T> => {
   // Собираем URL
   const finalUrl = query
@@ -42,6 +44,7 @@ export const request = async <T,>({
   }
 
   try {
+    console.log(finalUrl);
     const response = await fetch(finalUrl, {
       method,
       headers: {
@@ -50,7 +53,7 @@ export const request = async <T,>({
       },
       body: method === 'GET' ? undefined : JSON.stringify(body),
       credentials: credentials ? 'include' : 'omit',
-      cache : "force-cache"
+      cache
     });
 
     // Если ответ не успешный — парсим ошибку

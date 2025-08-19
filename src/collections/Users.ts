@@ -9,7 +9,8 @@ export const Users: CollectionConfig = {
     create: () => true,
     admin : ({req : {user}}) => {
       return Boolean(user?.role === "admin")
-    }
+    },
+    read : () => true
   },
   auth: {
     forgotPassword: {

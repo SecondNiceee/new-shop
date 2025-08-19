@@ -63,8 +63,6 @@ export function Categories() {
     }
   }
 
-  console.log(categories);
-
   if (isLoading && !categories.length) {
     return (
       <div className="flex justify-center py-8">

@@ -14,6 +14,7 @@ class ReviewsService {
         sort: '-createdAt',
         depth: '1',
       },
+      cache : "no-cache"
     })
     return response.docs
   }
@@ -28,6 +29,7 @@ class ReviewsService {
       },
       credentials: true,
     })
+    console.log(response.doc);
     return response.doc
   }
   async changeReview(dto:ChangeReviewDto){

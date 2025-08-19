@@ -132,7 +132,6 @@ export const useCartStore = create<CartState>()(
             credentials: true,
           })
           const userId = me?.user?.id
-          console.log(me);
           if (!userId) {
             set({isCartLoaded : true})
             return;
@@ -147,7 +146,6 @@ export const useCartStore = create<CartState>()(
             },
             credentials: true,
           })
-          console.log(res);
           if (res.totalDocs > 0) {
             const doc = res.docs[0]
             const items: CartItem[] =

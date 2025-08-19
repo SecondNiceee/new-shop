@@ -16,8 +16,6 @@ export default async function AccountLayout({
   const payload = await getPayload({ config })
   const headers = await getHeader()
   const user = await payload.auth({ headers })
-  console.log(user);
-
   if (!user.user) {
     redirect(routerConfig.home)
   }

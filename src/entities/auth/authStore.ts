@@ -24,8 +24,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         method: "GET",
         url: "/api/users/me",
         credentials: true,
+        cache : "no-cache"
       })
-      console.log(me)
+      console.log(me);
       set({ user: me.user, loading: false })
       return me
     } catch (e) {
@@ -75,11 +76,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
+      set({ user: null })
       await fetch("/api/users/logout", {
         method: "POST",
         credentials: "include",
       })
-      set({ user: null })
     } catch (e) {
       console.log(e);
       throw e

@@ -14,6 +14,7 @@ const UserLink:FC<IUserLink> = ({className = ""}) => {
     const {user} = useAuthStore();
     const {openDialog} = useAuthDialogStore();
     const router = useRouter();
+    console.log(user);
     const clickHandler = () => {
         if (user){
             router.push(`${routerConfig.profile}`)

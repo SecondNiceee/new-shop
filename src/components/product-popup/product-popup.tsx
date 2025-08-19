@@ -1,6 +1,4 @@
 "use client"
-
-import type React from "react"
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -15,7 +13,6 @@ import RelatedProducts from "./ui/RelatedProducts"
 import BreadCrumb from "./ui/BreadCrumb"
 import ProductImage from "./ui/ProductImage"
 import ProductInfo from "./ui/ProductInfo"
-import { request } from "@/utils/request"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { reviewService } from "@/services/review/reviewsService"
 import { toast } from "sonner"
@@ -37,6 +34,8 @@ const ProductPopup = () => {
   const [editingReview, setEditingReview] = useState<number | null>(null)
   const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: "" })
 
+  console.log(reviews);
+
   // Эффект закрытия
   useEffect(() => {
     if (!id) {
@@ -49,21 +48,18 @@ const ProductPopup = () => {
     newParams.delete("product")
     router.replace(`${window.location.pathname}?${newParams.toString()}`, { scroll: false })
   }
-  
-  
-    // Функция загрузки отзывов
+
+  // Функция загрузки отзывов
   const loadReviews = async (productId: number) => {
     setReviewsLoading(true)
-    try{
+    try {
       const reviews = await reviewService.loadReviews(productId)
       setReviews(reviews)
-    }
-    catch(e){
-      console.error("Error loading reviews:", error);
-      toast('Не удалось загрузить отзывы, проверьте подключение.')
+    } catch (e) {
+      console.error("Error loading reviews:", e)
+      toast("Не удалось загрузить отзывы, проверьте подключение.")
       setReviews([])
-    }
-    finally{
+    } finally {
       setReviewsLoading(false)
     }
   }
@@ -74,11 +70,11 @@ const ProductPopup = () => {
       getProduct(id)
       loadReviews(Number(id))
     }
-  }, [getProduct, id, isProductsPopupOpened])
+  }, [id, isProductsPopupOpened])
 
   // Создание отзыва
   const handleReviewSubmit = async () => {
-    if (!currentProduct){
+    if (!currentProduct) {
       toast("Товар не загружен, перезагрузите страницу.")
       return
     }
@@ -86,20 +82,59 @@ const ProductPopup = () => {
       toast("Для оставления отзыва необходимо войти в систему")
       return
     }
+
+    if (reviewsLoading) {
+      toast("Подождите, загружаются отзывы...")
+      return
+    }
+
     setIsSubmitting(true)
     try {
-      const review = await reviewService.createReview({comment : newReview.comment, productId : currentProduct.id,
-        rating : newReview.rating
+      const review = await reviewService.createReview({
+        comment: newReview.comment,
+        productId: currentProduct.id,
+        rating: newReview.rating,
       })
+      alert("Сделал запрос")
       if (review) {
-        await loadReviews(Number(id))
-        await getProduct(String(id))
+        const newReviewWithUser = {
+          ...review,
+          user: user,
+          createdAt: new Date().toISOString(),
+        }
+        setReviews((prev) => [newReviewWithUser, ...prev])
+
+        // Update product rating optimistically
+        const newReviewsCount = (currentProduct.reviewsCount || 0) + 1
+        const newAverageRating =
+          ((currentProduct.averageRating || 0) * (currentProduct.reviewsCount || 0) + newReview.rating) /
+          newReviewsCount
+
+        // Update the current product in store
+        useProductsStore.setState((state) => ({
+          ...state,
+          currentProduct: {
+            ...currentProduct,
+            averageRating: Math.round(newAverageRating * 10) / 10,
+            reviewsCount: newReviewsCount,
+          },
+        }))
+
         setNewReview({ rating: 5, comment: "" })
         setShowReviewForm(false)
+        toast("Отзыв успешно добавлен!")
       }
     } catch (error: any) {
       console.error("Error submitting review:", error)
-      toast("Ошибка при отправке отзыва")
+
+      if (error?.message?.includes("уже оставили отзыв")) {
+        toast("Вы уже оставили отзыв на этот товар. Обновляем список отзывов...")
+        // Reload reviews to sync UI state
+        await loadReviews(currentProduct.id)
+        setShowReviewForm(false)
+      } else {
+        toast(error?.message || "Ошибка при отправке отзыва")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -115,31 +150,50 @@ const ProductPopup = () => {
 
   // изменение отзыва
   const handleEditReview = async (reviewId: number) => {
-    if (!currentProduct){
+    if (!currentProduct) {
       toast("Продукт не загрузился, пожалуйста перезагрузите страничку")
-      return;
+      return
     }
     if (!user) return
     setIsSubmitting(true)
     try {
-      const review = await reviewService.changeReview({comment : editReviewData.comment, rating : editReviewData.rating,
-        reviewId 
+      const review = await reviewService.changeReview({
+        comment: editReviewData.comment,
+        rating: editReviewData.rating,
+        reviewId,
       })
       if (review) {
-        await loadReviews(currentProduct?.id)
-        await getProduct(String(id))
+        setReviews((prev) =>
+          prev.map((r) =>
+            r.id === reviewId ? { ...r, rating: editReviewData.rating, comment: editReviewData.comment } : r,
+          ),
+        )
+
+        // Recalculate average rating
+        const updatedReviews = reviews.map((r) => (r.id === reviewId ? { ...r, rating: editReviewData.rating } : r))
+        const newAverageRating = updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length
+
+        // Update the current product in store
+        useProductsStore.setState((state) => ({
+          ...state,
+          currentProduct: {
+            ...currentProduct,
+            averageRating: Math.round(newAverageRating * 10) / 10,
+          },
+        }))
+
         setEditingReview(null)
         setEditReviewData({ rating: 5, comment: "" })
+        toast("Отзыв успешно обновлен!")
       }
     } catch (error: any) {
       console.error("Error updating review:", error)
-      alert(error?.message || "Ошибка при обновлении отзыва")
+      toast(error?.message || "Ошибка при обновлении отзыва")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  // функция начала изменения отзыва
   const startEditReview = (review: Review) => {
     setEditingReview(review.id)
     setEditReviewData({
@@ -148,7 +202,7 @@ const ProductPopup = () => {
     })
   }
 
-  // Отзы именно этого юзера если он есть
+  // Отзыв именно этого юзера если он есть
   const userReview = user
     ? reviews.find((review) => (typeof review.user === "object" ? review.user.id === user.id : review.user === user.id))
     : null
@@ -198,37 +252,30 @@ const ProductPopup = () => {
               {/* Reviews Section */}
               <div className="px-6 py-8 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-4">
                     <h2 className="text-2xl font-semibold text-gray-900">Отзывы покупателей</h2>
-                    {currentProduct.averageRating && 
-                    <>
-                    {currentProduct.averageRating > 0 && (
-                      <div className="flex items-center space-x-1">
-                        <div className="text-2xl font-bold text-orange-500">
-                          {currentProduct.averageRating.toFixed(1)}
+                    {currentProduct.averageRating &&
+                      currentProduct.averageRating > 0 &&
+                      currentProduct.reviewsCount &&
+                      currentProduct.reviewsCount > 0 && (
+                        <div className="flex items-center space-x-2 bg-orange-50 px-3 py-2 rounded-lg">
+                          <span className="text-xl font-bold text-orange-600">
+                            {currentProduct.averageRating.toFixed(1)}
+                          </span>
+                          <Star className="w-5 h-5 text-orange-400 fill-current" />
+                          <span className="text-gray-600 font-medium">
+                            {currentProduct.reviewsCount}{" "}
+                            {currentProduct.reviewsCount === 1
+                              ? "отзыв"
+                              : currentProduct.reviewsCount < 5
+                                ? "отзыва"
+                                : "отзывов"}
+                          </span>
                         </div>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-5 h-5 ${
-                                i < Math.floor(currentProduct.averageRating as number)
-                                  ? "text-orange-400 fill-current"
-                                  : i < (currentProduct.averageRating as number)
-                                    ? "text-orange-400 fill-current opacity-50"
-                                    : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-gray-500 text-sm">({currentProduct.reviewsCount} отзывов)</span>
-                      </div>
-                    )}
-                    </>
-                  }
+                      )}
                   </div>
 
-                  {user && !userReview && (
+                  {user && !userReview && !reviewsLoading && (
                     <Button
                       onClick={() => setShowReviewForm(!showReviewForm)}
                       className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
@@ -240,10 +287,16 @@ const ProductPopup = () => {
                 </div>
 
                 {/* Review Form */}
-                {showReviewForm && user && !userReview && (
+                {showReviewForm && user && !userReview && !reviewsLoading && (
                   <div className="bg-gray-50 rounded-xl p-6 mb-6 animate-in slide-in-from-bottom-2 duration-300">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Оставить отзыв</h3>
-                    <form onSubmit={handleReviewSubmit} className="space-y-4">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault()
+                        handleReviewSubmit()
+                      }}
+                      className="space-y-4"
+                    >
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Ваша оценка</label>
                         <div className="flex space-x-1">
