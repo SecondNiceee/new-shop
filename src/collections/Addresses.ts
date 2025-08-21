@@ -34,30 +34,10 @@ const Addresses: CollectionConfig = {
         }
         if (!data.user) {
           data.user = req.user.id
-        } else {
-          const userId = typeof data.user === "number" ? data.user : data.user?.id
-          if (userId !== req.user.id) {
-            throw new Error("Invalid user for address")
-          } 
-        }
+        } 
         return data
       },
-    ],
-    beforeChange: [
-      async ({ data, req, originalDoc, operation }) => {
-        if (!req.user) {
-          throw new Error("Not authorized")
-        }
-        if (operation === "update") {
-          const originalUserId = typeof originalDoc.user === "number" ? originalDoc.user : originalDoc.user?.id
-          const newUserId = typeof data.user === "number" ? data.user : data.user?.id
-          if (newUserId && newUserId !== originalUserId) {
-            throw new Error("Cannot change address owner")
-          }
-        }
-        return data
-      },
-    ],
+    ]
   },
   fields: [
     {

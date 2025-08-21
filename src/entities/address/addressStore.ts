@@ -71,7 +71,7 @@ export const useAddressStore = create<AddressStore>()(
                   comment: address.comment,
                   coordinates: address.coordinates,
                 },
-                credentials: true,
+                credentials: true
               })
               console.log(updatedAddress)
 
@@ -89,7 +89,7 @@ export const useAddressStore = create<AddressStore>()(
                   comment: address.comment,
                   coordinates: address.coordinates,
                 },
-                credentials: true,
+                credentials: true
               })
               set({ currentAddress: newAddress.doc })
             }
@@ -142,7 +142,7 @@ export const useAddressStore = create<AddressStore>()(
               query: {
                 limit: "1",
               },
-              credentials: true,
+              credentials: true
             })
             const address = response.docs[0] || null
             set({ currentAddress: address })

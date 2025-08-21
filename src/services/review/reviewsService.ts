@@ -14,7 +14,6 @@ class ReviewsService {
         sort: '-createdAt',
         depth: '1',
       },
-      cache : "no-cache"
     })
     return response.docs
   }

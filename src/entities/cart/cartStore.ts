@@ -126,12 +126,8 @@ export const useCartStore = create<CartState>()(
       // Load the server cart (if logged in), and set items to server version
       loadServer: async () => {
         try {
-          const me = await request<{ user: { id: number } }>({
-            method: 'GET',
-            url: '/api/users/me',
-            credentials: true,
-          })
-          const userId = me?.user?.id
+          const {user} = useAuthStore();
+          const userId = user?.id;
           if (!userId) {
             set({isCartLoaded : true})
             return;
@@ -165,12 +161,8 @@ export const useCartStore = create<CartState>()(
       // Upsert (create or update) server cart with current items
       upsertServer: async () => {
         try {
-          const me = await request<{ user: { id: number } }>({
-            method: 'GET',
-            url: '/api/users/me',
-            credentials: true,
-          })
-          const userId = me?.user?.id
+          const {user} = useAuthStore();
+          const userId = user?.id
           if (!userId) return
 
           set({ syncing: true })
@@ -190,7 +182,7 @@ export const useCartStore = create<CartState>()(
               method: 'POST',
               url: '/api/carts',
               body: { user: userId, items: payloadItems },
-              credentials: true,
+              credentials: true
             })
             set({ serverCartId: created.doc.id })
           }
@@ -216,7 +208,7 @@ export const useCartStore = create<CartState>()(
               depth: '2',
               limit: '1',
             },
-            credentials: true,
+            credentials: true
           })
 
           const localItems = get().items

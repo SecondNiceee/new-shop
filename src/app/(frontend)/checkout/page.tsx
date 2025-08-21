@@ -12,7 +12,7 @@ import { useOrdersStore } from "@/entities/orders/ordersStore"
 import AddressPopup from "@/components/address-popup/address-popup"
 import Image from "next/image"
 import type { Media } from "@/payload-types"
-import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save } from "lucide-react"
+import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save, Plus, Minus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import useAuth from "@/hooks/useAuth"
 import { useAuthStore } from "@/entities/auth/authStore"
@@ -20,14 +20,16 @@ import { toast } from "sonner"
 import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
 import { DELIVERY_FEE } from "@/constants/dynamic-constants"
 import { routerConfig } from "@/config/router.config"
+import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, totalPrice, totalCount, clear } = useCartStore()
+  const { items, totalPrice, totalCount, clear,increment, dicrement } = useCartStore()
   const { currentAddress, getFullAddress, loadAddress, openDialog } = useAddressStore()
   const { addOrder } = useOrdersStore()
-  const { user } = useAuth()
+  const { user } = useAuthStore()
   const { updateProfile } = useAuthStore()
+  const { openDialog: openGuestDialog } = useGuestBenefitsStore()
   const [phone, setPhone] = useState("")
   const [originalPhone, setOriginalPhone] = useState("")
   const [isSaving, setIsSaving] = useState(false)
@@ -68,6 +70,11 @@ export default function CheckoutPage() {
   }
 
   const handlePayment = async () => {
+    if (!user) {
+      openGuestDialog("order")
+      return
+    }
+
     if (!isPhoneValid() || !currentAddress || items.length === 0) {
       toast.error("Заполните все обязательные поля")
       return
@@ -95,21 +102,18 @@ export default function CheckoutPage() {
         deliveryFee: DELIVERY_FEE, // По умолчанию наличными
         status: "pending",
       }
-      await addOrder(orderData);
+      await addOrder(orderData)
       await clear()
 
       toast.success("Заказ успешно оформлен!")
 
-      router.push(routerConfig.orders);
-      
+      router.push(routerConfig.orders)
+    } catch (e) {
+      console.error("Ошибка при создании заказа:", e)
+      toast.error("Ошибка при оформлении заказа. Попробуйте еще раз.")
+    } finally {
+      setIsProcessingOrder(false)
     }
-      catch(e){
-        console.error("Ошибка при создании заказа:", e)
-        toast.error("Ошибка при оформлении заказа. Попробуйте еще раз.")
-      }
-      finally{
-        setIsProcessingOrder(false);
-      }
   }
 
   const handleEditAddress = () => {
@@ -186,9 +190,30 @@ export default function CheckoutPage() {
                           {item.product.weight?.value} {item.product.weight?.unit}
                         </p>
                         <div className="flex justify-between items-center mt-3">
-                          <span className="text-gray-600 font-medium">
-                            {item.quantity} × {price} ₽
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => increment(item.product)}
+                                className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <span className="font-medium text-gray-900 min-w-[2rem] text-center">
+                                {item.quantity}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => dicrement(item.product.id)}
+                                className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <span className="text-gray-600 font-medium">× {price} ₽</span>
+                          </div>
                           <span className="font-bold text-xl bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
                             {sum} ₽
                           </span>

@@ -31,7 +31,7 @@ export const request = async <T,>({
   query,
   credentials = false,
   headers = {},
-  cache = "force-cache"
+  cache = "default"
 }: IRequest): Promise<T> => {
   // Собираем URL
   const finalUrl = query
@@ -53,7 +53,7 @@ export const request = async <T,>({
       },
       body: method === 'GET' ? undefined : JSON.stringify(body),
       credentials: credentials ? 'include' : 'omit',
-      cache
+      cache,
     });
 
     // Если ответ не успешный — парсим ошибку

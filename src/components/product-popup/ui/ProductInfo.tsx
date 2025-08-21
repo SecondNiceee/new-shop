@@ -1,12 +1,32 @@
-import { Button } from '@/components/ui/button'
-import { useCartStore } from '@/entities/cart/cartStore'
-import { Product } from '@/payload-types'
-import { Minus, Plus } from 'lucide-react'
-import React from 'react'
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { useCartStore } from "@/entities/cart/cartStore"
+import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
+import { useAuthStore } from "@/entities/auth/authStore"
+import type { Product } from "@/payload-types"
+import { Minus, Plus, Heart } from "lucide-react"
+import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
 
 const ProductInfo = ({ product }: { product: Product }) => {
   const { increment, dicrement, items } = useCartStore()
-  const qty = items.find((it) => it.product.id === product?.id)?.quantity ?? 0
+  const { addToFavorites, removeFromFavorites, favoriteProductIds } = useFavoritesStore()
+  const { user } = useAuthStore()
+  const isFavorite = [...favoriteProductIds].find( (id) => id === product.id );
+  const qty = items.find((it) => it.product.id === product?.id)?.quantity ?? 0;
+  const {openDialog} = useGuestBenefitsStore();
+  const handleFavoriteClick = async () => {
+    if (!user) {
+      openDialog("favorites")
+      return
+    }
+    if (isFavorite) {
+      await removeFromFavorites(product.id)
+    } else {
+      await addToFavorites(product.id)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -24,39 +44,54 @@ const ProductInfo = ({ product }: { product: Product }) => {
           </span>
         </div>
 
-        {qty > 0 ? (
-          <div className="flex items-center gap-3 justify-between bg-white rounded-lg p-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="shadow-xl w-7 h-7 md::w-12 md:h-12  p-4 hover:bg-gray-200"
-              onClick={(e) => {
-                dicrement(product.id)
-                e.stopPropagation()
-              }}
-            >
-              <Minus className="!w-[25px] !h-[25px]" />
-            </Button>
-            <span className="text-lg font-medium px-2">{qty} шт</span>
-            <Button
-              variant="ghost"
-              className="shadow-xl w-7 h-7 md::w-12 md:h-12 p-4 hover:bg-gray-200"
-              onClick={(e) => {
-                increment(product)
-                e.stopPropagation()
-              }}
-            >
-              <Plus className="!w-[25px] !h-[25px]" />
-            </Button>
-          </div>
-        ) : (
+        <div className="flex items-center gap-3">
           <Button
-            onClick={() => increment(product)}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg rounded-xl"
+            variant="ghost"
+            size="sm"
+            onClick={handleFavoriteClick}
+            className="w-12 h-12 p-0 hover:bg-gray-100 rounded-full border border-gray-200"
           >
-            Добавить в корзину
+            <Heart
+              className={`w-6 h-6 transition-colors ${
+                isFavorite ? "text-red-500 fill-red-500" : "text-gray-600 hover:text-red-500"
+              }`}
+            />
           </Button>
-        )}
+
+          {qty > 0 ? (
+            <div className="flex items-center gap-3 justify-between bg-white rounded-lg p-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="shadow-xl w-7 h-7 md::w-12 md:h-12  p-4 hover:bg-gray-200"
+                onClick={(e) => {
+                  dicrement(product.id)
+                  e.stopPropagation()
+                }}
+              >
+                <Minus className="!w-[25px] !h-[25px]" />
+              </Button>
+              <span className="text-lg font-medium px-2">{qty} шт</span>
+              <Button
+                variant="ghost"
+                className="shadow-xl w-7 h-7 md::w-12 md:h-12 p-4 hover:bg-gray-200"
+                onClick={(e) => {
+                  increment(product)
+                  e.stopPropagation()
+                }}
+              >
+                <Plus className="!w-[25px] !h-[25px]" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={() => increment(product)}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg rounded-xl"
+            >
+              Добавить в корзину
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Product Description */}

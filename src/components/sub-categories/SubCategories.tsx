@@ -1,34 +1,55 @@
-import { Category, Product } from '@/payload-types';
-import React, { forwardRef } from 'react';
-import { Badge } from '../ui/badge';
-import { ProductsWithSubCategory } from '@/actions/server/products/getFilterProducts';
- 
-interface ISubCategories{
-    sortedProducts : ProductsWithSubCategory[],
-    activeSubCategory : string|null;
-    badgesRef : React.RefObject<(HTMLDivElement | null)[]>;
-    sectionsRef : React.RefObject<(HTMLDivElement | null)[]>;
+"use client"
+
+import type { Category } from "@/payload-types"
+import type React from "react"
+import { forwardRef, useEffect } from "react"
+import { Badge } from "../ui/badge"
+import type { ProductsWithSubCategory } from "@/actions/server/products/getFilterProducts"
+
+interface ISubCategories {
+  sortedProducts: ProductsWithSubCategory[]
+  activeSubCategory: string | null
+  badgesRef: React.RefObject<(HTMLDivElement | null)[]>
+  sectionsRef: React.RefObject<(HTMLDivElement | null)[]>
 }
-const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(({sortedProducts, activeSubCategory, badgesRef, sectionsRef}, ref) => {
+const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(
+  ({ sortedProducts, activeSubCategory, badgesRef, sectionsRef }, ref) => {
     //  Прокрутка к секции при клике на бейдж
     const scrollToSection = (value: string) => {
-        const index = sortedProducts.findIndex((item) => (item.subCategory as Category).value === value)
-        const section = sectionsRef.current[index]
-        if (section) {
+      const index = sortedProducts.findIndex((item) => (item.subCategory as Category).value === value)
+      const section = sectionsRef.current[index]
+      if (section) {
         const sectionRect = section.getBoundingClientRect()
         const scrollTop = window.pageYOffset + sectionRect.top - 305
         window.scrollTo({
-            top: scrollTop,
-            behavior: 'smooth',
+          top: scrollTop,
+          behavior: "smooth",
         })
-        }
+      }
     }
+
+    useEffect(() => {
+      const container = ref?.current
+      if (!container) return
+
+      const handleWheel = (e: WheelEvent) => {
+        // Проверяем, что прокрутка происходит по горизонтали или можем прокручивать горизонтально
+        if (e.deltaY !== 0) {
+          e.preventDefault()
+          container.scrollLeft += e.deltaY
+        }
+      }
+
+      container.addEventListener("wheel", handleWheel, { passive: false })
+
+      return () => {
+        container.removeEventListener("wheel", handleWheel)
+      }
+    }, [ref])
+
     return (
-      <div
-      
-        className="flex sticky z-20 top-[225px] pb-3 pt-3 md:top-[185px] lg:top-[190px] mx-auto bg-white "
-      >
-        <div className='max-w-7xl w-full px-4 mx-auto'>
+      <div className="flex sticky z-20 top-[225px] pb-3 pt-3 md:top-[185px] lg:top-[190px] mx-auto bg-white ">
+        <div className="max-w-7xl w-full px-4 mx-auto">
           <div ref={ref} className="flex gap-4 overflow-x-scroll hide-scrollbar">
             {sortedProducts.map((item, index) => {
               const isActive = activeSubCategory === (item.subCategory as Category).value
@@ -42,9 +63,11 @@ const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(({sortedProduct
                   className="rounded-2xl cursor-pointer flex-shrink-0 whitespace-nowrap"
                 >
                   <Badge
-                    className={`${isActive ? 'bg-black hover:bg-black' : 'bg-gray-200 hover:bg-gray-200'} py-1 rounded-3xl flex justify-center items-center`}
+                    className={`${isActive ? "bg-black hover:bg-black" : "bg-gray-200 hover:bg-gray-200"} py-1 rounded-3xl flex justify-center items-center`}
                   >
-                    <p className={`${isActive ? 'text-white hover:text-white' : 'text-black hover:text-black'} text-sm`}>
+                    <p
+                      className={`${isActive ? "text-white hover:text-white" : "text-black hover:text-black"} text-sm`}
+                    >
                       {(item.subCategory as Category).title}
                     </p>
                   </Badge>
@@ -54,7 +77,8 @@ const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(({sortedProduct
           </div>
         </div>
       </div>
-    );
-})
+    )
+  },
+)
 
-export default SubCategories;
+export default SubCategories

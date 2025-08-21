@@ -5,6 +5,7 @@ import { useCartStore } from "@/entities/cart/cartStore"
 import { useCategoriesStore } from "@/entities/categories/categoriesStore"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { useAddressStore } from "@/entities/address/addressStore"
+import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
 
 /**
  * AppInit runs once on the client to bootstrap session, cart, address, and other app data.
@@ -15,7 +16,8 @@ export default function AppInit() {
   const fetchMe = useAuthStore((s) => s.fetchMe)
   const loadServerCart = useCartStore((s) => s.loadServer)
   const getCategories = useCategoriesStore((s) => s.getCategories)
-  const loadAddress = useAddressStore((s) => s.loadAddress)
+  const loadAddress = useAddressStore((s) => s.loadAddress);
+  const loadFavoritiesIds = useFavoritesStore((s) => s.loadFavoritiesIds)
 
   useEffect(() => {
     if (didBoot.current) return
@@ -40,6 +42,10 @@ export default function AppInit() {
         // 4) Prefetch categories (optional, improves UX of header/catalog)
         await getCategories()
       } catch {}
+      try{
+        await loadFavoritiesIds();
+      }
+      catch{}
     })()
   }, [fetchMe, loadServerCart, getCategories, loadAddress])
 

@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useCategoriesStore } from "@/entities/categories/categoriesStore"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import Image from "next/image"
@@ -18,7 +20,7 @@ export function Categories() {
   const [canScrollRight, setCanScrollRight] = useState(false)
 
   const params = useParams()
-  const slug = params?.slug ? (Array.isArray(params.slug) ? params.slug[0] : params.slug) : '';
+  const slug = params?.slug ? (Array.isArray(params.slug) ? params.slug[0] : params.slug) : ""
 
   useEffect(() => {
     if (!categories.length && !isCategoriesFetched.current) {
@@ -58,6 +60,16 @@ export function Categories() {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({
         left: 200,
+        behavior: "smooth",
+      })
+    }
+  }
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (scrollContainerRef.current) {
+      e.preventDefault()
+      scrollContainerRef.current.scrollBy({
+        left: e.deltaY > 0 ? 100 : -100,
         behavior: "smooth",
       })
     }
@@ -116,6 +128,7 @@ export function Categories() {
           ref={scrollContainerRef}
           className="flex items-start gap-3 md:gap-5 overflow-x-hidden overflow-y-hidden"
           onScroll={checkScrollability}
+          onWheel={handleWheel}
         >
           {categories.map((category, index) => (
             <Link
@@ -123,7 +136,9 @@ export function Categories() {
               key={index}
               className={`flex flex-col items-center gap-2 min-w-[90px] max-w-[90px] cursor-pointer hover:text-green-600 transition-colors`}
             >
-              <div className={`w-12 h-12 ${slug === category.value ? "bg-green-400" : "bg-gray-100"}  rounded-full flex items-center justify-center hover:bg-green-50`}>
+              <div
+                className={`w-12 h-12 ${slug === category.value ? "bg-green-400" : "bg-gray-100"}  rounded-full flex items-center justify-center hover:bg-green-50`}
+              >
                 <Image
                   width={30}
                   height={30}
@@ -132,7 +147,11 @@ export function Categories() {
                   className="h-6 w-6 text-black"
                 />
               </div>
-              <span className={`text-xs ${slug === category.value ? "text-green-400 font-semibold" : ""} text-center leading-tight`}>{category.title}</span>
+              <span
+                className={`text-xs ${slug === category.value ? "text-green-400 font-semibold" : ""} text-center leading-tight`}
+              >
+                {category.title}
+              </span>
             </Link>
           ))}
         </div>

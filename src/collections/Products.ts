@@ -1,3 +1,4 @@
+import { isAdmin } from "@/utils/accessUtils";
 import { CollectionConfig } from "payload";
 
 const Products: CollectionConfig = {
@@ -7,9 +8,9 @@ const Products: CollectionConfig = {
   },
   access: {
   read: () => true,
-  create: () => true,
-  update: () => true,
-  delete: () => true,
+  create: isAdmin,
+  update: isAdmin,
+  delete: isAdmin,
 },
   hooks: {
     afterRead: [

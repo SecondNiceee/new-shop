@@ -23,8 +23,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const me = await request<TUserResponse>({
         method: "GET",
         url: "/api/users/me",
-        credentials: true,
-        cache : "no-cache"
+        credentials: true
       })
       console.log(me);
       set({ user: me.user, loading: false })
@@ -47,7 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         method: "POST",
         credentials: true,
         headers: { "Content-Type": "application/json" },
-        body: { email, password },
+        body: { email, password }
       })
       set({ user: rezult.user })
     } catch (err: any) {
@@ -66,7 +65,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         credentials: true,
         headers: {
           "Content-Type": "application/json",
-        },
+        }
       })
     } catch (err: any) {
       console.log(err, JSON.stringify(err));

@@ -1,15 +1,6 @@
-import type { Access, CollectionConfig } from "payload"
+import { isAdmin, isLoggedIn, isOwn } from "@/utils/accessUtils"
+import type { CollectionConfig } from "payload"
 
-const isLoggedIn: Access = ({ req }) => !!req.user
-
-const readOwnOrders: Access = ({ req }) => {
-  if (!req.user) return false
-  return {
-    user: {
-      equals: req.user.id,
-    },
-  }
-}
 
 const Orders: CollectionConfig = {
   slug: "orders",
@@ -18,10 +9,10 @@ const Orders: CollectionConfig = {
     defaultColumns: ["orderNumber", "user", "status", "totalAmount", "createdAt"],
   },
   access: {
-    read: readOwnOrders,
+    read: isOwn,
     create: isLoggedIn,
-    update: ({ req }) => req.user?.role === "admin",
-    delete: ({ req }) => req.user?.role === "admin",
+    update: isAdmin,
+    delete: isAdmin,
   },
   hooks: {
     beforeValidate: [

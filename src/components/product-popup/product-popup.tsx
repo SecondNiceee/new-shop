@@ -20,7 +20,6 @@ const ProductPopup = () => {
   const router = useRouter()
 
   const { currentProduct, error, getProduct, isProductsPopupOpened, loading, setProductsPopup } = useProductsStore()
-
   // Эффект закрытия
   useEffect(() => {
     if (!id) {
@@ -33,7 +32,6 @@ const ProductPopup = () => {
     newParams.delete("product")
     router.replace(`${window.location.pathname}?${newParams.toString()}`, { scroll: false })
   }
-
 
   // Загрузка товара и отзывов
   useEffect(() => {

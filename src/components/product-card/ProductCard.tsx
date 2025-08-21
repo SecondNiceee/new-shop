@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Minus, Plus, Heart, Star } from "lucide-react"
@@ -7,6 +9,10 @@ import Image from "next/image"
 import type { Media, Product } from "@/payload-types"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCartStore } from "@/entities/cart/cartStore"
+import { useAuthStore } from "@/entities/auth/authStore"
+import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
+import { toast } from "sonner"
+import { useGuestBenefitsStore } from "../auth/guest-benefits-modal"
 
 interface IProductCard {
   product: Product
@@ -16,7 +22,20 @@ export function ProductCard({ product }: IProductCard) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { increment, dicrement, items } = useCartStore()
-  const qty = items.find((item) => item.product.id === product.id)?.quantity ?? 0
+  const { addToFavorites, removeFromFavorites,  favoriteProductIds } = useFavoritesStore()
+  const { user } = useAuthStore()
+  const { openDialog: openGuestDialog } = useGuestBenefitsStore()
+  const qty = items.find((item) => item.product.id === product.id)?.quantity ?? 0;
+
+
+  const isFavorite = [...favoriteProductIds].find( (id) => id === product.id );
+
+  // useEffect(() => {
+  //   if (user && product.id) {
+  //     checkFavoriteStatus(product.id)
+  //   }
+  // }, [user, product.id, checkFavoriteStatus])
+
   const onProductClick = () => {
     const newParams = new URLSearchParams(searchParams?.toString())
     if (newParams.get("product")) {
@@ -26,6 +45,32 @@ export function ProductCard({ product }: IProductCard) {
       router.push(`?product=${product.id}`, { scroll: false })
     }
   }
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!user) {
+      openGuestDialog("favorites");
+      return
+    }
+    if (isFavorite) {
+      try{
+        await removeFromFavorites(product.id)
+      }
+      catch(e){
+        console.log(e);
+        toast("Не удалось удалить товар из избранного, проверьте подключение к интернету")
+      }
+    } else {
+      try{
+        await addToFavorites(product.id)
+      }
+      catch(e){
+        console.log(e);
+        toast("Не удалось добавить товар в избранное, проверьте подключение к интернету")
+      }
+    }
+  }
+
   return (
     <Card
       onClick={onProductClick}
@@ -41,15 +86,15 @@ export function ProductCard({ product }: IProductCard) {
           alt={(product?.image as Media).alt}
           className="object-cover w-full h-full"
         />
-        {/* Heart Icon */}
         <button
-          onClick={(e) => {
-            e.stopPropagation()
-            // Add to favorites logic here
-          }}
+          onClick={handleFavoriteClick}
           className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
         >
-          <Heart className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors" />
+          <Heart
+            className={`w-4 h-4 transition-colors ${
+              isFavorite ? "text-red-500 fill-red-500" : "text-gray-600 hover:text-red-500"
+            }`}
+          />
         </button>
       </div>
 

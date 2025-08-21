@@ -1,11 +1,12 @@
 "use client"
 
-import { Clock, UserIcon } from "lucide-react"
+import { Clock, UserIcon, Heart } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 import useAuth from "@/hooks/useAuth"
+import { routerConfig } from "@/config/router.config"
 
 export default function AccountSidebar() {
-  const {logout} = useAuth()
+  const { logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -13,14 +14,20 @@ export default function AccountSidebar() {
     {
       icon: Clock,
       label: "История заказов",
-      path: "/orders",
-      isActive: pathname === "/orders",
+      path: routerConfig.orders,
+      isActive: pathname === routerConfig.orders,
     },
     {
       icon: UserIcon,
       label: "Мои данные",
-      path: "/profile",
-      isActive: pathname === "/profile",
+      path: routerConfig.profile,
+      isActive: pathname === routerConfig.profile,
+    },
+    {
+      icon: Heart,
+      label: "Избранное",
+      path: routerConfig.favorited,
+      isActive: pathname === routerConfig.favorited,
     },
   ]
 

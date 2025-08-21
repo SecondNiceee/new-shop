@@ -1,24 +1,30 @@
-import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/entities/auth/authStore'
-import { useProductsStore } from '@/entities/products/productsStore'
-import { Product, Review } from '@/payload-types'
-import { reviewService } from '@/services/review/reviewsService'
-import { Star, MessageCircle, Loader2, Send, User, Edit2 } from 'lucide-react'
-import React, { FC, useEffect, useState } from 'react'
-import { toast } from 'sonner'
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/entities/auth/authStore"
+import { useProductsStore } from "@/entities/products/productsStore"
+import type { Product, Review } from "@/payload-types"
+import { purchaseService } from "@/services/purchaseService/purchaseService"
+import { reviewService } from "@/services/review/reviewsService"
+import { Star, MessageCircle, Loader2, Send, User, Edit2 } from "lucide-react"
+import { type FC, useEffect, useState } from "react"
+import { toast } from "sonner"
+import StarJSX from "./Star"
 
 interface IReviewSection {
   product: Product
   id: string | null
 }
 const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
-  const [newReview, setNewReview] = useState({ rating: 4, comment: '' })
+  const [newReview, setNewReview] = useState({ rating: 4, comment: "" })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [reviews, setReviews] = useState<Review[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(false)
   const [editingReview, setEditingReview] = useState<number | null>(null)
-  const [editReviewData, setEditReviewData] = useState({ rating: 4, comment: '' })
+  const [editReviewData, setEditReviewData] = useState({ rating: 4, comment: "" })
+  const [hasPurchased, setHasPurchased] = useState<boolean | null>(null)
+  const [checkingPurchase, setCheckingPurchase] = useState(false)
 
   const { isProductsPopupOpened } = useProductsStore()
   const { user } = useAuthStore()
@@ -29,32 +35,56 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
       const reviews = await reviewService.loadReviews(productId)
       setReviews(reviews)
     } catch (e) {
-      console.error('Error loading reviews:', e)
-      toast('Не удалось загрузить отзывы, проверьте подключение.')
+      console.error("Error loading reviews:", e)
+      toast("Не удалось загрузить отзывы, проверьте подключение.")
       setReviews([])
     } finally {
       setReviewsLoading(false)
     }
   }
-  // Загрузка отзывов
+
+  const checkPurchaseStatus = async (productId: number) => {
+    if (!user) {
+      setHasPurchased(false)
+      return
+    }
+
+    setCheckingPurchase(true)
+    try {
+      const result = await purchaseService.checkPurchase(productId)
+      setHasPurchased(result.hasPurchased)
+    } catch (error) {
+      console.error("Ошибка проверки покупки:", error)
+      setHasPurchased(false)
+    } finally {
+      setCheckingPurchase(false)
+    }
+  }
+
   useEffect(() => {
     if (isProductsPopupOpened && id) {
       loadReviews(Number(id))
+      checkPurchaseStatus(Number(id))
     }
-  }, [id, isProductsPopupOpened])
+  }, [id, isProductsPopupOpened, user])
 
   const handleReviewSubmit = async () => {
     if (!product) {
-      toast('Товар не загружен, перезагрузите страницу.')
+      toast("Товар не загружен, перезагрузите страницу.")
       return
     }
     if (!user) {
-      toast('Для оставления отзыва необходимо войти в систему')
+      toast("Для оставления отзыва необходимо войти в систему")
+      return
+    }
+
+    if (hasPurchased === false) {
+      toast("Чтобы оставлять отзывы, нужно приобрести этот товар")
       return
     }
 
     if (reviewsLoading) {
-      toast('Подождите, загружаются отзывы...')
+      toast("Подождите, загружаются отзывы...")
       return
     }
     setIsSubmitting(true)
@@ -72,13 +102,10 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
         }
         setReviews((prev) => [newReviewWithUser, ...prev])
 
-        // Update product rating optimistically
         const newReviewsCount = (product.reviewsCount || 0) + 1
         const newAverageRating =
-          ((product.averageRating || 0) * (product.reviewsCount || 0) + newReview.rating) /
-          newReviewsCount
+          ((product.averageRating || 0) * (product.reviewsCount || 0) + newReview.rating) / newReviewsCount
 
-        // Update the current product in store
         useProductsStore.setState((state) => ({
           ...state,
           product: {
@@ -87,30 +114,35 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
             reviewsCount: newReviewsCount,
           },
         }))
-        setNewReview({ rating: 5, comment: '' })
+        setNewReview({ rating: 5, comment: "" })
         setShowReviewForm(false)
-        toast('Отзыв успешно добавлен!')
+        toast("Отзыв успешно добавлен!")
       }
     } catch (error: any) {
-      console.error('Error submitting review:', error)
-      toast(error?.message || 'Ошибка при отправке отзыва')
+      console.error("Error submitting review:", error)
+      toast(error?.message || "Ошибка при отправке отзыва")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleRatingClick = (rating: number) => {
-    setNewReview({ ...newReview, rating })
+  const handleShowReviewForm = () => {
+    if (!user) {
+      toast("Для оставления отзыва необходимо войти в систему")
+      return
+    }
+
+    if (hasPurchased === false) {
+      toast("Чтобы оставлять отзывы, нужно приобрести этот товар")
+      return
+    }
+
+    setShowReviewForm(!showReviewForm)
   }
 
-  const handleEditRatingClick = (rating: number) => {
-    setEditReviewData({ ...editReviewData, rating })
-  }
-
-  // изменение отзыва
   const handleEditReview = async (reviewId: number) => {
     if (!product) {
-      toast('Продукт не загрузился, пожалуйста перезагрузите страничку')
+      toast("Продукт не загрузился, пожалуйста перезагрузите страничку")
       return
     }
     if (!user) return
@@ -124,20 +156,13 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
       if (review) {
         setReviews((prev) =>
           prev.map((r) =>
-            r.id === reviewId
-              ? { ...r, rating: editReviewData.rating, comment: editReviewData.comment }
-              : r,
+            r.id === reviewId ? { ...r, rating: editReviewData.rating, comment: editReviewData.comment } : r,
           ),
         )
 
-        // Recalculate average rating
-        const updatedReviews = reviews.map((r) =>
-          r.id === reviewId ? { ...r, rating: editReviewData.rating } : r,
-        )
-        const newAverageRating =
-          updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length
+        const updatedReviews = reviews.map((r) => (r.id === reviewId ? { ...r, rating: editReviewData.rating } : r))
+        const newAverageRating = updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length
 
-        // Update the current product in store
         useProductsStore.setState((state) => ({
           ...state,
           product: {
@@ -147,12 +172,12 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
         }))
 
         setEditingReview(null)
-        setEditReviewData({ rating: 5, comment: '' })
-        toast('Отзыв успешно обновлен!')
+        setEditReviewData({ rating: 5, comment: "" })
+        toast("Отзыв успешно обновлен!")
       }
     } catch (error: any) {
-      console.error('Error updating review:', error)
-      toast(error?.message || 'Ошибка при обновлении отзыва')
+      console.error("Error updating review:", error)
+      toast(error?.message || "Ошибка при обновлении отзыва")
     } finally {
       setIsSubmitting(false)
     }
@@ -162,15 +187,12 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
     setEditingReview(review.id)
     setEditReviewData({
       rating: review.rating,
-      comment: review.comment || '',
+      comment: review.comment || "",
     })
   }
 
-  // Отзыв именно этого юзера если он есть
   const userReview = user
-    ? reviews.find((review) =>
-        typeof review.user === 'object' ? review.user.id === user.id : review.user === user.id,
-      )
+    ? reviews.find((review) => (typeof review.user === "object" ? review.user.id === user.id : review.user === user.id))
     : null
 
   return (
@@ -178,40 +200,37 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
           <h2 className="text-2xl font-semibold text-gray-900">Отзывы покупателей</h2>
-          {product.averageRating &&
-            product.averageRating > 0 &&
-            product.reviewsCount &&
-            product.reviewsCount > 0 && (
-              <div className="flex items-center space-x-2 bg-orange-50 px-3 py-2 rounded-lg">
-                <span className="text-xl font-bold text-orange-600">
-                  {product.averageRating.toFixed(1)}
-                </span>
-                <Star className="w-5 h-5 text-orange-400 fill-current" />
-                <span className="text-gray-600 font-medium">
-                  {product.reviewsCount}
-                  {product.reviewsCount === 1
-                    ? 'отзыв'
-                    : product.reviewsCount < 5
-                      ? 'отзыва'
-                      : 'отзывов'}
-                </span>
-              </div>
-            )}
+          {product.averageRating && product.averageRating > 0 && product.reviewsCount && product.reviewsCount > 0 && (
+            <div className="flex items-center space-x-2 bg-orange-50 px-3 py-2 rounded-lg">
+              <span className="text-xl font-bold text-orange-600">{product.averageRating.toFixed(1)}</span>
+              <Star className="w-5 h-5 text-orange-400 fill-current" />
+              <span className="text-gray-600 font-medium">
+                {product.reviewsCount} {product.reviewsCount === 1 ? "отзыв" : product.reviewsCount < 5 ? "отзыва" : "отзывов"}
+              </span>
+            </div>
+          )}
         </div>
 
-        {user && !userReview && !reviewsLoading && (
+        {user && !userReview && !reviewsLoading && !checkingPurchase && (
           <Button
-            onClick={() => setShowReviewForm(!showReviewForm)}
+            onClick={handleShowReviewForm}
             className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
+            disabled={hasPurchased === false}
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Написать отзыв</span>
+            <span>{hasPurchased === false ? "Нужна покупка для отзыва" : "Написать отзыв"}</span>
           </Button>
+        )}
+
+        {checkingPurchase && (
+          <div className="flex items-center space-x-2 text-gray-500">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Проверяем покупку...</span>
+          </div>
         )}
       </div>
 
-      {/* Review Form */}
-      {showReviewForm && user && !userReview && !reviewsLoading && (
+      {showReviewForm && user && !userReview && !reviewsLoading && hasPurchased && (
         <div className="bg-gray-50 rounded-xl p-6 mb-6 animate-in slide-in-from-bottom-2 duration-300">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Оставить отзыв</h3>
           <form
@@ -228,14 +247,14 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                   <button
                     key={star}
                     type="button"
-                    onClick={(e) => handleRatingClick(star)}
-                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${
+                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                    className={`w-7 h-7 rounded-full relative transition-all flex items-center justify-center ${
                       star <= newReview.rating
-                        ? 'bg-yellow-400 text-white'
-                        : 'bg-gray-200 text-gray-400 hover:bg-gray-300'
+                        ? "bg-yellow-400 text-white"
+                        : "bg-gray-200 text-gray-400 hover:bg-gray-300"
                     }`}
                   >
-                    <Star size={20} />
+                    <StarJSX />
                   </button>
                 ))}
               </div>
@@ -265,9 +284,7 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
               </Button>
               <Button
                 type="submit"
-                disabled={
-                  isSubmitting || !newReview.comment.trim() || newReview.comment.length < 10
-                }
+                disabled={isSubmitting || !newReview.comment.trim() || newReview.comment.length < 10}
                 className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
               >
                 {isSubmitting ? (
@@ -287,7 +304,6 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
         </div>
       )}
 
-      {/* Reviews List */}
       <div className="space-y-6">
         {reviewsLoading ? (
           <div className="flex items-center justify-center py-8">
@@ -302,12 +318,9 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
           </div>
         ) : (
           reviews.map((review) => {
-            const reviewUser = typeof review.user === 'object' ? review.user : null
+            const reviewUser = typeof review.user === "object" ? review.user : null
             const isOwnReview =
-              user &&
-              (typeof review.user === 'object'
-                ? review.user.id === user.id
-                : review.user === user.id)
+              user && (typeof review.user === "object" ? review.user.id === user.id : review.user === user.id)
 
             return (
               <div
@@ -317,36 +330,30 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                 {editingReview === review.id ? (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Ваша оценка
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Ваша оценка</label>
                       <div className="flex space-x-1 items-center">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
-                            onClick={(e) => handleEditRatingClick(star)}
-                            className={`w-8 h-8 rounded-full transition-all flex items-center justify-center ${
+                            onClick={() => setEditReviewData({ ...editReviewData, rating: star })}
+                            className={`w-7 h-7 rounded-full relative transition-all flex items-center justify-center ${
                               star <= editReviewData.rating
-                                ? 'bg-yellow-400 text-white'
-                                : 'bg-gray-200 text-gray-400 hover:bg-gray-300'
+                                ? "bg-yellow-400 text-white"
+                                : "bg-gray-200 text-gray-400 hover:bg-gray-300"
                             }`}
                           >
-                            <Star className="w-5 h-5" />
+                            <StarJSX />
                           </button>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Ваш отзыв
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Ваш отзыв</label>
                       <textarea
                         value={editReviewData.comment}
-                        onChange={(e) =>
-                          setEditReviewData({ ...editReviewData, comment: e.target.value })
-                        }
+                        onChange={(e) => setEditReviewData({ ...editReviewData, comment: e.target.value })}
                         rows={4}
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white"
                         required
@@ -360,7 +367,7 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                         variant="ghost"
                         onClick={() => {
                           setEditingReview(null)
-                          setEditReviewData({ rating: 5, comment: '' })
+                          setEditReviewData({ rating: 5, comment: "" })
                         }}
                         className="text-gray-500 hover:text-gray-700"
                       >
@@ -368,11 +375,7 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                       </Button>
                       <Button
                         onClick={() => handleEditReview(review.id)}
-                        disabled={
-                          isSubmitting ||
-                          !editReviewData.comment.trim() ||
-                          editReviewData.comment.length < 10
-                        }
+                        disabled={isSubmitting || !editReviewData.comment.trim() || editReviewData.comment.length < 10}
                         className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
                       >
                         {isSubmitting ? (
@@ -397,14 +400,12 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                           <User className="w-5 h-5 text-orange-500" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">
-                            {reviewUser?.email || 'Пользователь'}
-                          </h4>
+                          <h4 className="font-semibold text-gray-900">{reviewUser?.email || "Пользователь"}</h4>
                           <p className="text-sm text-gray-500">
-                            {new Date(review.createdAt).toLocaleDateString('ru-RU', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
+                            {new Date(review.createdAt).toLocaleDateString("ru-RU", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
                             })}
                           </p>
                         </div>
@@ -414,8 +415,8 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`w-5 h-5 ${
-                                i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                              className={`w-5 h-5  ${
+                                i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
                               }`}
                             />
                           ))}

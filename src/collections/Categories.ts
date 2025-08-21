@@ -1,4 +1,5 @@
 // src/collections/Categories.ts
+import { isAdmin } from '@/utils/accessUtils';
 import type { CollectionConfig } from 'payload';
 
 const Categories: CollectionConfig = {
@@ -6,6 +7,12 @@ const Categories: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'parent', 'value'],
+  },
+  access : {
+    create : isAdmin,
+    read : () => true,
+    update : isAdmin,
+    delete : isAdmin
   },
   fields: [
     {

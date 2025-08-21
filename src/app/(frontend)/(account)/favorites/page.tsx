@@ -1,0 +1,156 @@
+"use client"
+
+import { Heart, ShoppingCart, Trash2 } from "lucide-react"
+import { useEffect, useState, useCallback } from "react"
+import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
+import { useCartStore } from "@/entities/cart/cartStore"
+import { ProductCard } from "@/components/product-card/ProductCard"
+import { Button } from "@/components/ui/button"
+import type { Product } from "@/payload-types"
+
+export default function FavoritesPage() {
+  const { favorites, loading, loadFavorites, favoriteProductIds, loadMoreFavorites, removeFromFavorites, hasMore, isLoadingMore } =
+    useFavoritesStore()
+  const { increment } = useCartStore()
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadMoreElement, setLoadMoreElement] = useState<HTMLDivElement | null>(null)
+
+
+  useEffect(() => {
+    const loadData = async () => {
+      await loadFavorites()
+      setIsLoading(false)
+    }
+    loadData()
+  }, [loadFavorites])
+
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries
+      if (target.isIntersecting && hasMore && !isLoadingMore) {
+        loadMoreFavorites()
+        console.log("вызов этой функции")
+      }
+    },
+    [hasMore, isLoadingMore, loadMoreFavorites],
+  )
+
+  useEffect(() => {
+    if (!loadMoreElement) return
+    const observer = new IntersectionObserver(handleObserver, {
+        rootMargin : "50px 0px",
+        threshold : 0.1
+    })
+    observer.observe(loadMoreElement)
+    return () => observer.disconnect()
+  }, [handleObserver, loadMoreElement])
+
+  const handleRemoveFromFavorites = async (productId: number) => {
+    await removeFromFavorites(productId)
+  }
+
+  const handleAddToCart = (product: Product) => {
+    increment(product)
+  }
+
+  if (isLoading || loading) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+            <p className="text-gray-600 text-lg">Загрузка избранного...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (favorites.length === 0) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl">
+        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-10">
+          Избранное
+        </h2>
+
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
+            <Heart className="w-12 h-12 text-red-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Пока пусто</h3>
+          <p className="text-gray-600 text-lg mb-8 max-w-md">
+            Добавляйте товары в избранное, нажимая на сердечко в карточке товара
+          </p>
+          <Button
+            onClick={() => (window.location.href = "/")}
+            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg rounded-xl"
+          >
+            Перейти к покупкам
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl">
+      <div className="flex items-center justify-between mb-10">
+        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          Избранное
+        </h2>
+        <div className="flex items-center gap-2 text-gray-600">
+          <Heart className="w-5 h-5 text-red-500" />
+          <span className="text-lg font-medium">{[...favoriteProductIds].length} товаров</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {favorites.map((favorite) => {
+          const product = typeof favorite.product === "string" ? null : (favorite.product as Product)
+
+          if (!product) return null
+
+          return (
+            <div key={favorite.id} className="relative group">
+              <ProductCard product={product} />
+
+              {/* Overlay with actions */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    size="sm"
+                    className="bg-green-500 hover:bg-green-600 text-white shadow-lg"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-1" />В корзину
+                  </Button>
+                  <Button
+                    onClick={() => handleRemoveFromFavorites(product.id)}
+                    size="sm"
+                    variant="destructive"
+                    className="shadow-lg"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Удалить
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div ref={setLoadMoreElement} className="flex items-center justify-center h-[40px] mt-[20px]">
+        {hasMore && (
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
+            <p className="text-gray-600">Загружаем еще товары...</p>
+          </div>
+        )}
+        {!hasMore && favorites.length > 0 && (
+          <p className="text-gray-500 text-center">Все избранные товары загружены</p>
+        )}
+      </div>
+    </div>
+  )
+}

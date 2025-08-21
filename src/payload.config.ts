@@ -17,6 +17,7 @@ import { MAIL_NAME, MAIL_PASSWORD, MAIL_USER } from './constants/dynamic-constan
 import Addresses from './collections/Addresses'
 import Orders from './collections/Orders'
 import Reviews from './collections/Reviews'
+import Favorites from './collections/Favorites'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -31,7 +32,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews],
+  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -1,3 +1,4 @@
+import { isAdmin, isLoggedIn, isOwn } from '@/utils/accessUtils';
 import { type CollectionConfig } from 'payload'
 
 const Reviews: CollectionConfig = {
@@ -7,25 +8,12 @@ const Reviews: CollectionConfig = {
     defaultColumns: ['product', 'user', 'rating', 'createdAt'],
     group: 'Content',
   },
-  access : {
-    read : () => true,
-    create : () => true,
-    update : () => true,
-    delete : () => true
+  access: {
+    read: () => true,
+    create: isLoggedIn,
+    update: isOwn,
+    delete: isAdmin,
   },
-  // access: {
-  //   // Все могут читать
-  //   read: () => true,
-  //   create: ({ req }) => Boolean(req.user),
-  //   update: ({ req }) => {
-  //     const user = req.user
-  //     const docUser = req.data?.user
-  //     return Boolean(
-  //       user?.role === 'admin' || user?.id === (typeof docUser === 'object' ? docUser.id : docUser),
-  //     )
-  //   },
-  //   delete: ({ req }) => Boolean(req.user?.role === 'admin'),
-  // },
   fields: [
     {
       name: 'product',

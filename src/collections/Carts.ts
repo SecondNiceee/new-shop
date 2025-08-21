@@ -1,26 +1,6 @@
-import type { Access, CollectionConfig } from 'payload';
-
-const isLoggedIn: Access = ({ req }) => {
-  return !!req.user;
-};
-
-const readOwnCart: Access = ({ req }) => {
-  if (!req.user) return false;
-  return {
-    user: {
-      equals: req.user.id,
-    },
-  };
-};
-
-const deleteOwnCart: Access = ({ req }) => {
-  if (!req.user) return false;
-  return {
-    user: {
-      equals: req.user.id,
-    },
-  };
-};
+import { isLoggedIn, isOwn } from '@/utils/accessUtils';
+import { beforeValidateHook } from '@/utils/beforeValidateHook';
+import type { CollectionConfig } from 'payload';
 
 const Carts: CollectionConfig = {
   slug: 'carts',
@@ -29,47 +9,15 @@ const Carts: CollectionConfig = {
     defaultColumns: ['user', 'updatedAt'],
   },
   access: {
-    read: readOwnCart,
+    read: isOwn,
     create: isLoggedIn,
-    update: isLoggedIn,
-    delete: deleteOwnCart,
+    update: isOwn,
+    delete: isOwn,
   },
   hooks: {
     beforeValidate: [
-      ({ data, req }) => {
-        if (!data) return data;
-        if (!req.user) {
-          throw new Error('Not authorized');
-        }
-        if (!data.user) {
-          data.user = req.user;
-        } else {
-          const userId = typeof data.user === 'number' ? data.user : data.user?.id;
-          if (userId !== req.user.id) {
-            throw new Error('Invalid user for cart');
-          }
-        }
-        return data;
-      },
-    ],
-    beforeChange: [
-      async ({ data, req, originalDoc, operation }) => {
-        if (!req.user) {
-          throw new Error('Not authorized');
-        }
-        if (operation === 'update') {
-          const originalUserId = typeof originalDoc.user === 'number' ? originalDoc.user : originalDoc.user?.id;
-          if (originalUserId !== req.user.id) {
-            throw new Error('You can update only your cart');
-          }
-          const newUserId = typeof data.user === 'number' ? data.user : data.user?.id;
-          if (newUserId && newUserId !== originalUserId) {
-            throw new Error('Cannot change cart owner');
-          }
-        }
-        return data;
-      },
-    ],
+      beforeValidateHook
+    ]
   },
   fields: [
     {
