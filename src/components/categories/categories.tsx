@@ -65,15 +65,6 @@ export function Categories() {
     }
   }
 
-  const handleWheel = (e: React.WheelEvent) => {
-    if (scrollContainerRef.current) {
-      e.preventDefault()
-      scrollContainerRef.current.scrollBy({
-        left: e.deltaY > 0 ? 100 : -100,
-        behavior: "smooth",
-      })
-    }
-  }
 
   if (isLoading && !categories.length) {
     return (
@@ -126,9 +117,8 @@ export function Categories() {
         {/* Контейнер с категориями */}
         <div
           ref={scrollContainerRef}
-          className="flex items-start gap-3 md:gap-5 overflow-x-hidden overflow-y-hidden"
+          className="flex items-start gap-3 md:gap-5 overflow-x-scroll hide-scrollbar overflow-y-hidden"
           onScroll={checkScrollability}
-          onWheel={handleWheel}
         >
           {categories.map((category, index) => (
             <Link

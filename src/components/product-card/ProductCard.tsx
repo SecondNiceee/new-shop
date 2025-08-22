@@ -13,6 +13,7 @@ import { useAuthStore } from "@/entities/auth/authStore"
 import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
 import { toast } from "sonner"
 import { useGuestBenefitsStore } from "../auth/guest-benefits-modal"
+import { formatPrice, getDiscountInfo } from "@/utils/discountUtils"
 
 interface IProductCard {
   product: Product
@@ -22,19 +23,15 @@ export function ProductCard({ product }: IProductCard) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { increment, dicrement, items } = useCartStore()
-  const { addToFavorites, removeFromFavorites,  favoriteProductIds } = useFavoritesStore()
+  const { addToFavorites, removeFromFavorites, favoriteProductIds } = useFavoritesStore()
   const { user } = useAuthStore()
   const { openDialog: openGuestDialog } = useGuestBenefitsStore()
-  const qty = items.find((item) => item.product.id === product.id)?.quantity ?? 0;
+  const qty = items.find((item) => item.product.id === product.id)?.quantity ?? 0
 
+  const discountInfo = getDiscountInfo(product);
+  console.log(discountInfo);
 
-  const isFavorite = [...favoriteProductIds].find( (id) => id === product.id );
-
-  // useEffect(() => {
-  //   if (user && product.id) {
-  //     checkFavoriteStatus(product.id)
-  //   }
-  // }, [user, product.id, checkFavoriteStatus])
+  const isFavorite = [...favoriteProductIds].find((id) => id === product.id)
 
   const onProductClick = () => {
     const newParams = new URLSearchParams(searchParams?.toString())
@@ -49,23 +46,21 @@ export function ProductCard({ product }: IProductCard) {
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!user) {
-      openGuestDialog("favorites");
+      openGuestDialog("favorites")
       return
     }
     if (isFavorite) {
-      try{
+      try {
         await removeFromFavorites(product.id)
-      }
-      catch(e){
-        console.log(e);
+      } catch (e) {
+        console.log(e)
         toast("Не удалось удалить товар из избранного, проверьте подключение к интернету")
       }
     } else {
-      try{
+      try {
         await addToFavorites(product.id)
-      }
-      catch(e){
-        console.log(e);
+      } catch (e) {
+        console.log(e)
         toast("Не удалось добавить товар в избранное, проверьте подключение к интернету")
       }
     }
@@ -86,6 +81,11 @@ export function ProductCard({ product }: IProductCard) {
           alt={(product?.image as Media).alt}
           className="object-cover w-full h-full"
         />
+        {discountInfo.hasDiscount && (
+          <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
+            -{discountInfo.discountPercentage}%
+          </div>
+        )}
         <button
           onClick={handleFavoriteClick}
           className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
@@ -126,10 +126,10 @@ export function ProductCard({ product }: IProductCard) {
         {/* Price and Actions */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-red-500">{product.price} ₽</span>
-            {/* You can add original price here if available */}
-            {/* <span className="text-sm text-gray-400 line-through">2895 ₽</span>
-            <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">-78%</span> */}
+            <span className="text-lg font-bold text-red-500">{formatPrice(discountInfo.discountedPrice)}</span>
+            {discountInfo.hasDiscount && (
+              <span className="text-sm text-gray-400 line-through">{formatPrice(discountInfo.originalPrice)}</span>
+            )}
           </div>
 
           {qty === 0 ? (

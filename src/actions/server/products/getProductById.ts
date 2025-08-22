@@ -4,7 +4,6 @@
 import { getPayload } from 'payload';
 import config from '../../../payload.config';
 import { Product } from '@/payload-types';
-import { notFound } from 'next/navigation';
 
 type Result =
   | { product: Product; error: null }

@@ -1,3 +1,4 @@
+import { beforeValidateHook } from "@/utils/beforeValidateHook"
 import type { Access, CollectionConfig } from "payload"
 
 const isLoggedIn: Access = ({ req }) => {
@@ -27,16 +28,7 @@ const Addresses: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
-      ({ data, req }) => {
-        if (!data) return data
-        if (!req.user) {
-          throw new Error("Not authorized")
-        }
-        if (!data.user) {
-          data.user = req.user.id
-        } 
-        return data
-      },
+      beforeValidateHook
     ]
   },
   fields: [

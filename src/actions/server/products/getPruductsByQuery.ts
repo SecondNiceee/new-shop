@@ -17,6 +17,15 @@ export const searchProducts = async (query: string): Promise<Product[] > => {
           contains: query, 
         },
       },
+      select : {
+            averageRating : true,
+            discount : true,
+            image : true,
+            price : true,
+            title : true,
+            weight : true,
+            reviewsCount : true
+          },
       limit: 10,
       depth: 1,  // Загружать связанные поля (например, изображения)
     });

@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
 import { useCartStore } from "@/entities/cart/cartStore"
-import type { Media } from "@/payload-types"
+import type { Media, Product } from "@/payload-types"
 import { useRouter } from "next/navigation"
 import { routerConfig } from "@/config/router.config"
+import { getDiscountInfo, formatPrice } from "@/utils/discountUtils"
 
 export default function CartDrawer() {
   const router = useRouter()
@@ -53,7 +54,7 @@ export default function CartDrawer() {
             ) : (
               items.map((it) => {
                 const media = it.product.image as Media
-                const price = it.product.price || 0
+                const discountInfo = getDiscountInfo(it.product)
 
                 return (
                   <div
@@ -70,6 +71,11 @@ export default function CartDrawer() {
                           alt={media?.alt || it.product.title}
                           className="object-cover w-full h-full"
                         />
+                        {discountInfo.hasDiscount && (
+                          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded">
+                            -{discountInfo.discountPercentage}%
+                          </div>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -80,7 +86,16 @@ export default function CartDrawer() {
                         </p>
 
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-green-600">{price} ₽</span>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-green-600">
+                              {formatPrice(discountInfo.discountedPrice)}
+                            </span>
+                            {discountInfo.hasDiscount && (
+                              <span className="text-xs text-gray-400 line-through">
+                                {formatPrice(discountInfo.originalPrice)}
+                              </span>
+                            )}
+                          </div>
 
                           <div className="flex items-center gap-2">
                             {/* Quantity controls */}
@@ -130,7 +145,7 @@ export default function CartDrawer() {
               <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600">Товары ({totalCount})</span>
-                  <span className="font-semibold">{totalPrice} ₽</span>
+                  <span className="font-semibold">{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>Доставка</span>
@@ -139,7 +154,7 @@ export default function CartDrawer() {
                 <div className="border-t border-gray-200 mt-2 pt-2">
                   <div className="flex items-center justify-between text-lg font-bold">
                     <span>Итого</span>
-                    <span className="text-green-600">{totalPrice + 199} ₽</span>
+                    <span className="text-green-600">{formatPrice(totalPrice + 199)}</span>
                   </div>
                 </div>
               </div>

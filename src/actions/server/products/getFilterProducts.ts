@@ -42,6 +42,15 @@ export const getFilteredProducts = async (
           },
           depth: 1,
           limit: 0,
+          select : {
+            averageRating : true,
+            discount : true,
+            image : true,
+            price : true,
+            title : true,
+            weight : true,
+            reviewsCount : true
+          }
         })
 
         return {

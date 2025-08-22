@@ -23,7 +23,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const me = await request<TUserResponse>({
         method: "GET",
         url: "/api/users/me",
-        credentials: true
+        credentials: true,
+        query : {
+          "select[phone]" : "true",
+          "select[email]" : "true"
+        }
       })
       console.log(me);
       set({ user: me.user, loading: false })

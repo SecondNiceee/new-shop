@@ -22,6 +22,12 @@ export const getCategoriesWithProducts = async (): Promise<CategoryWithProducts[
       sort: 'createdAt',
       limit: 0, // Все категории
       depth: 1,
+      select : {
+        coverImage : true,
+        icon : true,
+        title : true,
+        value : true,
+      }
     });
 
     // Шаг 2: Для каждой категории — получить до 6 товаров и общее количество
@@ -35,6 +41,15 @@ export const getCategoriesWithProducts = async (): Promise<CategoryWithProducts[
           },
           limit: 6,
           depth: 1,
+          select : {
+            averageRating : true,
+            discount : true,
+            image : true,
+            price : true,
+            title : true,
+            weight : true,
+            reviewsCount : true
+          }
         });
 
         // Считаем общее количество товаров в категории

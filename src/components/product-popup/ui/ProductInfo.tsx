@@ -7,14 +7,18 @@ import { useAuthStore } from "@/entities/auth/authStore"
 import type { Product } from "@/payload-types"
 import { Minus, Plus, Heart } from "lucide-react"
 import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
+import { getDiscountInfo, formatPrice } from "@/utils/discountUtils"
 
 const ProductInfo = ({ product }: { product: Product }) => {
   const { increment, dicrement, items } = useCartStore()
   const { addToFavorites, removeFromFavorites, favoriteProductIds } = useFavoritesStore()
   const { user } = useAuthStore()
-  const isFavorite = [...favoriteProductIds].find( (id) => id === product.id );
-  const qty = items.find((it) => it.product.id === product?.id)?.quantity ?? 0;
-  const {openDialog} = useGuestBenefitsStore();
+  const isFavorite = [...favoriteProductIds].find((id) => id === product.id)
+  const qty = items.find((it) => it.product.id === product?.id)?.quantity ?? 0
+  const { openDialog } = useGuestBenefitsStore()
+
+  const discountInfo = getDiscountInfo(product)
+
   const handleFavoriteClick = async () => {
     if (!user) {
       openDialog("favorites")
@@ -38,8 +42,18 @@ const ProductInfo = ({ product }: { product: Product }) => {
 
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-3xl font-bold text-gray-900">{product.price} ₽</span>
-          <span className="text-gray-500 ml-2">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-3xl font-bold text-gray-900">{formatPrice(discountInfo.discountedPrice)}</span>
+            {discountInfo.hasDiscount && (
+              <>
+                <span className="text-xl text-gray-400 line-through">{formatPrice(discountInfo.originalPrice)}</span>
+                <span className="bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-lg">
+                  -{discountInfo.discountPercentage}%
+                </span>
+              </>
+            )}
+          </div>
+          <span className="text-gray-500">
             за {product.weight.value} {product.weight.unit}
           </span>
         </div>

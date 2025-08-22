@@ -17,14 +17,11 @@ const FilterPage = () => {
   const searchParams = useSearchParams()
   const {slug} = params as Record<string, string>
   const subCategoryValue = searchParams?.get('sub')
-  const productValue = searchParams?.get("product")
 
   const [sortedProducts, setSortedProducts] = useState<ProductsWithSubCategory[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setLoading] = useState<boolean>(false)
   const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
-
-  const {setProductsPopup} = useProductsStore();
 
   const badgesRef = useRef<(HTMLDivElement | null)[]>([])
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([])
@@ -61,11 +58,11 @@ const FilterPage = () => {
   }, [getSortedCategories])
 
   // Открытие попапа в случае изменения URl
-  useEffect( () => {
-    if (productValue){
-      setProductsPopup(true);
-    }
-  }, [productValue] )
+  // useEffect( () => {
+  //   if (productValue){
+  //     setProductsPopup(true);
+  //   }
+  // }, [productValue] )
 
   //  Наблюдение за секциями
   useEffect(() => {
