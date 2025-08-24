@@ -68,7 +68,7 @@ export function ProductCard({ product }: IProductCard) {
   return (
     <Card
       onClick={onProductClick}
-      className="p-0 cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
+      className="p-0 cursor-pointer justify-between bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
       {/* Product Image with Heart Icon */}
       <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl bg-gray-50">
@@ -157,7 +157,7 @@ export function ProductCard({ product }: IProductCard) {
               В корзину
             </Button>
           ) : (
-            <div className="flex items-center justify-between bg-gray-50 rounded-xl p-2">
+            <div className="flex md:h-auto h-[36px] items-center justify-between bg-gray-50 rounded-xl p-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -169,7 +169,7 @@ export function ProductCard({ product }: IProductCard) {
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <span className="text-sm font-medium px-2">{qty} шт</span>
+              <span className="text-sm font-medium">{qty} шт</span>
               <Button
                 variant="ghost"
                 size="sm"

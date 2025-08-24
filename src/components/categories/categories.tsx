@@ -117,7 +117,7 @@ export function Categories() {
         {/* Контейнер с категориями */}
         <div
           ref={scrollContainerRef}
-          className="flex items-start gap-3 md:gap-5 overflow-x-scroll hide-scrollbar overflow-y-hidden"
+          className="flex items-start gap-1 sm:gap-3 md:gap-5 overflow-x-scroll hide-scrollbar overflow-y-hidden"
           onScroll={checkScrollability}
         >
           {categories.map((category, index) => (
@@ -127,14 +127,14 @@ export function Categories() {
               className={`flex flex-col items-center gap-2 min-w-[90px] max-w-[90px] cursor-pointer hover:text-green-600 transition-colors`}
             >
               <div
-                className={`w-12 h-12 ${slug === category.value ? "bg-green-400" : "bg-gray-100"}  rounded-full flex items-center justify-center hover:bg-green-50`}
+                className={`sm:w-12 sm:h-12 w-6 h-6 ${slug === category.value ? "bg-green-400" : "bg-gray-100"}  rounded-full flex items-center justify-center hover:bg-green-50`}
               >
                 <Image
                   width={30}
                   height={30}
                   alt={"shop"}
                   src={(category.icon as Media).url ?? ""}
-                  className="h-6 w-6 text-black"
+                  className="sm:h-6 sm:w-6 h-4 w-4 text-black"
                 />
               </div>
               <span

@@ -83,7 +83,7 @@ export default function EcomarketApp() {
             {item.products.length ? (
               <>
                 <div className='flex justify-between items-start w-full'>
-                  <h2 className="text-2xl text-black font-bold">{item.category.title}</h2>
+                  <h2 className="md:text-2xl text-lg text-black font-bold">{item.category.title}</h2>
                   <Link href={`/${item.category.value}`} className='self-end flex items-center'>
                     <Badge className='bg-green-400 hover:bg-green-400 cursor-pointer gap-2 flex items-center'>
                       <p className='text-sm text-white'>Еще {item.productsCounter-6}</p>

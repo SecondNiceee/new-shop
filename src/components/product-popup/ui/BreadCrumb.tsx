@@ -10,7 +10,7 @@ interface IBreadCrumb {
 const BreadCrumb: FC<IBreadCrumb> = ({ product }) => {
   return (
     <div className="px-6 pt-6 pb-2">
-      <div className="flex items-end text-sm text-orange-500 space-x-1">
+      <div className="flex  items-end text-sm text-orange-500 space-x-1">
         <Link className={cl.breadcrumbLink} href={'/'}>
           Главная
         </Link>
