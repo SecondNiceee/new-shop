@@ -1,13 +1,15 @@
-import { Product } from "@/payload-types"
+import { Product } from '@/payload-types'
 
-type TDiscount =  {
-    isActive?: boolean | null | undefined;
-    type?: "percentage" | "fixed" | null | undefined;
-    value?: number | null | undefined;
-    startDate?: string | null | undefined;
-    endDate?: string | null | undefined;
-    description?: string | null | undefined;
-} | undefined
+type TDiscount =
+  | {
+      isActive?: boolean | null | undefined
+      type?: 'percentage' | 'fixed' | null | undefined
+      value?: number | null | undefined
+      startDate?: string | null | undefined
+      endDate?: string | null | undefined
+      description?: string | null | undefined
+    }
+  | undefined
 
 /**
  * Проверяет, активна ли скидка в данный момент
@@ -45,11 +47,11 @@ export const calculateDiscountAmount = (price: number, discount?: TDiscount): nu
   if (!isDiscountActive(discount)) {
     return 0
   }
-  if (discount!.type === "percentage") {
+  if (discount!.type === 'percentage') {
     return Math.round((price * (discount?.value as number)) / 100)
   } else {
     // Фиксированная скидка не может быть больше цены товара
-    return Math.min((discount?.value as number), price)
+    return Math.min(discount?.value as number, price)
   }
 }
 
@@ -65,8 +67,7 @@ export const calculateDiscountedPrice = (price: number, discount?: TDiscount): n
  * Возвращает информацию о скидке для отображения
  */
 export const getDiscountInfo = (product: Product) => {
-  const { price, discount } = product;
-  console.log(product);    
+  const { price, discount } = product
 
   if (!isDiscountActive(discount)) {
     return {
@@ -97,9 +98,9 @@ export const getDiscountInfo = (product: Product) => {
  * Форматирует цену для отображения
  */
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
+  return new Intl.NumberFormat('ru-RU', {
+    style: 'currency',
+    currency: 'RUB',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price)

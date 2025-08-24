@@ -1,8 +1,8 @@
-"use client"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-import { request } from "@/utils/request"
-import { useAuthStore } from "../auth/authStore"
+'use client'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { request } from '@/utils/request'
+import { useAuthStore } from '../auth/authStore'
 
 export interface Address {
   id?: number | string
@@ -32,7 +32,7 @@ interface AddressStore {
 }
 
 type TChangeResponse = {
-    doc : Address
+  doc: Address
 }
 
 export const useAddressStore = create<AddressStore>()(
@@ -62,7 +62,7 @@ export const useAddressStore = create<AddressStore>()(
               // Обновляем существующий адрес
               const updatedAddress = await request<TChangeResponse>({
                 url: `/api/addresses/${currentAddress.id}`,
-                method: "PATCH",
+                method: 'PATCH',
                 body: {
                   street: address.street,
                   apartment: address.apartment,
@@ -71,16 +71,15 @@ export const useAddressStore = create<AddressStore>()(
                   comment: address.comment,
                   coordinates: address.coordinates,
                 },
-                credentials: true
+                credentials: true,
               })
-              console.log(updatedAddress)
 
               set({ currentAddress: updatedAddress.doc })
             } else {
               // Создаем новый адрес
               const newAddress = await request<TChangeResponse>({
-                url: "/api/addresses",
-                method: "POST",
+                url: '/api/addresses',
+                method: 'POST',
                 body: {
                   street: address.street,
                   apartment: address.apartment,
@@ -89,7 +88,7 @@ export const useAddressStore = create<AddressStore>()(
                   comment: address.comment,
                   coordinates: address.coordinates,
                 },
-                credentials: true
+                credentials: true,
               })
               set({ currentAddress: newAddress.doc })
             }
@@ -98,7 +97,7 @@ export const useAddressStore = create<AddressStore>()(
             set({ currentAddress: address })
           }
         } catch (error) {
-          console.error("Error saving address:", error)
+          console.error('Error saving address:', error)
           // В случае ошибки сохраняем локально
           set({ currentAddress: address })
         } finally {
@@ -114,13 +113,13 @@ export const useAddressStore = create<AddressStore>()(
           try {
             await request({
               url: `/api/addresses/${get().currentAddress?.id}`,
-              method: "DELETE",
+              method: 'DELETE',
               credentials: true,
             })
 
             set({ currentAddress: null })
           } catch (error) {
-            console.error("Error deleting address:", error)
+            console.error('Error deleting address:', error)
           }
         } else {
           set({ currentAddress: null })
@@ -137,19 +136,19 @@ export const useAddressStore = create<AddressStore>()(
           if (user) {
             // Загружаем адрес из БД
             const response = await request<{ docs: Address[] }>({
-              url: "/api/addresses",
-              method: "GET",
+              url: '/api/addresses',
+              method: 'GET',
               query: {
-                limit: "1",
+                limit: '1',
               },
-              credentials: true
+              credentials: true,
             })
             const address = response.docs[0] || null
             set({ currentAddress: address })
           }
           // Если пользователь не авторизован, используем данные из localStorage (persist)
         } catch (error) {
-          console.error("Error loading address:", error)
+          console.error('Error loading address:', error)
         } finally {
           set({ loading: false })
         }
@@ -157,7 +156,7 @@ export const useAddressStore = create<AddressStore>()(
 
       getFullAddress: () => {
         const { currentAddress } = get()
-        if (!currentAddress) return ""
+        if (!currentAddress) return ''
 
         let fullAddress = currentAddress.street
 
@@ -167,14 +166,14 @@ export const useAddressStore = create<AddressStore>()(
         if (currentAddress.floor) details.push(`этаж ${currentAddress.floor}`)
 
         if (details.length > 0) {
-          fullAddress += `, ${details.join(", ")}`
+          fullAddress += `, ${details.join(', ')}`
         }
 
         return fullAddress.charAt(0).toUpperCase() + fullAddress.slice(1)
       },
     }),
     {
-      name: "address-store",
+      name: 'address-store',
       partialize: (state) => ({
         currentAddress: state.currentAddress,
       }),

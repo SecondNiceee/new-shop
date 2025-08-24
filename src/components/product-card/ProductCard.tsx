@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Minus, Plus, Heart, Star } from "lucide-react"
-import Image from "next/image"
-import type { Media, Product } from "@/payload-types"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useCartStore } from "@/entities/cart/cartStore"
-import { useAuthStore } from "@/entities/auth/authStore"
-import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
-import { toast } from "sonner"
-import { useGuestBenefitsStore } from "../auth/guest-benefits-modal"
-import { formatPrice, getDiscountInfo } from "@/utils/discountUtils"
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Minus, Plus, Heart, Star } from 'lucide-react'
+import Image from 'next/image'
+import type { Media, Product } from '@/payload-types'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCartStore } from '@/entities/cart/cartStore'
+import { useAuthStore } from '@/entities/auth/authStore'
+import { useFavoritesStore } from '@/entities/favorites/favoritesStore'
+import { toast } from 'sonner'
+import { useGuestBenefitsStore } from '../auth/guest-benefits-modal'
+import { formatPrice, getDiscountInfo } from '@/utils/discountUtils'
 
 interface IProductCard {
   product: Product
@@ -28,15 +28,14 @@ export function ProductCard({ product }: IProductCard) {
   const { openDialog: openGuestDialog } = useGuestBenefitsStore()
   const qty = items.find((item) => item.product.id === product.id)?.quantity ?? 0
 
-  const discountInfo = getDiscountInfo(product);
-  console.log(discountInfo);
+  const discountInfo = getDiscountInfo(product)
 
   const isFavorite = [...favoriteProductIds].find((id) => id === product.id)
 
   const onProductClick = () => {
     const newParams = new URLSearchParams(searchParams?.toString())
-    if (newParams.get("product")) {
-      newParams.set("product", String(product.id))
+    if (newParams.get('product')) {
+      newParams.set('product', String(product.id))
       router.replace(`${window.location.pathname}?${newParams}`)
     } else {
       router.push(`?product=${product.id}`, { scroll: false })
@@ -46,7 +45,7 @@ export function ProductCard({ product }: IProductCard) {
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!user) {
-      openGuestDialog("favorites")
+      openGuestDialog('favorites')
       return
     }
     if (isFavorite) {
@@ -54,14 +53,14 @@ export function ProductCard({ product }: IProductCard) {
         await removeFromFavorites(product.id)
       } catch (e) {
         console.log(e)
-        toast("Не удалось удалить товар из избранного, проверьте подключение к интернету")
+        toast('Не удалось удалить товар из избранного, проверьте подключение к интернету')
       }
     } else {
       try {
         await addToFavorites(product.id)
       } catch (e) {
         console.log(e)
-        toast("Не удалось добавить товар в избранное, проверьте подключение к интернету")
+        toast('Не удалось добавить товар в избранное, проверьте подключение к интернету')
       }
     }
   }
@@ -77,7 +76,7 @@ export function ProductCard({ product }: IProductCard) {
           loading="lazy"
           width={400}
           height={300}
-          src={(product?.image as Media).url || "/placeholder.svg"}
+          src={(product?.image as Media).url || '/placeholder.svg'}
           alt={(product?.image as Media).alt}
           className="object-cover w-full h-full"
         />
@@ -92,7 +91,7 @@ export function ProductCard({ product }: IProductCard) {
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
-              isFavorite ? "text-red-500 fill-red-500" : "text-gray-600 hover:text-red-500"
+              isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-600 hover:text-red-500'
             }`}
           />
         </button>
@@ -103,18 +102,29 @@ export function ProductCard({ product }: IProductCard) {
         {/* Brand/Title */}
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">{product.title}</h3>
+            <h3 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">
+              {product.title}
+            </h3>
             <p className="text-xs text-gray-500 mt-1">{`${product.weight.value} ${product.weight.unit}`}</p>
           </div>
         </div>
 
-        {product.averageRating && product.averageRating > 0 && product.reviewsCount && product.reviewsCount > 0 ? (
+        {product.averageRating &&
+        product.averageRating > 0 &&
+        product.reviewsCount &&
+        product.reviewsCount > 0 ? (
           <div className="flex items-center space-x-1">
-            <span className="text-sm font-semibold text-orange-500">{product.averageRating.toFixed(1)}</span>
+            <span className="text-sm font-semibold text-orange-500">
+              {product.averageRating.toFixed(1)}
+            </span>
             <Star className="w-4 h-4 text-orange-400 fill-current" />
             <span className="text-xs text-gray-500">
-              {product.reviewsCount}{" "}
-              {product.reviewsCount === 1 ? "отзыв" : product.reviewsCount < 5 ? "отзыва" : "отзывов"}
+              {product.reviewsCount}{' '}
+              {product.reviewsCount === 1
+                ? 'отзыв'
+                : product.reviewsCount < 5
+                  ? 'отзыва'
+                  : 'отзывов'}
             </span>
           </div>
         ) : (
@@ -126,9 +136,13 @@ export function ProductCard({ product }: IProductCard) {
         {/* Price and Actions */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-red-500">{formatPrice(discountInfo.discountedPrice)}</span>
+            <span className="text-lg font-bold text-red-500">
+              {formatPrice(discountInfo.discountedPrice)}
+            </span>
             {discountInfo.hasDiscount && (
-              <span className="text-sm text-gray-400 line-through">{formatPrice(discountInfo.originalPrice)}</span>
+              <span className="text-sm text-gray-400 line-through">
+                {formatPrice(discountInfo.originalPrice)}
+              </span>
             )}
           </div>
 

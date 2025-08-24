@@ -1,38 +1,49 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Package, Clock, CheckCircle, Truck, XCircle, RefreshCw, ChevronDown, ChevronUp, MapPin } from "lucide-react"
-import { useRouter } from "next/navigation"
-import useAuth from "@/hooks/useAuth"
-import type { Media } from "@/payload-types"
-import { toast } from "sonner"
-import { useOrdersStore } from "@/entities/orders/ordersStore"
-import { formatDate } from "@/utils/formatData"
-import { getFullAddress } from "@/utils/getFullAddress"
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import {
+  Package,
+  Clock,
+  CheckCircle,
+  Truck,
+  XCircle,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+} from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import useAuth from '@/hooks/useAuth'
+import type { Media } from '@/payload-types'
+import { toast } from 'sonner'
+import { useOrdersStore } from '@/entities/orders/ordersStore'
+import { formatDate } from '@/utils/formatData'
+import { getFullAddress } from '@/utils/getFullAddress'
 
 const statusConfig = {
-  pending: { label: "Ожидает обработки", color: "bg-yellow-500", icon: Clock },
-  confirmed: { label: "Подтвержден", color: "bg-blue-500", icon: CheckCircle },
-  preparing: { label: "Готовится", color: "bg-orange-500", icon: Package },
-  delivering: { label: "В доставке", color: "bg-purple-500", icon: Truck },
-  delivered: { label: "Доставлен", color: "bg-green-500", icon: CheckCircle },
-  cancelled: { label: "Отменен", color: "bg-red-500", icon: XCircle },
+  pending: { label: 'Ожидает обработки', color: 'bg-yellow-500', icon: Clock },
+  confirmed: { label: 'Подтвержден', color: 'bg-blue-500', icon: CheckCircle },
+  preparing: { label: 'Готовится', color: 'bg-orange-500', icon: Package },
+  delivering: { label: 'В доставке', color: 'bg-purple-500', icon: Truck },
+  delivered: { label: 'Доставлен', color: 'bg-green-500', icon: CheckCircle },
+  cancelled: { label: 'Отменен', color: 'bg-red-500', icon: XCircle },
 }
 
 export default function OrdersPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const { orders, loading, error, loadOrders, clearOrders, refreshOrder, refreshingOrderId } = useOrdersStore()
+  const { orders, loading, error, loadOrders, clearOrders, refreshOrder, refreshingOrderId } =
+    useOrdersStore()
 
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
   const [expandedAddresses, setExpandedAddresses] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-    loadOrders();
+    loadOrders()
   }, [user, clearOrders])
 
   useEffect(() => {
@@ -48,7 +59,7 @@ export default function OrdersPage() {
 
   const handleRefreshOrder = async (orderId: number) => {
     await refreshOrder(orderId)
-    toast.success("Статус заказа обновлен")
+    toast.success('Статус заказа обновлен')
   }
 
   if (loading) {
@@ -79,9 +90,11 @@ export default function OrdersPage() {
               <Package className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Заказов пока нет</h3>
-            <p className="text-gray-500 text-center mb-6">Когда вы сделаете первый заказ, он появится здесь</p>
+            <p className="text-gray-500 text-center mb-6">
+              Когда вы сделаете первый заказ, он появится здесь
+            </p>
             <Button
-              onClick={() => router.push("/")}
+              onClick={() => router.push('/')}
               className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white"
             >
               Перейти к покупкам
@@ -93,12 +106,13 @@ export default function OrdersPage() {
             const StatusIcon = status.icon
             const isItemsExpanded = expandedItems[order.id] || false
             const isAddressExpanded = expandedAddresses[order.id] || false
-            const isRefreshing = refreshingOrderId === order.id;
-            console.log(isRefreshing, refreshingOrderId,order.id );
-
+            const isRefreshing = refreshingOrderId === order.id
 
             return (
-              <Card key={order.id} className="shadow-lg border-0 bg-white/70 backdrop-blur-sm overflow-hidden">
+              <Card
+                key={order.id}
+                className="shadow-lg border-0 bg-white/70 backdrop-blur-sm overflow-hidden"
+              >
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-3">
@@ -106,7 +120,11 @@ export default function OrdersPage() {
                       Заказ #{order.orderNumber}
                     </CardTitle>
                     <div className="flex items-center gap-2">
-                      <Badge className={`${status.color} text-white text-center hover:${status.color}`}>{status.label}</Badge>
+                      <Badge
+                        className={`${status.color} text-white text-center hover:${status.color}`}
+                      >
+                        {status.label}
+                      </Badge>
                       <Button
                         variant="outline"
                         size="sm"
@@ -114,7 +132,7 @@ export default function OrdersPage() {
                         disabled={isRefreshing}
                         className="h-8 w-8 p-0"
                       >
-                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                       </Button>
                     </div>
                   </div>
@@ -134,13 +152,18 @@ export default function OrdersPage() {
                             <Image
                               width={48}
                               height={48}
-                              src={media?.url || "/placeholder.svg?height=48&width=48&query=product-thumbnail"}
-                              alt={media?.alt || product?.title || "Товар"}
+                              src={
+                                media?.url ||
+                                '/placeholder.svg?height=48&width=48&query=product-thumbnail'
+                              }
+                              alt={media?.alt || product?.title || 'Товар'}
                               className="object-cover w-full h-full"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm text-gray-900 truncate">{product?.title || "Товар"}</h4>
+                            <h4 className="font-medium text-sm text-gray-900 truncate">
+                              {product?.title || 'Товар'}
+                            </h4>
                             <div className="flex justify-between items-center mt-1">
                               <span className="text-xs text-gray-500">
                                 {item.quantity} × {item.price} ₽
@@ -182,11 +205,11 @@ export default function OrdersPage() {
                       <MapPin className="h-4 w-4 text-gray-600" />
                       <h4 className="font-medium text-sm text-gray-900">Адрес доставки:</h4>
                     </div>
-                    <p className="text-sm text-gray-600">
-                        {getFullAddress(order.deliveryAddress)}
-                    </p>
+                    <p className="text-sm text-gray-600">{getFullAddress(order.deliveryAddress)}</p>
                     {order.deliveryAddress?.comment && isAddressExpanded && (
-                      <p className="text-xs text-gray-500 mt-1">💬 {order.deliveryAddress.comment}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        💬 {order.deliveryAddress.comment}
+                      </p>
                     )}
                   </div>
 

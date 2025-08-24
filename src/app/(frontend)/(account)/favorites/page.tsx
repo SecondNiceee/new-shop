@@ -1,20 +1,27 @@
-"use client"
+'use client'
 
-import { Heart, ShoppingCart, Trash2 } from "lucide-react"
-import { useEffect, useState, useCallback } from "react"
-import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
-import { useCartStore } from "@/entities/cart/cartStore"
-import { ProductCard } from "@/components/product-card/ProductCard"
-import { Button } from "@/components/ui/button"
-import type { Product } from "@/payload-types"
+import { Heart, ShoppingCart, Trash2 } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { useFavoritesStore } from '@/entities/favorites/favoritesStore'
+import { useCartStore } from '@/entities/cart/cartStore'
+import { ProductCard } from '@/components/product-card/ProductCard'
+import { Button } from '@/components/ui/button'
+import type { Product } from '@/payload-types'
 
 export default function FavoritesPage() {
-  const { favorites, loading, loadFavorites, favoriteProductIds, loadMoreFavorites, removeFromFavorites, hasMore, isLoadingMore } =
-    useFavoritesStore()
+  const {
+    favorites,
+    loading,
+    loadFavorites,
+    favoriteProductIds,
+    loadMoreFavorites,
+    removeFromFavorites,
+    hasMore,
+    isLoadingMore,
+  } = useFavoritesStore()
   const { increment } = useCartStore()
   const [isLoading, setIsLoading] = useState(true)
   const [loadMoreElement, setLoadMoreElement] = useState<HTMLDivElement | null>(null)
-
 
   useEffect(() => {
     const loadData = async () => {
@@ -29,7 +36,6 @@ export default function FavoritesPage() {
       const [target] = entries
       if (target.isIntersecting && hasMore && !isLoadingMore) {
         loadMoreFavorites()
-        console.log("вызов этой функции")
       }
     },
     [hasMore, isLoadingMore, loadMoreFavorites],
@@ -38,8 +44,8 @@ export default function FavoritesPage() {
   useEffect(() => {
     if (!loadMoreElement) return
     const observer = new IntersectionObserver(handleObserver, {
-        rootMargin : "50px 0px",
-        threshold : 0.1
+      rootMargin: '50px 0px',
+      threshold: 0.1,
     })
     observer.observe(loadMoreElement)
     return () => observer.disconnect()
@@ -82,7 +88,7 @@ export default function FavoritesPage() {
             Добавляйте товары в избранное, нажимая на сердечко в карточке товара
           </p>
           <Button
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = '/')}
             className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 text-lg rounded-xl"
           >
             Перейти к покупкам
@@ -106,7 +112,8 @@ export default function FavoritesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {favorites.map((favorite) => {
-          const product = typeof favorite.product === "string" ? null : (favorite.product as Product)
+          const product =
+            typeof favorite.product === 'string' ? null : (favorite.product as Product)
 
           if (!product) return null
 

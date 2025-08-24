@@ -3,7 +3,6 @@ import { request } from '@/utils/request'
 import { CreateReviewDto } from './dto/CreateReviewDto'
 import { ChangeReviewDto } from './dto/ChangeReviewDto'
 
-
 class ReviewsService {
   async loadReviews(productId: number) {
     const response = await request<{ docs: Review[] }>({
@@ -24,20 +23,19 @@ class ReviewsService {
       body: {
         product: dto.productId,
         rating: dto.rating,
-        comment: dto.comment
+        comment: dto.comment,
       },
       credentials: true,
     })
-    console.log(response.doc);
     return response.doc
   }
-  async changeReview(dto:ChangeReviewDto){
+  async changeReview(dto: ChangeReviewDto) {
     const response = await request<{ doc: Review }>({
       url: `/api/reviews/${dto.reviewId}`,
       method: 'PATCH',
       body: {
         rating: dto.rating,
-        comment: dto.comment
+        comment: dto.comment,
       },
       credentials: true,
     })

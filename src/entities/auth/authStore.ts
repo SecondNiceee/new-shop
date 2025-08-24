@@ -1,7 +1,7 @@
-"use client"
-import { create } from "zustand"
-import { request, type RequestError } from "@/utils/request"
-import type { User } from "@/payload-types"
+'use client'
+import { create } from 'zustand'
+import { request, type RequestError } from '@/utils/request'
+import type { User } from '@/payload-types'
 export type TUserResponse = { user: User | null }
 type AuthState = {
   user: User | null
@@ -21,15 +21,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null })
     try {
       const me = await request<TUserResponse>({
-        method: "GET",
-        url: "/api/users/me",
+        method: 'GET',
+        url: '/api/users/me',
         credentials: true,
-        query : {
-          "select[phone]" : "true",
-          "select[email]" : "true"
-        }
+        query: {
+          'select[phone]': 'true',
+          'select[email]': 'true',
+        },
       })
-      console.log(me);
       set({ user: me.user, loading: false })
       return me
     } catch (e) {
@@ -38,7 +37,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // А если и интернета нет, то мы получим так и так это уведомление
       const error = e as RequestError
       console.log(e)
-      set({ error, loading: false, user:null })
+      set({ error, loading: false, user: null })
       throw e
     }
   },
@@ -46,16 +45,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email, password) => {
     try {
       const rezult = await request<{ user: User }>({
-        url: "/api/users/login",
-        method: "POST",
+        url: '/api/users/login',
+        method: 'POST',
         credentials: true,
-        headers: { "Content-Type": "application/json" },
-        body: { email, password }
+        headers: { 'Content-Type': 'application/json' },
+        body: { email, password },
       })
       set({ user: rezult.user })
     } catch (err: any) {
-      console.log(err, JSON.stringify(err));
-      const requestError: RequestError = { message: "Не удалось зайти", status: 404 }
+      console.log(err, JSON.stringify(err))
+      const requestError: RequestError = { message: 'Не удалось зайти', status: 404 }
       throw requestError
     }
   },
@@ -63,16 +62,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (email, password) => {
     try {
       await request<User>({
-        url: "/api/auth/register",
-        method: "POST",
+        url: '/api/auth/register',
+        method: 'POST',
         body: { email, password },
         credentials: true,
         headers: {
-          "Content-Type": "application/json",
-        }
+          'Content-Type': 'application/json',
+        },
       })
     } catch (err: any) {
-      console.log(err, JSON.stringify(err));
+      console.log(err, JSON.stringify(err))
       throw err
     }
   },
@@ -80,26 +79,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     try {
       set({ user: null })
-      await fetch("/api/users/logout", {
-        method: "POST",
-        credentials: "include",
+      await fetch('/api/users/logout', {
+        method: 'POST',
+        credentials: 'include',
       })
     } catch (e) {
-      console.log(e);
+      console.log(e)
       throw e
     }
   },
 
   updateProfile: async (data) => {
     const { user } = get()
-    if (!user) throw new Error("User not authenticated")
+    if (!user) throw new Error('User not authenticated')
 
     try {
       const updatedUser = await request<{ doc: User }>({
-        method: "PATCH",
+        method: 'PATCH',
         url: `/api/users/${user.id}`,
         credentials: true,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: data,
       })
       set({ user: { ...user, ...updatedUser.doc } })

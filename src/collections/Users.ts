@@ -5,6 +5,10 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: "email",
   },
+  defaultPopulate : {
+    email : true,
+    id : true
+  },
   access: {
     create: () => true,
     admin : ({req : {user}}) => {
@@ -42,7 +46,6 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {},
-  
   fields: [
     // Email added by default
     {
