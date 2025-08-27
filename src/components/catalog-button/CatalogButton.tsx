@@ -6,7 +6,7 @@ import { useCatalogStore } from '@/entities/catalog/catalogStore';
 const CatalogButton = () => {
     const {setPopupCatalogOpened} = useCatalogStore();
     return (
-      <Button onClick={() => {setPopupCatalogOpened(true)}} variant="outline" className="flex w-full md:w-auto items-center gap-2 bg-transparent h-10 lg:h-11">
+      <Button onClick={() => {setPopupCatalogOpened(true)}} variant="outline" className="flex h-[53.6px] sm:h-auto justify-start md:justify-center w-full md:w-auto items-center gap-2 bg-transparent  lg:h-11">
         <Image
           alt="ГрандБАЗАР магазин"
           width={24}

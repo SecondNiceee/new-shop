@@ -196,16 +196,17 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
     : null
 
   return (
-    <div className="px-6 py-8 border-t border-gray-50">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-2xl font-semibold text-gray-900">Отзывы покупателей</h2>
+    <div className="px-3 py-4 sm:px-6 sm:py-8 border-t border-gray-50">
+      <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4 sm:mb-6">
+        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
+          <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Отзывы покупателей</h2>
           {product.averageRating && product.averageRating > 0 && product.reviewsCount && product.reviewsCount > 0 && (
-            <div className="flex items-center space-x-2 bg-orange-50 px-3 py-2 rounded-lg">
-              <span className="text-xl font-bold text-orange-600">{product.averageRating.toFixed(1)}</span>
-              <Star className="w-5 h-5 text-orange-400 fill-current" />
-              <span className="text-gray-600 font-medium">
-                {product.reviewsCount} {product.reviewsCount === 1 ? "отзыв" : product.reviewsCount < 5 ? "отзыва" : "отзывов"}
+            <div className="flex items-center space-x-2 bg-orange-50 px-2 py-1 sm:px-3 sm:py-2 rounded-lg self-start">
+              <span className="text-lg sm:text-xl font-bold text-orange-600">{product.averageRating.toFixed(1)}</span>
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400 fill-current" />
+              <span className="text-sm sm:text-base text-gray-600 font-medium">
+                {product.reviewsCount}{" "}
+                {product.reviewsCount === 1 ? "отзыв" : product.reviewsCount < 5 ? "отзыва" : "отзывов"}
               </span>
             </div>
           )}
@@ -214,41 +215,45 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
         {user && !userReview && !reviewsLoading && !checkingPurchase && (
           <Button
             onClick={handleShowReviewForm}
-            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
+            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 min-h-[44px]"
             disabled={hasPurchased === false}
           >
-            <MessageCircle className="w-4 h-4" />
-            <span>{hasPurchased === false ? "Нужна покупка для отзыва" : "Написать отзыв"}</span>
+            <MessageCircle className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden xs:inline">
+              {hasPurchased === false ? "Нужна покупка для отзыва" : "Написать отзыв"}
+            </span>
+            <span className="xs:hidden">{hasPurchased === false ? "Нужна покупка" : "Отзыв"}</span>
           </Button>
         )}
 
         {checkingPurchase && (
-          <div className="flex items-center space-x-2 text-gray-500">
+          <div className="flex items-center space-x-2 text-gray-500 text-sm">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Проверяем покупку...</span>
+            <span className="hidden sm:inline">Проверяем покупку...</span>
+            <span className="sm:hidden">Проверяем...</span>
           </div>
         )}
       </div>
 
       {showReviewForm && user && !userReview && !reviewsLoading && hasPurchased && (
-        <div className="bg-gray-50 rounded-xl p-6 mb-6 animate-in slide-in-from-bottom-2 duration-300">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Оставить отзыв</h3>
+        <div className="bg-gray-50 rounded-xl p-3 sm:p-6 mb-4 sm:mb-6 animate-in slide-in-from-bottom-2 duration-300">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Оставить отзыв</h3>
           <form
             onSubmit={(e) => {
               e.preventDefault()
               handleReviewSubmit()
             }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Ваша оценка</label>
-              <div className="flex gap-1 items-center">
+              <div className="flex gap-2 items-center">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => setNewReview({ ...newReview, rating: star })}
-                    className={`w-7 h-7 rounded-full relative transition-all flex items-center justify-center ${
+                    className={`w-10 h-10 sm:w-8 sm:h-8 rounded-full relative transition-all flex items-center justify-center touch-manipulation ${
                       star <= newReview.rating
                         ? "bg-yellow-400 text-white"
                         : "bg-gray-200 text-gray-400 hover:bg-gray-300"
@@ -265,27 +270,27 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
               <textarea
                 value={newReview.comment}
                 onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white text-sm sm:text-base"
                 placeholder="Поделитесь своим опытом использования товара..."
                 required
                 minLength={10}
               />
             </div>
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex flex-col-reverse sm:flex-row justify-end space-y-2 space-y-reverse sm:space-y-0 sm:space-x-3">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setShowReviewForm(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 min-h-[44px]"
               >
                 Отмена
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || !newReview.comment.trim() || newReview.comment.length < 10}
-                className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
+                className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center space-x-2 min-h-[44px]"
               >
                 {isSubmitting ? (
                   <>
@@ -304,17 +309,17 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
         </div>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-6">
         {reviewsLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-orange-500 mr-2" />
-            <span className="text-gray-500">Загрузка отзывов...</span>
+          <div className="flex items-center justify-center py-6 sm:py-8">
+            <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-orange-500 mr-2" />
+            <span className="text-gray-500 text-sm sm:text-base">Загрузка отзывов...</span>
           </div>
         ) : reviews.length === 0 ? (
-          <div className="text-center py-12">
-            <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">Пока нет отзывов об этом товаре.</p>
-            <p className="text-gray-400 text-sm mt-2">Будьте первым, кто оставит отзыв!</p>
+          <div className="text-center py-8 sm:py-12">
+            <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3 sm:mb-4" />
+            <p className="text-gray-500 text-sm sm:text-base">Пока нет отзывов об этом товаре.</p>
+            <p className="text-gray-400 text-xs sm:text-sm mt-2">Будьте первым, кто оставит отзыв!</p>
           </div>
         ) : (
           reviews.map((review) => {
@@ -325,19 +330,19 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
             return (
               <div
                 key={review.id}
-                className="bg-white border border-gray-100 rounded-xl p-6 hover:shadow-md transition-shadow"
+                className="bg-white border border-gray-100 rounded-xl p-3 sm:p-6 hover:shadow-md transition-shadow"
               >
                 {editingReview === review.id ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Ваша оценка</label>
-                      <div className="flex space-x-1 items-center">
+                      <div className="flex gap-2 items-center">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
                             onClick={() => setEditReviewData({ ...editReviewData, rating: star })}
-                            className={`w-7 h-7 rounded-full relative transition-all flex items-center justify-center ${
+                            className={`w-10 h-10 sm:w-8 sm:h-8 rounded-full relative transition-all flex items-center justify-center touch-manipulation ${
                               star <= editReviewData.rating
                                 ? "bg-yellow-400 text-white"
                                 : "bg-gray-200 text-gray-400 hover:bg-gray-300"
@@ -354,14 +359,14 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                       <textarea
                         value={editReviewData.comment}
                         onChange={(e) => setEditReviewData({ ...editReviewData, comment: e.target.value })}
-                        rows={4}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white"
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-white text-sm sm:text-base"
                         required
                         minLength={10}
                       />
                     </div>
 
-                    <div className="flex justify-end space-x-3">
+                    <div className="flex flex-col-reverse sm:flex-row justify-end space-y-2 space-y-reverse sm:space-y-0 sm:space-x-3">
                       <Button
                         type="button"
                         variant="ghost"
@@ -369,14 +374,14 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                           setEditingReview(null)
                           setEditReviewData({ rating: 5, comment: "" })
                         }}
-                        className="text-gray-500 hover:text-gray-700"
+                        className="text-gray-500 hover:text-gray-700 min-h-[44px]"
                       >
                         Отмена
                       </Button>
                       <Button
                         onClick={() => handleEditReview(review.id)}
                         disabled={isSubmitting || !editReviewData.comment.trim() || editReviewData.comment.length < 10}
-                        className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2"
+                        className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center space-x-2 min-h-[44px]"
                       >
                         {isSubmitting ? (
                           <>
@@ -394,14 +399,16 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex flex-col space-y-2 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-orange-500" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">{reviewUser?.email || "Пользователь"}</h4>
-                          <p className="text-sm text-gray-500">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                            {reviewUser?.email || "Пользователь"}
+                          </h4>
+                          <p className="text-xs sm:text-sm text-gray-500">
                             {new Date(review.createdAt).toLocaleDateString("ru-RU", {
                               day: "numeric",
                               month: "long",
@@ -410,12 +417,12 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center justify-between sm:justify-end space-x-2 sm:flex-col sm:items-end sm:space-x-0 sm:space-y-1">
                         <div className="flex items-center">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`w-5 h-5  ${
+                              className={`w-4 h-4 sm:w-5 sm:h-5 ${
                                 i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
                               }`}
                             />
@@ -426,14 +433,14 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
                             variant="ghost"
                             size="sm"
                             onClick={() => startEditReview(review)}
-                            className="h-8 w-8 p-0 hover:bg-gray-100"
+                            className="h-8 w-8 p-0 hover:bg-gray-100 touch-manipulation"
                           >
                             <Edit2 className="h-4 w-4 text-gray-500" />
                           </Button>
                         )}
                       </div>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                    <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.comment}</p>
                   </>
                 )}
               </div>

@@ -138,7 +138,7 @@ export default function ProfilePage() {
           className="w-full flex items-center justify-between bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-all duration-200 rounded-2xl px-6 py-5 border border-orange-100 shadow-sm hover:shadow-md group"
         >
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center">
+            <div className="min-w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center">
               <MapPin className="h-5 w-5 text-white" />
             </div>
             <span className="text-sm md:text-base text-gray-900 font-medium">

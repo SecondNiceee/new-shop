@@ -88,14 +88,14 @@ export function Categories() {
   }
 
   return (
-    <div className="bg-white  py-4">
+    <div className="bg-white py-4">
       <div className="max-w-7xl mx-auto px-4 relative">
         {/* Кнопка прокрутки влево */}
         {canScrollLeft && (
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-50 rounded-full w-8 h-8"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-50 rounded-full w-5 h-5 sm:w-8 sm:h-8"
             onClick={scrollLeft}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -107,7 +107,7 @@ export function Categories() {
           <Button
             variant="outline"
             size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-50 rounded-full w-8 h-8"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-50 rounded-full w-5 h-5 sm:w-8 sm:h-8"
             onClick={scrollRight}
           >
             <ChevronRight className="h-4 w-4" />
@@ -127,7 +127,7 @@ export function Categories() {
               className={`flex flex-col items-center gap-2 min-w-[90px] max-w-[90px] cursor-pointer hover:text-green-600 transition-colors`}
             >
               <div
-                className={`sm:w-12 sm:h-12 w-6 h-6 ${slug === category.value ? "bg-green-400" : "bg-gray-100"}  rounded-full flex items-center justify-center hover:bg-green-50`}
+                className={`sm:w-12 sm:h-12 w-7 h-7 ${slug === category.value ? "bg-green-400" : "bg-gray-100"}  rounded-full flex items-center justify-center hover:bg-green-50`}
               >
                 <Image
                   width={30}

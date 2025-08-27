@@ -99,13 +99,13 @@ const ProductSearch = ({onProductSelect }: ProductSearchProps) => {
       </div>
 
       {isOpen && (
-        <Card className="absolute py-0 w-full md:w-[140%] lg:w-[150%] top-full right-0 mt-1 bg-white border border-gray-200 shadow-lg z-[100] max-h-96 overflow-y-auto">
+        <Card className="absolute py-0 w-[calc(100vw-40px)] md:w-[140%] lg:w-[150%] top-full left-0 md:left-auto md:right-0 mt-1 bg-white border border-gray-200 shadow-lg z-[200] max-h-96 overflow-y-auto">
           {isLoading ? (
             <div className="p-4 text-center text-gray-500">
               Поиск...
             </div>
           ) : results.length > 0 ? (
-            <div className="p-2 grid grid-cols-3 gap-3">
+            <div className="p-2 grid grid-cols-1 md:grid-cols-3 gap-3">
               {results.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

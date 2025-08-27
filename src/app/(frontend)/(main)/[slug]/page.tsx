@@ -193,7 +193,7 @@ useEffect(() => {
               onClick={toNextCategory}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
             >
-             <p className='text-white font-semibold'>К разделу "{categories[currentCategoryIndex + 1].title}"</p> 
+             <p className='text-white text-sm md:text-base font-semibold'>К разделу "{categories[currentCategoryIndex + 1].title}"</p> 
             <ArrowRight color='white' size={20} />
             </button>
           </div>

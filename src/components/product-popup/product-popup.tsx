@@ -1,8 +1,8 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { X, Loader2} from "lucide-react"
+import { X, Loader2 } from "lucide-react"
 import { useProductsStore } from "@/entities/products/productsStore"
 import { useRouter, useSearchParams } from "next/navigation"
 import ErrorAlert from "../error-alert/ErrorAlert"
@@ -50,7 +50,7 @@ const ProductPopup = () => {
   }
   return (
     <Dialog open={isProductsPopupOpened} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl border-none max-h-[90vh] p-0 overflow-hidden rounded-2xl z-[110] bg-white shadow-xl">
+      <DialogContent className="max-w-6xl border-none max-h-[90vh] p-0 overflow-hidden rounded-2xl bg-white shadow-xl">
         <DialogTitle className="sr-only">{currentProduct?.title || "Просмотр товара"}</DialogTitle>
         {loading || !currentProduct ? (
           <div className="flex h-[80vh] items-center justify-center py-8">
@@ -63,17 +63,17 @@ const ProductPopup = () => {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="absolute top-4 right-4 z-50 h-8 w-8 p-0 hover:bg-gray-100 rounded-full"
+              className="absolute top-2 right-2 z-50 h-10 w-10 p-0 hover:bg-gray-100 rounded-full sm:top-4 sm:right-4 sm:h-8 sm:w-8"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 sm:h-4 sm:w-4" />
             </Button>
-            <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: "90vh" }}>
+            <div className="overflow-y-auto mt-[18px] pb-[30px] hide-scrollbar" style={{ maxHeight: "95vh" }}>
               {/* Breadcrumb */}
               <BreadCrumb product={currentProduct} />
 
               {/* Main Product Section */}
-              <div className="px-6 py-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="px-3 py-2 sm:px-6 sm:py-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
                   {/* Product Image */}
                   <ProductImage product={currentProduct} />
 
@@ -83,7 +83,6 @@ const ProductPopup = () => {
               </div>
 
               {/* Reviews Section */}
-
               <ReviewSection id={id} product={currentProduct} />
               {/* Related Products Section */}
               <RelatedProducts product={currentProduct} />

@@ -31,7 +31,7 @@ const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(
     }
 
     return (
-      <div className="flex sticky z-20 top-[225px] pb-3 pt-3 md:top-[185px] lg:top-[190px] mx-auto bg-white ">
+      <div className="flex sticky z-20 top-[164px] sm:top-[205px] pb-3 pt-3 md:top-[185px] lg:top-[190px] mx-auto bg-white ">
         <div className="max-w-7xl w-full px-4 mx-auto">
           <div ref={ref} className="flex gap-4 overflow-x-scroll hide-scrollbar">
             {sortedProducts.map((item, index) => {

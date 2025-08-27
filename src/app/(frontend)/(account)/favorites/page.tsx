@@ -75,7 +75,7 @@ export default function FavoritesPage() {
   if (favorites.length === 0) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl">
-        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-10">
+        <h2 className="md:text-2xl text-lg text-black font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-10">
           Избранное
         </h2>
 
@@ -101,12 +101,12 @@ export default function FavoritesPage() {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl">
       <div className="flex items-center justify-between mb-10">
-        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+        <h2 className="md:text-2xl text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           Избранное
         </h2>
         <div className="flex items-center gap-2 text-gray-600">
           <Heart className="w-5 h-5 text-red-500" />
-          <span className="text-lg font-medium">{[...favoriteProductIds].length} товаров</span>
+          <span className="text-base sm:text-lg font-medium">{[...favoriteProductIds].length} товаров</span>
         </div>
       </div>
 
@@ -120,28 +120,6 @@ export default function FavoritesPage() {
           return (
             <div key={favorite.id} className="relative group">
               <ProductCard product={product} />
-
-              {/* Overlay with actions */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    size="sm"
-                    className="bg-green-500 hover:bg-green-600 text-white shadow-lg"
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-1" />В корзину
-                  </Button>
-                  <Button
-                    onClick={() => handleRemoveFromFavorites(product.id)}
-                    size="sm"
-                    variant="destructive"
-                    className="shadow-lg"
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Удалить
-                  </Button>
-                </div>
-              </div>
             </div>
           )
         })}

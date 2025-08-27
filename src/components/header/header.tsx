@@ -5,7 +5,7 @@ import HeaderDesktop from "./ui/header-desktop/header-desktop"
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-[40]">
+    <header className="sticky top-0 z-[200]">
       <div className="bg-gray-100 z-30 relative shadow-md px-4 py-4 lg:py-5">
         <div className="max-w-7xl mx-auto">
           {/* Mobile Layout (< 768px) */}

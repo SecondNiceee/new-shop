@@ -174,7 +174,7 @@ const AddressPopup = () => {
         {/* Фиксированный заголовок */}
         <div className="flex-shrink-0 bg-white border-b border-gray-100">
           <DialogHeader className="flex flex-row items-center justify-between p-6 pb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-900">Выберите адрес доставки</DialogTitle>
+            <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900">Выберите адрес доставки</DialogTitle>
             <Button
               variant="ghost"
               size="sm"

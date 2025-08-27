@@ -4,7 +4,7 @@ import { MapPin } from 'lucide-react'
 import React, { FC } from 'react'
 
 interface IAddressButton {
-  className?: string
+  className?: string  
 }
 const AddressButton: FC<IAddressButton> = ({ className }) => {
   const { getFullAddress, openDialog } = useAddressStore()
