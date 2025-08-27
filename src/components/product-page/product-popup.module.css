@@ -1,0 +1,13 @@
+.breadcrumbLink {
+  @apply text-xs sm:text-sm;
+}
+
+/* Added scrollbar hide utility for breadcrumbs */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

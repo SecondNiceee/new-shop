@@ -4,8 +4,6 @@ import { Product } from "@/payload-types";
 import { RequestError } from "@/utils/request";
 import { create } from "zustand";
 interface ProductsStore{
-    isProductsPopupOpened : boolean,
-    setProductsPopup : (value : boolean) => void ,
     currentProduct : Product | null,
     products : Record<string, Product>,
     getProduct : (id : string) => Promise<void>,
@@ -13,8 +11,6 @@ interface ProductsStore{
     loading : boolean
 }
 export const useProductsStore = create<ProductsStore>((set, get) => ({
-    isProductsPopupOpened : false,
-    setProductsPopup : (value : boolean) => {set({isProductsPopupOpened:value})},
     currentProduct : null,
     products : {},
     error : null,

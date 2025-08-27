@@ -130,7 +130,7 @@ export default function CheckoutPage() {
   const isOrderValid = isPhoneValid() && currentAddress && items.length > 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 p-4">
+    <div className="min-h-screen p-4 bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -138,13 +138,13 @@ export default function CheckoutPage() {
             variant="ghost"
             size="sm"
             onClick={() => router.back()}
-            className="p-3 hover:bg-white/60 rounded-full shadow-sm transition-all duration-200 hover:shadow-md"
+            className="p-3 transition-all duration-200 rounded-full shadow-sm hover:bg-white/60 hover:shadow-md"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse"></div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <div className="p-2 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 animate-pulse"></div>
+            <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text">
               Оформление заказа
             </h1>
           </div>
@@ -152,19 +152,19 @@ export default function CheckoutPage() {
 
         <div className="grid lg:grid-cols-3 gap-8 lg:grid-rows-[auto_1fr] lg:items-start">
           {/* Left Column - Order Details */}
-          <div className="lg:col-span-2 grid gap-6 lg:grid-rows-subgrid lg:row-span-2">
+          <div className="grid gap-6 lg:col-span-2 lg:grid-rows-subgrid lg:row-span-2">
             {/* Cart Items */}
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden flex flex-col">
+            <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
-                  <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 animate-pulse"></div>
                   Ваш заказ
-                  <span className="px-3 py-1 bg-gradient-to-r from-emerald-500 to-blue-500 text-white text-sm rounded-full font-medium">
+                  <span className="px-3 py-1 text-sm font-medium text-white rounded-full bg-gradient-to-r from-emerald-500 to-blue-500">
                     {totalCount} товаров
                   </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 pt-3 flex-1">
+              <CardContent className="flex-1 pt-3 space-y-4">
                 {items.map((item) => {
                   const media = item.product.image as Media
                   const price = item.product.price || 0
@@ -173,9 +173,9 @@ export default function CheckoutPage() {
                   return (
                     <div
                       key={item.product.id}
-                      className="group flex gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-blue-50/50 rounded-2xl hover:shadow-md transition-all duration-200 border border-gray-100/50"
+                      className="flex gap-4 p-4 transition-all duration-200 border group bg-gradient-to-r from-gray-50/80 to-blue-50/50 rounded-2xl hover:shadow-md border-gray-100/50"
                     >
-                      <div className="relative w-20 h-20 overflow-hidden rounded-xl bg-white shadow-sm group-hover:shadow-md transition-shadow duration-200">
+                      <div className="relative w-20 h-20 overflow-hidden transition-shadow duration-200 bg-white shadow-sm rounded-xl group-hover:shadow-md">
                         <Image
                           width={80}
                           height={80}
@@ -185,20 +185,20 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate text-lg">{item.product.title}</h3>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">{item.product.title}</h3>
+                        <p className="mt-1 text-sm text-gray-500">
                           {item.product.weight?.value} {item.product.weight?.unit}
                         </p>
-                        <div className="flex justify-between items-center mt-3">
+                        <div className="flex items-center justify-between mt-3">
                           <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
+                            <div className="flex items-center gap-2 p-1 bg-white rounded-lg shadow-sm">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => increment(item.product)}
-                                className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md"
+                                className="w-8 h-8 p-0 rounded-md hover:bg-gray-100"
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus className="w-4 h-4" />
                               </Button>
                               <span className="font-medium text-gray-900 min-w-[2rem] text-center">
                                 {item.quantity}
@@ -207,14 +207,14 @@ export default function CheckoutPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => dicrement(item.product.id)}
-                                className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md"
+                                className="w-8 h-8 p-0 rounded-md hover:bg-gray-100"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="w-4 h-4" />
                               </Button>
                             </div>
-                            <span className="text-gray-600 font-medium">× {price} ₽</span>
+                            <span className="font-medium text-gray-600">× {price} ₽</span>
                           </div>
-                          <span className="font-bold text-xl bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                          <span className="text-xl font-bold text-transparent bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text">
                             {sum} ₽
                           </span>
                         </div>
@@ -226,25 +226,25 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Address */}
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden flex flex-col">
+            <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
-                  <MapPin className="h-6 w-6 text-blue-500" />
+                  <MapPin className="w-6 h-6 text-blue-500" />
                   Адрес доставки
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-3 flex-1">
+              <CardContent className="flex-1 pt-3">
                 <div
                   onClick={handleEditAddress}
                   className="group bg-gradient-to-r from-blue-50/80 to-purple-50/50 p-5 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-200 border border-blue-100/50 hover:border-blue-200 h-full flex flex-col justify-between min-h-[120px]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900 text-lg leading-relaxed">
+                      <p className="text-lg font-semibold leading-relaxed text-gray-900">
                         {currentAddress ? getFullAddress() : "Адрес не указан"}
                       </p>
                       {currentAddress?.comment && (
-                        <p className="text-gray-600 mt-2 text-sm bg-white/60 px-3 py-2 rounded-lg">
+                        <p className="px-3 py-2 mt-2 text-sm text-gray-600 rounded-lg bg-white/60">
                           💬 {currentAddress.comment}
                         </p>
                       )}
@@ -252,12 +252,12 @@ export default function CheckoutPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="ml-3 p-2 hover:bg-blue-100 rounded-full group-hover:bg-blue-100 transition-colors duration-200"
+                      className="p-2 ml-3 transition-colors duration-200 rounded-full hover:bg-blue-100 group-hover:bg-blue-100"
                     >
-                      <Edit3 className="h-4 w-4 text-blue-600" />
+                      <Edit3 className="w-4 h-4 text-blue-600" />
                     </Button>
                   </div>
-                  <p className="text-xs text-blue-600 mt-3 opacity-70 group-hover:opacity-100 transition-opacity duration-200">
+                  <p className="mt-3 text-xs text-blue-600 transition-opacity duration-200 opacity-70 group-hover:opacity-100">
                     Нажмите для изменения адреса
                   </p>
                 </div>
@@ -268,17 +268,17 @@ export default function CheckoutPage() {
           {/* Right Column - Payment */}
           <div className="grid gap-6 lg:grid-rows-subgrid lg:row-span-2">
             {/* Phone Input */}
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md overflow-hidden flex flex-col">
+            <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
-                  <Phone className="h-6 w-6 text-emerald-500" />
+                  <Phone className="w-6 h-6 text-emerald-500" />
                   Контакты
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-3 flex-1">
+              <CardContent className="flex-1 pt-3">
                 <div className="space-y-3 h-full flex flex-col justify-between min-h-[120px]">
                   <div className="space-y-3">
-                    <label className="text-sm text-gray-600 font-medium">
+                    <label className="text-sm font-medium text-gray-600">
                       По телефону мы сможем связаться с вами при доставке
                     </label>
                     <div className="flex gap-2">
@@ -287,27 +287,27 @@ export default function CheckoutPage() {
                         placeholder="+7 (___) ___-__-__"
                         value={phone}
                         onChange={handlePhoneChange}
-                        className="bg-white/70 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 text-lg py-3 rounded-xl flex-1"
+                        className="flex-1 py-3 text-lg border-gray-200 bg-white/70 focus:border-emerald-500 focus:ring-emerald-500/20 rounded-xl"
                         maxLength={18}
                       />
                       {hasPhoneChanged && (
                         <Button
                           onClick={handleSavePhone}
                           disabled={isSaving || !isPhoneValid()}
-                          className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-3 rounded-xl transition-all duration-200 disabled:opacity-50"
+                          className="px-4 py-3 text-white transition-all duration-200 bg-emerald-500 hover:bg-emerald-600 rounded-xl disabled:opacity-50"
                         >
                           {isSaving ? (
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <div className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin" />
                           ) : (
-                            <Save className="h-4 w-4" />
+                            <Save className="w-4 h-4" />
                           )}
                         </Button>
                       )}
                     </div>
                   </div>
                   {!isPhoneValid() && (
-                    <p className="text-sm text-red-600 flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
+                    <p className="flex items-center gap-2 text-sm text-red-600">
+                      <Phone className="w-4 h-4" />
                       Укажите номер телефона для оформления заказа
                     </p>
                   )}
@@ -316,24 +316,24 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Order Summary */}
-            <Card className="shadow-2xl border-0 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600 text-white overflow-hidden flex flex-col">
+            <Card className="flex flex-col overflow-hidden text-white border-0 shadow-2xl bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-xl">
-                  <CreditCard className="h-6 w-6" />
+                  <CreditCard className="w-6 h-6" />
                   Итого к оплате
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 pt-3 flex-1 flex flex-col justify-between">
+              <CardContent className="flex flex-col justify-between flex-1 pt-3 space-y-6">
                 <div className="space-y-3">
-                  <div className="flex justify-between text-white/90 text-lg">
+                  <div className="flex justify-between text-lg text-white/90">
                     <span>Товары ({totalCount})</span>
                     <span className="font-semibold">{totalPrice} ₽</span>
                   </div>
-                  <div className="flex justify-between text-white/90 text-lg">
+                  <div className="flex justify-between text-lg text-white/90">
                     <span>Доставка</span>
                     <span className="font-semibold">199 ₽</span>
                   </div>
-                  <div className="border-t border-white/30 pt-3">
+                  <div className="pt-3 border-t border-white/30">
                     <div className="flex justify-between text-2xl font-bold">
                       <span>Итого</span>
                       <span>{totalPrice + 199} ₽</span>
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                 >
                   {isProcessingOrder ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 rounded-full border-emerald-600 border-t-transparent animate-spin" />
                       Оформляем заказ...
                     </div>
                   ) : (

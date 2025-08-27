@@ -14,6 +14,7 @@ import { useFavoritesStore } from '@/entities/favorites/favoritesStore'
 import { toast } from 'sonner'
 import { useGuestBenefitsStore } from '../auth/guest-benefits-modal'
 import { formatPrice, getDiscountInfo } from '@/utils/discountUtils'
+import { routerConfig } from '@/config/router.config'
 
 interface IProductCard {
   product: Product
@@ -21,7 +22,6 @@ interface IProductCard {
 
 export function ProductCard({ product }: IProductCard) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { increment, dicrement, items } = useCartStore()
   const { addToFavorites, removeFromFavorites, favoriteProductIds } = useFavoritesStore()
   const { user } = useAuthStore()
@@ -33,13 +33,7 @@ export function ProductCard({ product }: IProductCard) {
   const isFavorite = [...favoriteProductIds].find((id) => id === product.id)
 
   const onProductClick = () => {
-    const newParams = new URLSearchParams(searchParams?.toString())
-    if (newParams.get('product')) {
-      newParams.set('product', String(product.id))
-      router.replace(`${window.location.pathname}?${newParams}`)
-    } else {
-      router.push(`?product=${product.id}`, { scroll: false })
-    }
+    router.push(`${routerConfig.product}?id=${product.id}`);
   }
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {

@@ -7,6 +7,7 @@ class Router{
     mobileLogin = "/login"
     mobileCart = "/mobile-cart"
     mobileCatalog = "/catalog"
+    product = "/product"
 
 }
 export const routerConfig = new Router();
