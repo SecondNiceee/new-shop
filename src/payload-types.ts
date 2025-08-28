@@ -76,6 +76,7 @@ export interface Config {
     orders: Order;
     reviews: Review;
     favorites: Favorite;
+    about: About;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -91,6 +92,7 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     favorites: FavoritesSelect<false> | FavoritesSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -393,6 +395,115 @@ export interface Favorite {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  title: string;
+  /**
+   * Описание для поисковых систем (до 160 символов)
+   */
+  metaDescription?: string | null;
+  content?:
+    | (
+        | {
+            title: string;
+            subtitle?: string | null;
+            backgroundImage?: (number | null) | Media;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            title?: string | null;
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            alignment?: ('left' | 'center' | 'right') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textBlock';
+          }
+        | {
+            image: number | Media;
+            alt: string;
+            caption?: string | null;
+            size?: ('small' | 'medium' | 'large' | 'full') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'imageBlock';
+          }
+        | {
+            image: number | Media;
+            alt: string;
+            title?: string | null;
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            layout?: ('imageLeft' | 'imageRight') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'imageTextBlock';
+          }
+        | {
+            title?: string | null;
+            stats?:
+              | {
+                  number: string;
+                  label: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'statsBlock';
+          }
+        | {
+            title?: string | null;
+            members?:
+              | {
+                  name: string;
+                  position: string;
+                  photo?: (number | null) | Media;
+                  description?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'teamBlock';
+          }
+      )[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -433,6 +544,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'favorites';
         value: number | Favorite;
+      } | null)
+    | ({
+        relationTo: 'about';
+        value: number | About;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -664,6 +779,89 @@ export interface ReviewsSelect<T extends boolean = true> {
 export interface FavoritesSelect<T extends boolean = true> {
   user?: T;
   product?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  title?: T;
+  metaDescription?: T;
+  content?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              backgroundImage?: T;
+              id?: T;
+              blockName?: T;
+            };
+        textBlock?:
+          | T
+          | {
+              title?: T;
+              content?: T;
+              alignment?: T;
+              id?: T;
+              blockName?: T;
+            };
+        imageBlock?:
+          | T
+          | {
+              image?: T;
+              alt?: T;
+              caption?: T;
+              size?: T;
+              id?: T;
+              blockName?: T;
+            };
+        imageTextBlock?:
+          | T
+          | {
+              image?: T;
+              alt?: T;
+              title?: T;
+              content?: T;
+              layout?: T;
+              id?: T;
+              blockName?: T;
+            };
+        statsBlock?:
+          | T
+          | {
+              title?: T;
+              stats?:
+                | T
+                | {
+                    number?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        teamBlock?:
+          | T
+          | {
+              title?: T;
+              members?:
+                | T
+                | {
+                    name?: T;
+                    position?: T;
+                    photo?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
 }
