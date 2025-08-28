@@ -2,6 +2,7 @@ import { Favorite, Product } from '@/payload-types'
 import { favoritesService } from '@/services/favoritesService/favoritesService'
 import { RequestError } from '@/utils/request'
 import { create } from 'zustand'
+import { useAuthStore } from '../auth/authStore'
 
 interface FavoritesState {
   favorites: Favorite[]

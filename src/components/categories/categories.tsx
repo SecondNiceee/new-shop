@@ -65,6 +65,17 @@ export function Categories() {
     }
   }
 
+  // Горизонтальная прокрутка колесиком мыши
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (!scrollContainerRef.current) return
+    // Блокируем вертикальную прокрутку страницы при взаимодействии с категориями
+    e.preventDefault()
+    e.stopPropagation()
+    // Преобразуем вертикальную прокрутку в горизонтальную (или используем горизонтальную, если она есть)
+    const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+    scrollContainerRef.current.scrollBy({ left: delta, behavior: "smooth" })
+  }
+
 
   if (isLoading && !categories.length) {
     return (
@@ -117,8 +128,9 @@ export function Categories() {
         {/* Контейнер с категориями */}
         <div
           ref={scrollContainerRef}
-          className="flex items-start gap-1 sm:gap-3 md:gap-5 overflow-x-scroll hide-scrollbar overflow-y-hidden"
+          className="flex items-start gap-1 sm:gap-3 md:gap-5 overflow-x-scroll hide-scrollbar overflow-y-hidden overscroll-x-contain overscroll-y-none touch-pan-x"
           onScroll={checkScrollability}
+          onWheelCapture={handleWheel}
         >
           {categories.map((category, index) => (
             <Link

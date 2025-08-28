@@ -25,8 +25,6 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
   const [editReviewData, setEditReviewData] = useState({ rating: 4, comment: "" })
   const [hasPurchased, setHasPurchased] = useState<boolean | null>(null)
   const [checkingPurchase, setCheckingPurchase] = useState(false)
-
-  const { isProductsPopupOpened } = useProductsStore()
   const { user } = useAuthStore()
 
   const loadReviews = async (productId: number) => {
@@ -62,11 +60,9 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
   }
 
   useEffect(() => {
-    if (isProductsPopupOpened && id) {
       loadReviews(Number(id))
       checkPurchaseStatus(Number(id))
-    }
-  }, [id, isProductsPopupOpened, user])
+  }, [id, user])
 
   const handleReviewSubmit = async () => {
     if (!product) {

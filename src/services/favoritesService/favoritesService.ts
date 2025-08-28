@@ -41,7 +41,7 @@ class FavoritesService {
         url : `${this.baseUrl}`,
         credentials : true,
         query : {
-          page : String(page), limit : String(limit)
+          page : String(page), limit : String(limit),
         }
     })
     return rezult;
@@ -51,7 +51,7 @@ class FavoritesService {
     const rezult = await request<{docs:Favorite[]}>({
         method : "GET",
         url : this.baseUrl + '/findIds',
-        credentials : true,
+        credentials : true
     })
 
     return rezult.docs.map( (product) => (product.product as number) );

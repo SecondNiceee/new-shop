@@ -8,5 +8,6 @@ export const beforeValidateHook:CollectionBeforeValidateHook<any> = ({ data, req
         if (!data.user) {
           data.user = req.user.id
         } 
+        console.log(data);
         return data
 }

@@ -17,7 +17,10 @@ export const GET = async (req: NextRequest) => {
       select: {
         product: true,
       },
-      user : user.user
+      user : user.user,
+      where : {
+        user : {equals : user.user.id}
+      }
     })
     return NextResponse.json({ docs: favoritiesIds.docs }, { status: 200 })
   } catch (e) {
