@@ -1,18 +1,8 @@
-import { isAdmin } from "@/utils/accessUtils"
-import type { CollectionConfig } from "payload"
+import type { GlobalConfig } from "payload"
 
-const About: CollectionConfig = {
+const About: GlobalConfig = {
   slug: "about",
-  admin: {
-    useAsTitle: "title",
-    defaultColumns: ["title", "updatedAt"],
-  },
-  access: {
-    create: isAdmin,
-    read: () => true,
-    update: isAdmin,
-    delete: isAdmin,
-  },
+  label: "О нас",
   fields: [
     {
       name: "title",
@@ -22,24 +12,20 @@ const About: CollectionConfig = {
       defaultValue: "О нас",
     },
     {
-      name: "metaDescription",
+      name: "description",
       type: "textarea",
-      label: "Мета-описание",
-      maxLength: 160,
-      admin: {
-        description: "Описание для поисковых систем (до 160 символов)",
-      },
+      label: "Описание для SEO",
     },
     {
-      name: "content",
+      name: "blocks",
       type: "blocks",
-      label: "Содержимое страницы",
+      label: "Блоки контента",
       blocks: [
         {
           slug: "hero",
           labels: {
-            singular: "Главный блок",
-            plural: "Главные блоки",
+            singular: "Hero блок",
+            plural: "Hero блоки",
           },
           fields: [
             {
@@ -56,8 +42,8 @@ const About: CollectionConfig = {
             {
               name: "backgroundImage",
               type: "upload",
-              label: "Фоновое изображение",
               relationTo: "media",
+              label: "Фоновое изображение",
             },
           ],
         },
@@ -79,17 +65,6 @@ const About: CollectionConfig = {
               label: "Содержимое",
               required: true,
             },
-            {
-              name: "alignment",
-              type: "select",
-              label: "Выравнивание",
-              options: [
-                { label: "По левому краю", value: "left" },
-                { label: "По центру", value: "center" },
-                { label: "По правому краю", value: "right" },
-              ],
-              defaultValue: "left",
-            },
           ],
         },
         {
@@ -102,32 +77,20 @@ const About: CollectionConfig = {
             {
               name: "image",
               type: "upload",
-              label: "Изображение",
               relationTo: "media",
+              label: "Изображение",
               required: true,
             },
             {
               name: "alt",
               type: "text",
-              label: "Альтернативный текст",
+              label: "Alt текст",
               required: true,
             },
             {
               name: "caption",
               type: "text",
-              label: "Подпись к изображению",
-            },
-            {
-              name: "size",
-              type: "select",
-              label: "Размер изображения",
-              options: [
-                { label: "Маленький", value: "small" },
-                { label: "Средний", value: "medium" },
-                { label: "Большой", value: "large" },
-                { label: "Во всю ширину", value: "full" },
-              ],
-              defaultValue: "medium",
+              label: "Подпись",
             },
           ],
         },
@@ -141,36 +104,37 @@ const About: CollectionConfig = {
             {
               name: "image",
               type: "upload",
-              label: "Изображение",
               relationTo: "media",
+              label: "Изображение",
               required: true,
             },
             {
               name: "alt",
               type: "text",
-              label: "Альтернативный текст",
+              label: "Alt текст",
               required: true,
             },
             {
               name: "title",
               type: "text",
               label: "Заголовок",
+              required: true,
             },
             {
               name: "content",
               type: "richText",
-              label: "Текст",
+              label: "Содержимое",
               required: true,
             },
             {
-              name: "layout",
+              name: "imagePosition",
               type: "select",
-              label: "Расположение",
+              label: "Позиция изображения",
               options: [
-                { label: "Изображение слева", value: "imageLeft" },
-                { label: "Изображение справа", value: "imageRight" },
+                { label: "Слева", value: "left" },
+                { label: "Справа", value: "right" },
               ],
-              defaultValue: "imageLeft",
+              defaultValue: "left",
             },
           ],
         },
@@ -217,8 +181,8 @@ const About: CollectionConfig = {
             {
               name: "title",
               type: "text",
-              label: "Заголовок",
-              defaultValue: "Наша команда",
+              label: "Заголовок блока",
+              required: true,
             },
             {
               name: "members",
@@ -240,13 +204,13 @@ const About: CollectionConfig = {
                 {
                   name: "photo",
                   type: "upload",
-                  label: "Фотография",
                   relationTo: "media",
+                  label: "Фото",
                 },
                 {
-                  name: "description",
+                  name: "bio",
                   type: "textarea",
-                  label: "Описание",
+                  label: "Биография",
                 },
               ],
             },
