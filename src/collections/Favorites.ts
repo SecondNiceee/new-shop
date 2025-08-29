@@ -11,21 +11,12 @@ const Favorites: CollectionConfig = {
     read: isOwn,
     create: isLoggedIn,
     update: isOwn,
-    delete: isOwn,
+    delete : () => true
+    // delete: isOwn,
   },
   hooks: {
     beforeValidate: [
-      ({ data, req }) => {
-        if (!data) return data
-        if (!req.user) {
-          throw new Error('Not authorized')
-        }
-        if (!data.user) {
-          data.user = req.user.id
-        }
-        console.log(data)
-        return data
-      },
+      beforeValidateHook
     ],
   },
   fields: [
@@ -53,7 +44,6 @@ const Favorites: CollectionConfig = {
       unique: true
     },
   ]
-  // Уникальная комбинация пользователь + товар
 }
 
 export default Favorites

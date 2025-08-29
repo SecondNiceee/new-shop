@@ -19,7 +19,7 @@ export const getCategoriesWithSubs = async (): Promise<CategoryWithSubs[]> => {
       where: {
         parent: { exists: false },
       },
-      depth: 1,
+      depth: 1, 
       limit: 100,
       sort : "createdAt"
     });

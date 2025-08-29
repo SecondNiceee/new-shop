@@ -1,20 +1,20 @@
-import { getAboutData } from "@/actions/server/about/getAboutData"
-import BlockRenderer from "@/components/about/ui/block-renderer"
-import type { AboutBlock } from "@/components/about/types/about-types"
+import { RichText } from '@payloadcms/richtext-lexical/react'
 import { notFound } from "next/navigation"
+import { getPayload } from 'payload';
+import config from "@payload-config";
+import { getAbout } from '@/actions/server/pages/getAbout';
 
 export default async function AboutPage() {
   try {
-    const aboutData = await getAboutData()
-
+    const about = await getAbout();
     // Если данных нет
-    if (!aboutData) {
+    if (!about) {
       notFound()
     }
 
     return (
-      <div className="min-h-screen">
-        <BlockRenderer blocks={(aboutData.blocks as AboutBlock[]) || []} />
+      <div className="max-w-7xl">
+        <RichText data={about.content} />
       </div>
     )
   } catch (error) {
@@ -29,7 +29,7 @@ export async function generateMetadata() {
     const aboutData = await getAboutData()
 
     return {
-      title: aboutData?.title || "О нас",
+      title: "О нас",
       description: aboutData?.description || "Узнайте больше о нашей компании ГрандБАЗАР",
     }
   } catch (error) {

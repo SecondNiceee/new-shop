@@ -17,7 +17,7 @@ import Addresses from "./collections/Addresses"
 import Orders from "./collections/Orders"
 import Reviews from "./collections/Reviews"
 import Favorites from "./collections/Favorites"
-import About from "./globals/About"
+import { Pages } from "./collections/Pages"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -35,9 +35,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites],
-  globals: [About],
-  editor: lexicalEditor(),
+  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites, Pages],
+  editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
