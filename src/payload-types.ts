@@ -400,9 +400,20 @@ export interface Favorite {
 export interface Page {
   id: number;
   /**
-   * Это страничка <О нас>. Не меняйте название страницы.
+   * Уникальный slug, не менять!
+   */
+  slug: string;
+  /**
+   * Название странички (в поисковике будет)
    */
   title: string;
+  /**
+   * Описание, которое в поисковике.
+   */
+  description: string;
+  /**
+   * Это контент страницы
+   */
   content: {
     root: {
       type: string;
@@ -707,7 +718,9 @@ export interface FavoritesSelect<T extends boolean = true> {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
+  slug?: T;
   title?: T;
+  description?: T;
   content?: T;
   updatedAt?: T;
   createdAt?: T;

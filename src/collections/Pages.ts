@@ -1,55 +1,59 @@
-import {CollectionConfig} from "payload";
+import type { CollectionConfig } from "payload"
 
-export const Pages:CollectionConfig ={
-    slug : "pages",
-    admin : {
-        useAsTitle : "title"
-    },
-    access : {
-        read : ({req : {user}}) => {
-            if (user?.role === "admin"){
-                return true
-            }
-            return {
-                _status : {
-                    equals : "published"
-                }
-            }
-        }
-    },
-    versions : {
-        drafts : {
-            autosave : true
-        }
-    },
-    fields : [
-        {
-            name : "slug",
-            type : "text",
-            admin : {
-                description : "Уникальный slug странички. Не менять!"
-            }
+export const Pages: CollectionConfig = {
+  slug: "pages",
+  admin: {
+    useAsTitle: "title",
+  },
+  access: {
+    read: ({ req: { user } }) => {
+      if (user?.role === "admin") {
+        return true
+      }
+      return {
+        _status: {
+          equals: "published",
         },
-        {
-            name : "title",
-            type : "text",
-            required : true,
-            admin : {
-                description : "Название странички(для поииска)"
-            }
-        },
-        {
-            name : "description",
-            type : "text",
-            admin : {
-                description : "Описание страницы (для поиска)"
-            },
-            required : true
-        },
-        {
-            name : "content",
-            type : "richText",
-            required : true
-        }
-    ]
+      }
+    },
+  },
+  versions: {
+    drafts: {
+      autosave: true,
+    },
+  },
+  fields: [
+    {
+      name : "slug",
+      type : "text",
+      required : true,
+      admin : { 
+        description : "Уникальный slug, не менять!"
+       },
+    },
+    {
+      name : "title",
+      type : "text",
+      required : true,
+      admin : {
+        description : "Название странички (в поисковике будет)"
+      }
+    },
+    {
+      name : "description",
+      type : "text",
+      required : true,
+      admin : {
+        description : "Описание, которое в поисковике."
+      }
+    },
+    {
+      name : "content",
+      type : "richText",
+      required : true,
+      admin : {
+        description : "Это контент страницы"
+      }
+    }
+  ],
 }

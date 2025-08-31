@@ -8,7 +8,7 @@ export const getAbout = async () => {
     const about = await payload.find({
       collection : "pages",
       where : {
-        title : {equals : "About"}
+        slug : {equals : "about"}
       }
     })
     return about.docs[0]
