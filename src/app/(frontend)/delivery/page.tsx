@@ -1,23 +1,21 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { notFound } from "next/navigation"
-import { getAbout } from '@/actions/server/pages/getAbout';
 import jsxConverters from '@/utils/jsx-converters';
 import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
+import { getDelivery } from '@/actions/server/pages/getDelivery';
 
 export default async function AboutPage() {
   try {
-    const about = await getAbout();
+    const delivery = await getDelivery();
     // Если данных нет
-
-    if (!about) {
+    if (!delivery) {
       notFound()
     }
-
     return (
       <div className="rich-container">
-        <RefreshRouteOnSave route='/about'   />
-        <RichText converters={jsxConverters} data={about.content} />
+        <RefreshRouteOnSave route='/delivery'   />
+        <RichText converters={jsxConverters} data={delivery.content} />
       </div>
     )
   } catch (error) {
@@ -29,15 +27,15 @@ export default async function AboutPage() {
 // Метаданные для SEO
 export async function generateMetadata() {
   try {
-    const aboutData = await getAbout()
+    const deliveryData = await getDelivery()
     return {
-      title: aboutData.title || "О нас",
-      description: aboutData?.description || "Узнайте больше о нашей компании ГрандБАЗАР",
+      title: deliveryData.title || "Доставка",
+      description: deliveryData?.description || "Узнайте больше о нашей доставке в компании ГрандБАЗАР",
     }
   } catch (error) {
     return {
-      title: "О нас",
-      description: "Узнайте больше о нашей компании ГрандБАЗАР",
+      title: "Доставка",
+      description: "Узнайте больше о нашей доставке в компании ГрандБАЗАР",
     }
   }
 }

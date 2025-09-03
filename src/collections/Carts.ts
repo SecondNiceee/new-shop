@@ -6,6 +6,7 @@ const Carts: CollectionConfig = {
   slug: 'carts',
   admin: {
     useAsTitle: 'id',
+    hidden : true,
     defaultColumns: ['user', 'updatedAt'],
   },
   access: {

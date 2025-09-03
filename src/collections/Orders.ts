@@ -6,6 +6,7 @@ const Orders: CollectionConfig = {
   slug: "orders",
   admin: {
     useAsTitle: "orderNumber",
+    group : "Заказы(Важно)",
     defaultColumns: ["orderNumber", "user", "status", "totalAmount", "createdAt"],
   },
   access: {

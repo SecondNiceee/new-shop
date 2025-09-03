@@ -12,7 +12,7 @@ const CatalogButton = () => {
           width={24}
           height={24}
           src={'/catalog.svg'}
-          className="lg:w-[30px] lg:h-[30px]"
+          className="lg:w-[30px] lg:h-[30px] my-0"
         />
         <span className="text-sm font-medium">Каталог</span>
       </Button>

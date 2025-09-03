@@ -18,11 +18,12 @@ import Orders from "./collections/Orders"
 import Reviews from "./collections/Reviews"
 import Favorites from "./collections/Favorites"
 import { Pages } from "./collections/Pages"
-import { HeaderBlock } from "./block/HeaderBlock"
-import { SubHeaderBlock } from "./block/SubheaderBlock"
-import { ImageBlock } from "./block/ImageBlock"
-import { PararaphBlock } from "./block/ParagraphBlock"
-import { TextWithImageBlock } from "./block/TextWithImageBlock"
+import { ImageBlock } from "./lib/payload-blocks/ImageBlock"
+import { PararaphBlock } from "./lib/payload-blocks/ParagraphBlock"
+import { TextWithImageBlock } from "./lib/payload-blocks/TextWithImageBlock"
+import { HeaderBlock } from "./lib/payload-blocks/HeaderBlock"
+import { ImageGalleryBlock } from "./lib/payload-blocks/ImageGalleryBlock"
+import { ContactsBlock } from "./lib/payload-blocks/ContactsBlock"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -39,13 +40,17 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    livePreview : {
+      url : `${process.env.PAYLOAD_PUBLIC_URL}/about`,
+      collections : ['pages']
+    }
   },
   collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites, Pages],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       BlocksFeature({
-        blocks : [HeaderBlock, SubHeaderBlock, ImageBlock, PararaphBlock, TextWithImageBlock]
+        blocks : [HeaderBlock, ImageBlock, PararaphBlock, TextWithImageBlock, ImageGalleryBlock, ContactsBlock]
       })
     ],
   }),

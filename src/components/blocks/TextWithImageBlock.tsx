@@ -3,18 +3,12 @@ import Image from "next/image"
 import { Media } from "@/payload-types"
 
 interface TextWithImageBlockProps {
-  text: any // Rich text content
+  text: string // Rich text content
   image: Media,
   imagePosition: "left" | "right" 
 }
 
 export const TextWithImageBlock: React.FC<TextWithImageBlockProps> = ({ text, image, imagePosition }) => {
-  const renderRichText = (content: any) => {
-    if (typeof content === "string") {
-      return content
-    }
-    return JSON.stringify(content)
-  }
 
   const getLayoutClasses = () => {
     switch (imagePosition) {
@@ -27,10 +21,10 @@ export const TextWithImageBlock: React.FC<TextWithImageBlockProps> = ({ text, im
 
 
   return (
-    <div className={`flex flex-col gap-6 mb-8 ${getLayoutClasses()}`}>
+    <div className={`flex flex-col gap-6 my-5 ${getLayoutClasses()}`}>
       <div className={`md:w-1/2`}>
         <div className="prose prose-gray max-w-none">
-          <div className="text-base md:text-lg leading-relaxed text-gray-700">{renderRichText(text)}</div>
+          <textarea className="text-base md:text-lg leading-relaxed text-gray-700">{text}</textarea>
         </div>
       </div>
 

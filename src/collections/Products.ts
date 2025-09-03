@@ -6,6 +6,7 @@ const Products: CollectionConfig = {
   slug: "products",
   admin: {
     useAsTitle: "title",
+    group : "Категории, подкатегории, товары"
   },
   access: {
     read: () => true,

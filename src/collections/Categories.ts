@@ -6,6 +6,7 @@ const Categories: CollectionConfig = {
   slug: 'categories',
   admin: {
     useAsTitle: 'title',
+    group : "Категории, подкатегории, товары",
     defaultColumns: ['title', 'parent', 'value'],
   },
   access : {

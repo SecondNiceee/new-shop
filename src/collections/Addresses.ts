@@ -17,6 +17,7 @@ const readOwnAddress: Access = ({ req }) => {
 const Addresses: CollectionConfig = {
   slug: "addresses",
   admin: {
+    hidden : true,
     useAsTitle: "street",
     defaultColumns: ["street", "user", "updatedAt"],
   },

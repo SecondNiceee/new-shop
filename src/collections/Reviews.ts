@@ -6,7 +6,7 @@ const Reviews: CollectionConfig = {
   admin: {
     useAsTitle: 'product',
     defaultColumns: ['product', 'user', 'rating', 'createdAt'],
-    group: 'Content',
+    group: 'Отзывы',
   },
   access: {
     read: () => true,

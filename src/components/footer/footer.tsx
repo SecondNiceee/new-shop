@@ -76,18 +76,7 @@ export function Footer() {
                     Оферта
                   </Link>
                 </li>
-                <li>
-                  <Link href="/eco" className="text-sm text-gray-600 hover:text-gray-800">
-                    Берегём природу
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3 */}
-            <div>
-              <ul className="space-y-3">
-                <li>
+                  <li>
                   <Link href="/contacts" className="text-sm text-gray-600 hover:text-gray-800">
                     Контакты
                   </Link>

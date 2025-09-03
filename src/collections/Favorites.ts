@@ -5,7 +5,9 @@ import type { CollectionConfig } from 'payload'
 const Favorites: CollectionConfig = {
   slug: 'favorites',
   admin: {
+
     useAsTitle: 'product',
+    hidden : true
   },
   access: {
     read: isOwn,
