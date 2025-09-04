@@ -7,6 +7,7 @@ import "leaflet/dist/leaflet.css"
 import { Toaster } from "sonner"
 import { BottomNavigation } from "@/components/bottom-navigation/BottomNavigation"
 import { Footer } from "@/components/footer/footer"
+import { ContactWidget } from "@/components/contact-widget/contact-widget"
 
 export const metadata = {
   description: "A blank template using Payload in a Next.js app.",
@@ -29,6 +30,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </main>
           <Footer />
           <Toaster />
+          <ContactWidget />
         </PopupProvider>
       </body>
     </html>

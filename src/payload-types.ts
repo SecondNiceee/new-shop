@@ -836,6 +836,8 @@ export interface SiteSetting {
     phone: string;
   };
   socialLinks: {
+    email?: string | null;
+    whatsApp?: string | null;
     vk?: string | null;
     telegram?: string | null;
     youtube?: string | null;
@@ -859,6 +861,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   socialLinks?:
     | T
     | {
+        email?: T;
+        whatsApp?: T;
         vk?: T;
         telegram?: T;
         youtube?: T;

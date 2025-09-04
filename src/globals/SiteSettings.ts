@@ -42,6 +42,20 @@ export const SiteSettings: GlobalConfig = {
       required:true,
       fields: [
         {
+            name: "email",
+            type: "text",
+            label: "Email",
+            required: false,
+            defaultValue: "Ваш Email",         
+        },
+        {
+            name: "whatsApp",
+            type: "text",
+            label: "WhatsApp",
+            required: false,
+            defaultValue: "ссылка на ваш ватсапп акк",  
+        },
+        {
           name: "vk",
           type: "text",
           label: "VK",
