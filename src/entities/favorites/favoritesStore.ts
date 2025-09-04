@@ -52,6 +52,10 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
   },
 
   loadFavoritiesIds: async () => {
+    const user = useAuthStore().user;
+    if (!user){
+      return;
+    }
     const favoritesIds = await favoritesService.getFavoritiesIds()
     const favoritiesIdsSet = new Set(favoritesIds)
     set({ favoriteProductIds: favoritiesIdsSet })

@@ -1,17 +1,18 @@
 "use client"
 import Link from "next/link"
 import { Phone } from "lucide-react"
+import { useSiteSettings } from "@/entities/siteSettings/siteSettingsStore"
 
 const TopBar = () => {
-
+  const {siteSettings} = useSiteSettings()
   return (
     <div
       className={`bg-gray-50 border-b border-gray-200 transition-transform duration-300 `}
     >
       <div className="px-4 py-2 mx-auto max-w-7xl">
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-0 justify-between text-sm">
           {/* Левая часть - ссылки */}
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
             <Link href="/about" className="text-gray-600 transition-colors hover:text-gray-900">
               О нас
             </Link>
@@ -30,7 +31,7 @@ const TopBar = () => {
           <div className="flex items-center gap-2 text-gray-700">
             <Phone className="w-4 h-4" />
             <a href="tel:+74951599009" className="font-medium transition-colors hover:text-gray-900">
-              8 (495) 159-90-09
+              {siteSettings?.companyInfo.phone}
             </a>
           </div>
         </div>

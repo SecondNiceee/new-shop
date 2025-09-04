@@ -1,3 +1,4 @@
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { Block } from "payload";
 
 
@@ -10,17 +11,18 @@ export const TextWithImageBlock:Block = {
     fields : [
         {
             name : "text",
-            type : "text",
+            type : "richText",
             admin : {
                 description : "Текст параграфа"
-            }
+            },
+            editor : lexicalEditor({})
         },
         {
             name : "image",
             type : "upload",
             relationTo : "media",
             admin : {
-                description : "Картинка"
+                description : "Картинка (желательно 4:4) - квадратная то есть"
             }
         },
         {

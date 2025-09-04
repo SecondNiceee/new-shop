@@ -136,7 +136,7 @@
 }
 
 .paragraph{
-  @apply flex flex-col gap-1 my-5;
+  @apply flex flex-col gap-1 md:my-5 my-3;
   p{
     @apply my-0;
   }
@@ -145,5 +145,11 @@
   }
   h4,h5,h6{
     @apply my-1;
+  }
+
+}
+.rich-imageWithTextBlok{
+  img{
+    @apply my-0
   }
 }

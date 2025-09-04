@@ -23,11 +23,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <PopupProvider>
           <AppInit />
           <Header />
-          <main className="mx-auto">
+          <main className="mx-auto min-h-[60vh]">
             {children}
-            <div className="pb-16 md:pb-0">
               <BottomNavigation />
-            </div>
           </main>
           <Footer />
           <Toaster />

@@ -6,6 +6,7 @@ import { useCategoriesStore } from "@/entities/categories/categoriesStore"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { useAddressStore } from "@/entities/address/addressStore"
 import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
+import { useSiteSettings } from "@/entities/siteSettings/siteSettingsStore"
 
 /**
  * AppInit runs once on the client to bootstrap session, cart, address, and other app data.
@@ -18,6 +19,7 @@ export default function AppInit() {
   const getCategories = useCategoriesStore((s) => s.getCategories)
   const loadAddress = useAddressStore((s) => s.loadAddress);
   const loadFavoritiesIds = useFavoritesStore((s) => s.loadFavoritiesIds)
+  const loadSiteSettings = useSiteSettings((s) => s.getSiteSettings);
 
   useEffect(() => {
     if (didBoot.current) return
@@ -44,8 +46,11 @@ export default function AppInit() {
       } catch {}
       try{
         await loadFavoritiesIds();
-      }
-      catch{}
+      } catch{}
+      try{
+        await loadSiteSettings();
+      }catch{}
+
     })()
   }, [fetchMe, loadServerCart, getCategories, loadAddress])
 

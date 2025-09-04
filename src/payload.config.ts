@@ -24,6 +24,8 @@ import { TextWithImageBlock } from "./lib/payload-blocks/TextWithImageBlock"
 import { HeaderBlock } from "./lib/payload-blocks/HeaderBlock"
 import { ImageGalleryBlock } from "./lib/payload-blocks/ImageGalleryBlock"
 import { ContactsBlock } from "./lib/payload-blocks/ContactsBlock"
+import { SiteSettings } from "./globals/SiteSettings"
+import { Blogs } from "./collections/Blogs"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -45,7 +47,8 @@ export default buildConfig({
       collections : ['pages']
     }
   },
-  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites, Pages],
+  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites, Pages, Blogs],
+  globals : [SiteSettings],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,

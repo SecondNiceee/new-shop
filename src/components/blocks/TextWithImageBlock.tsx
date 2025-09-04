@@ -1,15 +1,15 @@
 import type React from "react"
 import Image from "next/image"
 import { Media } from "@/payload-types"
+import { RichText } from "@payloadcms/richtext-lexical/react"
 
 interface TextWithImageBlockProps {
-  text: string // Rich text content
+  text: any // Rich text content
   image: Media,
   imagePosition: "left" | "right" 
 }
 
 export const TextWithImageBlock: React.FC<TextWithImageBlockProps> = ({ text, image, imagePosition }) => {
-
   const getLayoutClasses = () => {
     switch (imagePosition) {
       case "left":
@@ -19,23 +19,20 @@ export const TextWithImageBlock: React.FC<TextWithImageBlockProps> = ({ text, im
   }
 }
 
-
   return (
-    <div className={`flex flex-col gap-6 my-5 ${getLayoutClasses()}`}>
-      <div className={`md:w-1/2`}>
-        <div className="prose prose-gray max-w-none">
-          <textarea className="text-base md:text-lg leading-relaxed text-gray-700">{text}</textarea>
-        </div>
+    <div className={`rich-imageWithTextBlok flex flex-col gap-6 ${getLayoutClasses()}`}>
+      <div className={`md:w-1/2 w-ful self-start flex justify-center items-center shadow-lg rounded-lg p-1 md:p-4`}>
+        <RichText data={text} />
       </div>
 
       <div className={`md:w-1/2`}>
-        <div className="relative aspect-video rounded-lg overflow-hidden">
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden">
           <Image
-            src={image.url || "/placeholder.svg"}
+            src={image.url || "/placeholder.svg"} 
             alt={ image.alt || ""}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="100%"
           />
         </div>
       </div>

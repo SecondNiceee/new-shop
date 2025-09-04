@@ -8,6 +8,7 @@ import { useCartStore } from "@/entities/cart/cartStore"
 import { useMobileStore } from "@/entities/mobileMenu/mobileMenuStore"
 import UserLink from "../user-link/user-link"
 import AddressButton from "../address-button/address-button"
+import TopBar from "../top-bar/top-bar"
 
 const HeaderMobile = () => {
   const { open, totalCount } = useCartStore()
@@ -64,6 +65,11 @@ const HeaderMobile = () => {
               <AddressButton className="w-full flex justify-start gap-3 p-4 h-auto border-2 border-gray-200 rounded-lg"/>
 
             </div>
+
+            <div className="mt-2">
+              <TopBar />
+            </div>
+
           </SheetContent>
         </Sheet>
       </div>

@@ -1,8 +1,6 @@
 "use client"
 import React from 'react'
 import { Menu } from 'lucide-react'
-import { routerConfig } from '@/config/router.config'
-import Link from 'next/link'
 import Cart from '@/components/cart/cart'
 import CatalogButton from '@/components/catalog-button/CatalogButton'
 import ProductSearch from '@/components/product-search/ProductSearch'
