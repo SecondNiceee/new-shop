@@ -1,5 +1,4 @@
 import { routerConfig } from '@/config/router.config';
-import { useSiteSettings } from '@/entities/siteSettings/siteSettingsStore';
 import Link from 'next/link';
 import React from 'react';
 

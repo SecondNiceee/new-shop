@@ -2,25 +2,29 @@ import type { Block } from "payload"
 
 export const HeaderBlock: Block = {
   slug: "header",
+  labels: {
+    singular: "Заголовок",
+    plural: "Заголовки",
+  },
   fields: [
     {
       name: "text",
       type: "text",
+      label: "Текст заголовка",
       admin: {
-        description: "Это текст заголовка",
+        description: "Введите текст заголовка",
       },
     },
     {
       name: "level",
       type: "select",
-      defaultValue: "h2",
+      label: "Уровень заголовка",
+      defaultValue: "h3",
       options: [
-        { label: "H1", value: "h1" },
-        { label: "H2", value: "h2" },
-        { label: "H3", value: "h3" },
-        { label: "H4", value: "h4" },
-        { label: "H5", value: "h5" },
-        { label: "H6", value: "h6" },
+        { label: "Заголовок 3 (основной)", value: "h3" },
+        { label: "Заголовок 4", value: "h4" },
+        { label: "Заголовок 5", value: "h5" },
+        { label: "Заголовок 6", value: "h6" },
       ],
       admin: {
         description: "Выберите уровень заголовка (H1-H6)",
@@ -29,6 +33,7 @@ export const HeaderBlock: Block = {
     {
       name: "color",
       type: "select",
+      label: "Цвет заголовка",
       defaultValue: "black",
       options: [
         { label: "Черный", value: "black" },

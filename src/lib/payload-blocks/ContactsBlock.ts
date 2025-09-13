@@ -10,15 +10,17 @@ export const ContactsBlock: Block = {
     {
       name: "contacts",
       type: "array",
+      label: "Список контактов",
       minRows: 1,
       maxRows: 10,
       admin: {
-        description: "Список контактов",
+        description: "Добавьте контактную информацию для отображения на сайте",
       },
       fields: [
         {
           name: "key",
           type: "text",
+          label: "Название контакта",
           required: true,
           admin: {
             description: "Название контакта (например: WhatsApp, Email, Телефон)",
@@ -27,6 +29,7 @@ export const ContactsBlock: Block = {
         {
           name: "valueType",
           type: "select",
+          label: "Тип значения",
           required: true,
           options: [
             { label: "Текст", value: "text" },
@@ -34,23 +37,25 @@ export const ContactsBlock: Block = {
           ],
           defaultValue: "text",
           admin: {
-            description: "Тип значения",
+            description: "Выберите тип отображаемого значения",
           },
         },
         {
           name: "value",
           type: "text",
+          label: "Значение",
           required: true,
           admin: {
-            description: "Значение (текст или URL)",
+            description: "Значение контакта (текст или URL)",
           },
         },
         {
           name: "icon",
           type: "upload",
+          label: "Иконка",
           relationTo : "media",
           admin: {
-            description: "Иконка (необязательно, например: phone, email, whatsapp)",
+            description: "Иконка для контакта (необязательно)",
           },
         },
       ],

@@ -146,6 +146,12 @@ export interface User {
    */
   phone?: string | null;
   role?: ('admin' | 'user' | 'manager') | null;
+  /**
+   * Выберите коллекции, к которым пользователь будет иметь доступ. Если не выбрано ничего, доступ ко всем коллекциям (только для админов).
+   */
+  accessCollections?:
+    | ('users' | 'categories' | 'products' | 'media' | 'orders' | 'reviews' | 'pages' | 'blogs')[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -582,6 +588,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   phone?: T;
   role?: T;
+  accessCollections?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

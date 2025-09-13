@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { Search, X } from 'lucide-react'
 import React, { useState, useEffect, useRef } from 'react'
@@ -12,7 +12,7 @@ interface ProductSearchProps {
   onProductSelect?: (product: Product) => void
 }
 
-const ProductSearch = ({onProductSelect }: ProductSearchProps) => {
+const ProductSearch = ({ onProductSelect }: ProductSearchProps) => {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -76,7 +76,6 @@ const ProductSearch = ({onProductSelect }: ProductSearchProps) => {
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 lg:w-5 lg:h-5"
         />
         <Input
-         
           type="text"
           placeholder="Поиск по товарам"
           className="pl-10 pr-10 h-10 lg:h-11 w-full"
@@ -99,21 +98,23 @@ const ProductSearch = ({onProductSelect }: ProductSearchProps) => {
       </div>
 
       {isOpen && (
-        <Card className="absolute py-0 w-[calc(100vw-40px)] md:w-[140%] lg:w-[150%] top-full left-0 md:left-auto md:right-0 mt-1 bg-white border border-gray-200 shadow-lg z-[200] max-h-96 overflow-y-auto">
+        <Card className="absolute py-0 w-[calc(100vw-40px)] md:min-w-[350px] md:w-[100%] lg:w-[200%] top-full left-0 lg:left-[-50%] mt-1 bg-white border border-gray-200 shadow-lg z-[200] max-h-96 overflow-y-auto">
           {isLoading ? (
-            <div className="p-4 text-center text-gray-500">
-              Поиск...
-            </div>
+            <div className="p-4 text-center text-gray-500">Поиск...</div>
           ) : results.length > 0 ? (
-            <div className="p-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-2 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {results.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  clickHandler={() => {
+                    setIsOpen(false)
+                  }}
+                  key={product.id}
+                  product={product}
+                />
               ))}
             </div>
           ) : query.trim().length > 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              Товары не найдены
-            </div>
+            <div className="p-4 text-center text-gray-500">Товары не найдены</div>
           ) : null}
         </Card>
       )}

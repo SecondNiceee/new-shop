@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { X, Heart, ShoppingBag, MapPin, History, Bell } from "lucide-react"
-import { useAuthDialogStore } from "@/entities/auth/authDialogStore"
-import { create } from "zustand"
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { X, Heart, ShoppingBag, MapPin, History, Bell } from 'lucide-react'
+import { useAuthDialogStore } from '@/entities/auth/authDialogStore'
+import { create } from 'zustand'
 
 type GuestBenefitsStore = {
   open: boolean
-  type: "favorites" | "order" | null
-  openDialog: (type: "favorites" | "order") => void
+  type: 'favorites' | 'order' | null
+  openDialog: (type: 'favorites' | 'order') => void
   closeDialog: () => void
 }
 
@@ -26,27 +26,25 @@ export default function GuestBenefitsModal() {
 
   const handleLogin = () => {
     closeDialog()
-    openAuthDialog("login")
+    openAuthDialog('login')
   }
 
   const handleRegister = () => {
     closeDialog()
-    openAuthDialog("register")
+    openAuthDialog('register')
   }
 
   const favoritesBenefits = [
-    { icon: Heart, text: "Добавлять товары в избранное" },
-    { icon: History, text: "Следить за историей покупок" },
-    { icon: MapPin, text: "Сохранить место доставки" },
-    { icon: ShoppingBag, text: "Сохранять корзину на разных устройствах" },
-    { icon: Bell, text: "Следить за статусом товара" },
+    { icon: Heart, text: 'Добавлять товары в избранное' },
+    { icon: ShoppingBag, text: 'Сохранять корзину на разных устройствах' },
+    { icon: Bell, text: 'Следить за статусом товара' },
   ]
 
   return (
     <Dialog open={open} onOpenChange={(val) => (!val ? closeDialog() : undefined)}>
       <DialogContent className="p-0 w-full bg-white rounded-3xl overflow-hidden shadow-2xl max-w-md">
         <DialogTitle className="sr-only">
-          {type === "favorites" ? "Преимущества регистрации" : "Отслеживание заказа"}
+          {type === 'favorites' ? 'Преимущества регистрации' : 'Отслеживание заказа'}
         </DialogTitle>
 
         <div className="relative">
@@ -60,7 +58,7 @@ export default function GuestBenefitsModal() {
             <X className="h-5 w-5" />
           </Button>
 
-          {type === "favorites" ? (
+          {type === 'favorites' ? (
             <div className="px-8 py-8">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-gradient-to-r from-pink-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-4">

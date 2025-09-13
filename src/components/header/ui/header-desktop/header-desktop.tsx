@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import React from 'react'
 import { Menu } from 'lucide-react'
 import Cart from '@/components/cart/cart'
@@ -13,7 +13,6 @@ import HeaderLogo from '../header-logo/header-logo'
 const HeaderDesktop = () => {
   return (
     <div className="hidden md:flex items-center justify-between gap-6">
-      
       <HeaderLogo />
 
       <div className="flex-1 max-w-sm lg:max-w-md">
@@ -30,7 +29,7 @@ const HeaderDesktop = () => {
         </SheetTrigger>
         <SheetContent side="right" className="w-80 bg-white">
           <SheetTitle className="space-y-4 mt-6">
-            <AddressButton className='py-2 cursor-pointer border-black border-solid border-2 rounded-lg p-2 flex  ' />
+            <AddressButton className="cursor-pointer border-black border-solid border-2 rounded-lg p-2 flex  " />
             <Cart />
           </SheetTitle>
         </SheetContent>
@@ -38,7 +37,7 @@ const HeaderDesktop = () => {
 
       {/* Address info - hidden on tablet, shown on desktop */}
 
-      <AddressButton className='hidden lg:flex' />
+      <AddressButton className="hidden lg:flex" />
       {/* Mini cart summary (dynamic) */}
       <Cart />
       <UserLink />

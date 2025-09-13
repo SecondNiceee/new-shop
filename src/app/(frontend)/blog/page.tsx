@@ -1,5 +1,5 @@
 import { getArticles } from '@/actions/server/blogs/getArticles';
-import Article from '@/components/article/article';
+import Article from '@/components/article/Article';
 import { Media } from '@/payload-types';
 import React from 'react';
 

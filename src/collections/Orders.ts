@@ -1,4 +1,5 @@
-import { isAdmin, isLoggedIn, isOwn } from "@/utils/accessUtils"
+import { isAccess, isAdmin, isLoggedIn, isOwn } from "@/utils/accessUtils"
+import { formatOrderMessage } from "@/utils/telegramNotification"
 import type { CollectionConfig } from "payload"
 
 
@@ -12,10 +13,49 @@ const Orders: CollectionConfig = {
   access: {
     read: isOwn,
     create: isLoggedIn,
-    update: isAdmin,
-    delete: isAdmin,
+    update: isAccess("orders"),
+    delete: isAccess("orders"),
   },
   hooks: {
+    afterChange: [
+      async ({ data, operation }) => {
+        // Send Telegram notification only for new orders
+        if (operation === 'create' && data) {
+          try {
+            const botToken = process.env.TELEGRAM_BOT_TOKEN
+            const channelId = process.env.TELEGRAM_CHANNEL_ID
+            
+            if (!botToken || !channelId) {
+              console.warn('Telegram bot credentials not configured')
+              return
+            }
+
+            const message = formatOrderMessage(data)
+            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`
+            
+            const response = await fetch(telegramUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                chat_id: channelId,
+                text: message,
+                parse_mode: 'Markdown',
+              }),
+            })
+
+            if (!response.ok) {
+              console.error('Failed to send Telegram notification:', await response.text())
+            } else {
+              console.log('Telegram notification sent successfully')
+            }
+          } catch (error) {
+            console.error('Error sending Telegram notification:', error)
+          }
+        }
+      }
+    ],
     beforeValidate: [
       ({ data, req, operation }) => {
         if (!data) return data
@@ -67,6 +107,7 @@ const Orders: CollectionConfig = {
     {
       name: "orderNumber",
       type: "text",
+      label: "Номер заказа",
       required: true,
       unique: true,
       admin: {
@@ -78,6 +119,7 @@ const Orders: CollectionConfig = {
       name: "user",
       type: "relationship",
       relationTo: "users",
+      label: "Пользователь",
       required: true,
       admin: {
         readOnly: true,
@@ -87,6 +129,7 @@ const Orders: CollectionConfig = {
     {
       name: "status",
       type: "select",
+      label: "Статус",
       required: true,
       defaultValue: "pending",
       options: [
@@ -115,6 +158,7 @@ const Orders: CollectionConfig = {
     {
       name: "items",
       type: "array",
+      label: "Товары в заказе",
       required: true,
       admin: {
         description: "Order items",
@@ -124,17 +168,20 @@ const Orders: CollectionConfig = {
           name: "product",
           type: "relationship",
           relationTo: "products",
+          label: "Товар",
           required: true,
         },
         {
           name: "quantity",
           type: "number",
+          label: "Количество",
           required: true,
           min: 1,
         },
         {
           name: "price",
           type: "number",
+          label: "Цена",
           required: true,
           admin: {
             description: "Price at the time of order",
@@ -178,6 +225,7 @@ const Orders: CollectionConfig = {
     {
       name: "customerPhone",
       type: "text",
+      label: "Телефон клиента",
       required: true,
       admin: {
         description: "Customer phone number",
@@ -186,6 +234,7 @@ const Orders: CollectionConfig = {
     {
       name: "totalAmount",
       type: "number",
+      label: "Общая сумма",
       required: true,
       admin: {
         description: "Total order amount including delivery",
@@ -194,6 +243,7 @@ const Orders: CollectionConfig = {
     {
       name: "deliveryFee",
       type: "number",
+      label: "Стоимость доставки",
       required: true,
       defaultValue: 199,
       admin: {
@@ -203,6 +253,7 @@ const Orders: CollectionConfig = {
     {
       name: "notes",
       type: "textarea",
+      label: "Примечания",
       admin: {
         description: "Additional notes or comments",
       },

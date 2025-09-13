@@ -4,11 +4,18 @@ import { ImageBlock } from "@/lib/payload-blocks/ImageBlock";
 import { ImageGalleryBlock } from "@/lib/payload-blocks/ImageGalleryBlock";
 import { PararaphBlock } from "@/lib/payload-blocks/ParagraphBlock";
 import { TextWithImageBlock } from "@/lib/payload-blocks/TextWithImageBlock";
-import { BlocksFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
+import { isAccess } from "@/utils/accessUtils";
+import { BlocksFeature, HeadingFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
 import { CollectionConfig } from "payload";
 
 export const Blogs:CollectionConfig = {
     slug : "blogs",
+    access : {
+        read : () => true,
+        create : isAccess("blogs"),
+        update : isAccess("blogs"),
+        delete : isAccess("blogs")
+    },
     admin : {
         useAsTitle : "title",
         group : "Страницы"
@@ -17,6 +24,7 @@ export const Blogs:CollectionConfig = {
         {
             name:"slug",
             type :"text",
+            label: "URL-адрес",
             admin:{
                 description : "SLUG на англ.языке без пробелов, для пути странички"
             },
@@ -26,6 +34,7 @@ export const Blogs:CollectionConfig = {
         {
             name : "title",
             type : "text",
+            label: "Заголовок",
             admin : {
                 description : "Заголовок для SEO"
             },
@@ -34,6 +43,7 @@ export const Blogs:CollectionConfig = {
         {
             name : "description",
             type : "text",
+            label: "Описание",
             required : true,
             admin : {
                 description : "Описание для SEO"
@@ -44,6 +54,7 @@ export const Blogs:CollectionConfig = {
             name : "background",
             type: "upload",
             relationTo : "media",
+            label: "Фоновое изображение",
             admin: {
                 description : "Фоновое изображение для блога(на страничке выбора блогов)"
             },
@@ -52,6 +63,7 @@ export const Blogs:CollectionConfig = {
         {
             name : "content",
             type : "richText",
+            label: "Контент",
             admin : {
                 description : "Контент"
             },
@@ -61,6 +73,11 @@ export const Blogs:CollectionConfig = {
                     ...defaultFeatures,
                     BlocksFeature({
                         blocks : [HeaderBlock, ImageBlock, PararaphBlock, TextWithImageBlock, ImageGalleryBlock, ContactsBlock]
+                    }),
+                    HeadingFeature({
+                        enabledHeadingSizes : [
+                          "h3", "h4", "h5", "h6"
+                        ]
                     })
                 ]
             })

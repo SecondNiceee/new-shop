@@ -11,7 +11,15 @@ const Reviews: CollectionConfig = {
   access: {
     read: () => true,
     create: isLoggedIn,
-    update: isOwn,
+    update: ({req}) => {
+      if (!req.user){
+        return false;
+      }
+      return Boolean({
+        user : {equals : req.user.id}
+      }) || Boolean(req.user.accessCollections?.includes("reviews"))
+      // Проверить работает ли это?
+    },
     delete: isAdmin,
   },
   fields: [
@@ -19,6 +27,7 @@ const Reviews: CollectionConfig = {
       name: 'product',
       type: 'relationship',
       relationTo: 'products',
+      label: 'Товар',
       required: true,
       admin: {
         position: 'sidebar',
@@ -28,6 +37,7 @@ const Reviews: CollectionConfig = {
       name: 'user',
       type: 'relationship',
       relationTo: 'users',
+      label: 'Пользователь',
       required: true,
       defaultValue: ({ user }) => user?.id, // автоматически подставляет текущего пользователя
       access: {

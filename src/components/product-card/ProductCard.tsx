@@ -18,9 +18,10 @@ import { routerConfig } from '@/config/router.config'
 
 interface IProductCard {
   product: Product
+  clickHandler?: () => void
 }
 
-export function ProductCard({ product }: IProductCard) {
+export function ProductCard({ product, clickHandler }: IProductCard) {
   const router = useRouter()
   const { increment, dicrement, items } = useCartStore()
   const { addToFavorites, removeFromFavorites, favoriteProductIds } = useFavoritesStore()
@@ -33,7 +34,10 @@ export function ProductCard({ product }: IProductCard) {
   const isFavorite = [...favoriteProductIds].find((id) => id === product.id)
 
   const onProductClick = () => {
-    router.push(`${routerConfig.product}?id=${product.id}`);
+    router.push(`${routerConfig.product}?id=${product.id}`)
+    if (clickHandler) {
+      clickHandler()
+    }
   }
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {

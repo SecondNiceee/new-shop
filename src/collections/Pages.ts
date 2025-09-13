@@ -1,3 +1,4 @@
+import { isAccess } from "@/utils/accessUtils"
 import type { CollectionConfig } from "payload"
 
 export const Pages: CollectionConfig = {
@@ -17,6 +18,16 @@ export const Pages: CollectionConfig = {
         },
       }
     },
+    create : isAccess("pages"),
+    delete : isAccess("pages"),
+    update : isAccess("pages")
+  },
+  hooks: {
+    afterChange: [
+      ({ data }) => {
+        return data
+      }
+    ]
   },
   versions: {
     drafts: {
@@ -27,6 +38,7 @@ export const Pages: CollectionConfig = {
     {
       name : "slug",
       type : "text",
+      label: "URL-адрес",
       required : true,
       admin : { 
         description : "Уникальный slug, не менять!"
@@ -35,6 +47,7 @@ export const Pages: CollectionConfig = {
     {
       name : "title",
       type : "text",
+      label: "Заголовок",
       required : true,
       admin : {
         description : "Название странички (в поисковике будет)"
@@ -43,6 +56,7 @@ export const Pages: CollectionConfig = {
     {
       name : "description",
       type : "text",
+      label: "Описание",
       required : true,
       admin : {
         description : "Описание, которое в поисковике."
@@ -51,6 +65,7 @@ export const Pages: CollectionConfig = {
     {
       name : "content",
       type : "richText",
+      label: "Контент",
       required : true,
       admin : {
         description : "Это контент страницы"

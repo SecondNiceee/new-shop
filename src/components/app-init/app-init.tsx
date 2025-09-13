@@ -6,7 +6,7 @@ import { useCategoriesStore } from "@/entities/categories/categoriesStore"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { useAddressStore } from "@/entities/address/addressStore"
 import { useFavoritesStore } from "@/entities/favorites/favoritesStore"
-import { useSiteSettings } from "@/entities/siteSettings/siteSettingsStore"
+import { useSiteSettings } from "@/entities/siteSettings/SiteSettingsStore"
 
 /**
  * AppInit runs once on the client to bootstrap session, cart, address, and other app data.

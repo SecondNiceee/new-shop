@@ -1,11 +1,11 @@
 // tailwind.config.js
 export default {
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@payloadcms/ui/**/*.{js,ts,jsx,tsx}',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx}', './node_modules/@payloadcms/ui/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      screens: {
+        xs: '360px',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -62,7 +62,5 @@ export default {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms'),
-    require('tailwindcss-animate')
-  ],
+  plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')],
 }

@@ -1,7 +1,7 @@
 // storage-adapter-import-placeholder
 import { postgresAdapter } from "@payloadcms/db-postgres"
 import { payloadCloudPlugin } from "@payloadcms/payload-cloud"
-import { BlocksFeature, lexicalEditor } from "@payloadcms/richtext-lexical"
+import { BlocksFeature, lexicalEditor, HeadingFeature } from "@payloadcms/richtext-lexical"
 import path from "path"
 import { buildConfig } from "payload"
 import { fileURLToPath } from "url"
@@ -54,6 +54,11 @@ export default buildConfig({
       ...defaultFeatures,
       BlocksFeature({
         blocks : [HeaderBlock, ImageBlock, PararaphBlock, TextWithImageBlock, ImageGalleryBlock, ContactsBlock]
+      }),
+      HeadingFeature({
+        enabledHeadingSizes : [
+          "h3", "h4", "h5", "h6"
+        ]
       })
     ],
   }),
