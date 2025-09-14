@@ -5,6 +5,10 @@ import jsxConverters from '@/utils/jsx-converters';
 import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 
+// Принудительно динамический рендеринг
+export const dynamic = 'auto';
+export const revalidate = 120;
+
 export default async function AboutPage() {
   try {
     const about = await getAbout();

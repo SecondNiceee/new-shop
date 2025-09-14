@@ -5,6 +5,12 @@ import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 import { getContacts } from '@/actions/server/pages/getContacts';
 
+// Перевалидация каждые 60 секунд
+export const revalidate = 60;
+
+// Принудительно динамический рендеринг
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage() {
   try {
     const contacts = await getContacts();

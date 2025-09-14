@@ -832,22 +832,57 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Основные настройки сайта и контактная информация
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
   id: number;
+  /**
+   * Основная информация о вашей компании
+   */
   companyInfo: {
+    /**
+     * Полное юридическое название компании
+     */
     legalName: string;
+    /**
+     * Год основания компании
+     */
     year: number;
+    /**
+     * Основной контактный телефон компании
+     */
     phone: string;
   };
+  /**
+   * Ссылки на ваши социальные сети и мессенджеры
+   */
   socialLinks: {
+    /**
+     * Контактный email адрес
+     */
     email?: string | null;
+    /**
+     * Ссылка на WhatsApp (номер телефона или ссылка)
+     */
     whatsApp?: string | null;
+    /**
+     * Ссылка на страницу ВКонтакте
+     */
     vk?: string | null;
+    /**
+     * Ссылка на Telegram канал или бот
+     */
     telegram?: string | null;
+    /**
+     * Ссылка на YouTube канал
+     */
     youtube?: string | null;
+    /**
+     * Ссылка на Instagram профиль
+     */
     instagram?: string | null;
   };
   updatedAt?: string | null;

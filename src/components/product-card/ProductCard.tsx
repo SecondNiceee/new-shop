@@ -66,7 +66,7 @@ export function ProductCard({ product, clickHandler }: IProductCard) {
   return (
     <Card
       onClick={onProductClick}
-      className="p-0 cursor-pointer justify-between bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
+      className="p-0 cursor-pointer gap-0 justify-between bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
       {/* Product Image with Heart Icon */}
       <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl bg-gray-50">
@@ -96,7 +96,7 @@ export function ProductCard({ product, clickHandler }: IProductCard) {
       </div>
 
       {/* Product Info */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 flex flex-col gap-2 pt-3">
         {/* Brand/Title */}
         <div className="flex justify-between items-start">
           <div className="flex-1">
@@ -132,7 +132,7 @@ export function ProductCard({ product, clickHandler }: IProductCard) {
         )}
 
         {/* Price and Actions */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-lg font-bold text-red-500">
               {formatPrice(discountInfo.discountedPrice)}

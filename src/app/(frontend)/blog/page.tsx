@@ -2,6 +2,8 @@ import { getArticles } from '@/actions/server/blogs/getArticles';
 import Article from '@/components/article/Article';
 import { Media } from '@/payload-types';
 import React from 'react';
+export const dynamic = 'auto';
+export const revalidate = 120;
 
 const BlogsPage = async () => {
     const articles = await getArticles();
