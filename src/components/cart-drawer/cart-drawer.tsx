@@ -10,6 +10,8 @@ import type { Media, Product } from "@/payload-types"
 import { useRouter } from "next/navigation"
 import { routerConfig } from "@/config/router.config"
 import { getDiscountInfo, formatPrice } from "@/utils/discountUtils"
+import OrderItem from "../order-item/OrderItem"
+import OrderItemMobile from "../order-item/OrderItemMobile"
 
 export default function CartDrawer() {
   const router = useRouter()
@@ -52,87 +54,9 @@ export default function CartDrawer() {
                 <p className="text-gray-400 text-sm mt-1">Добавьте товары для оформления заказа</p>
               </div>
             ) : (
-              items.map((it) => {
-                const media = it.product.image as Media
-                const discountInfo = getDiscountInfo(it.product)
-
+              items.map((it, id) => {
                 return (
-                  <div
-                    key={it.product.id}
-                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex gap-3">
-                      {/* Image */}
-                      <div className="relative w-16 h-16 overflow-hidden rounded-lg bg-gray-50 flex-shrink-0">
-                        <Image
-                          width={64}
-                          height={64}
-                          src={media?.url || "/placeholder.svg?height=64&width=64&query=product-thumbnail"}
-                          alt={media?.alt || it.product.title}
-                          className="object-cover w-full h-full"
-                        />
-                        {discountInfo.hasDiscount && (
-                          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded">
-                            -{discountInfo.discountPercentage}%
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm text-gray-900 mb-1 line-clamp-2">{it.product.title}</h3>
-                        <p className="text-xs text-gray-500 mb-2">
-                          {it.product.weight?.value} {it.product.weight?.unit}
-                        </p>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-green-600">
-                              {formatPrice(discountInfo.discountedPrice)}
-                            </span>
-                            {discountInfo.hasDiscount && (
-                              <span className="text-xs text-gray-400 line-through">
-                                {formatPrice(discountInfo.originalPrice)}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {/* Quantity controls */}
-                            <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 w-7 p-0 hover:bg-gray-200"
-                                onClick={() => dicrement(it.product.id as number)}
-                              >
-                                <Minus className="h-3 w-3" />
-                              </Button>
-                              <span className="w-8 text-center text-sm font-medium">{it.quantity}</span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 w-7 p-0 hover:bg-gray-200"
-                                onClick={() => increment(it.product)}
-                              >
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                            </div>
-
-                            {/* Delete button */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 w-7 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
-                              onClick={() => remove(it.product.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <OrderItemMobile item={it} key={id} />
                 )
               })
             )}

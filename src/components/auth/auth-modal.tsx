@@ -13,13 +13,13 @@ import RegisterSection from "./registration/registerSection"
 
 export default function AuthDialog() {
   const router = useRouter()
-  const { open, closeDialog, mode, setMode } = useAuthDialogStore()
+  const { open, closeDialog, mode, setMode, isRedirect } = useAuthDialogStore()
   const { user } = useAuthStore()
 
   useEffect(() => {
     if (user && open) {
       closeDialog()
-      router.push(routerConfig.profile)
+      if (isRedirect) router.push(routerConfig.profile)
     }
   }, [user, open, closeDialog, router])
 

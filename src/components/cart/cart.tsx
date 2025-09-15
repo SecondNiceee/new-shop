@@ -18,7 +18,7 @@ const Cart: FC = () => {
   return (
     <div
       onClick={open}
-      className={`${isProducts ? (isLess ? 'bg-orange-400' : 'bg-green-500') : 'bg-white'}  cursor-pointer md:flex  lg:items-center gap-2 px-4  border-black border-solid md:border-2 lg:border-none rounded-lg p-2 flex-shrink-0`}
+      className={`${isProducts ? (isLess ? 'bg-orange-400' : 'bg-green-500') : 'bg-white'}  cursor-pointer md:flex  lg:items-center gap-2 px-4  border-black border-solid md:border-2 md:border-none rounded-lg p-2 flex-shrink-0`}
     >
       <div className="text-right">
         {totalPrice > 0 ? (

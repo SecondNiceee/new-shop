@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { X, Heart, ShoppingBag, MapPin, History, Bell } from 'lucide-react'
+import { X, Heart, ShoppingBag,  Bell } from 'lucide-react'
 import { useAuthDialogStore } from '@/entities/auth/authDialogStore'
 import { create } from 'zustand'
 
@@ -26,12 +26,12 @@ export default function GuestBenefitsModal() {
 
   const handleLogin = () => {
     closeDialog()
-    openAuthDialog('login')
+    openAuthDialog('login', false)
   }
 
   const handleRegister = () => {
     closeDialog()
-    openAuthDialog('register')
+    openAuthDialog('register', false)
   }
 
   const favoritesBenefits = [

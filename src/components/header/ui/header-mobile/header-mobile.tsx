@@ -11,11 +11,24 @@ import AddressButton from '../address-button/address-button'
 import TopBar from '../top-bar/top-bar'
 import { useRouter } from 'next/navigation'
 import { routerConfig } from '@/config/router.config'
+import { useAuthDialogStore } from '@/entities/auth/authDialogStore'
+import { useAuthStore } from '@/entities/auth/authStore'
 
 const HeaderMobile = () => {
   const { open, totalCount } = useCartStore()
   const { isOpened, setOpened } = useMobileStore()
   const router = useRouter()
+
+  const { user } = useAuthStore()
+  const { openDialog } = useAuthDialogStore()
+  const clickHandler = () => {
+    setOpened(false);
+    if (user) {
+      router.push(`${routerConfig.profile}`)
+    } else {
+      openDialog('login')
+    }
+  }
 
   return (
     <div className="md:hidden">
@@ -61,10 +74,7 @@ const HeaderMobile = () => {
               <Button
                 variant="outline"
                 className="w-full h-[53.6px] justify-start gap-3 p-4 bg-transparent"
-                onClick={() => {
-                  setOpened(false)
-                  router.push(routerConfig.profile)
-                }}
+                onClick={clickHandler}
               >
                 <UserLink />
                 <p className="">Аккаунт</p>

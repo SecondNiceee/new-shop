@@ -66,8 +66,8 @@ export default function ProfilePage() {
 
       <div className="flex flex-col items-center mb-10">
         <div className="relative group">
-          <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-green-400 via-green-500 to-emerald-600 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-105">
-            <UserIcon className="w-14 h-14 md:w-18 md:h-18 text-white" />
+          <div className="w-20 h-20 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-green-400 via-green-500 to-emerald-600 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-105">
+            <UserIcon className="w-10 h-10 md:w-18 md:h-18 text-white" />
           </div>
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 opacity-20 blur-xl animate-pulse"></div>
         </div>

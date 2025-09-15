@@ -10,9 +10,7 @@ import { useCartStore } from "@/entities/cart/cartStore"
 import { useAddressStore } from "@/entities/address/addressStore"
 import { useOrdersStore } from "@/entities/orders/ordersStore"
 import AddressPopup from "@/components/address-popup/address-popup"
-import Image from "next/image"
-import type { Media } from "@/payload-types"
-import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save, Plus, Minus } from "lucide-react"
+import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { toast } from "sonner"
@@ -20,19 +18,20 @@ import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
 import { DELIVERY_FEE } from "@/constants/dynamic-constants"
 import { routerConfig } from "@/config/router.config"
 import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
+import OrderItem from "@/components/order-item/OrderItem"
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, totalPrice, totalCount, clear,increment, dicrement } = useCartStore()
+  const { items, totalPrice, totalCount, clear } = useCartStore()
   const { currentAddress, getFullAddress, loadAddress, openDialog } = useAddressStore()
   const { addOrder } = useOrdersStore()
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
   const { updateProfile } = useAuthStore()
   const { openDialog: openGuestDialog } = useGuestBenefitsStore()
   const [phone, setPhone] = useState("")
   const [originalPhone, setOriginalPhone] = useState("")
   const [isSaving, setIsSaving] = useState(false)
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false)
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
   useEffect(() => {
     loadAddress()
@@ -51,7 +50,11 @@ export default function CheckoutPage() {
   }
 
   const handleSavePhone = async () => {
-    const validation = validatePhone(phone)
+    const validation = validatePhone(phone);
+    if (!user){
+      toast("Войдите в аккаунт или зарегестрируйтесь для сохранения телефона.");
+      return;
+    }
     if (!validation.isValid) {
       toast.error(validation.error || "Неверный номер телефона")
       return
@@ -153,7 +156,7 @@ export default function CheckoutPage() {
           {/* Left Column - Order Details */}
           <div className="grid gap-6 lg:col-span-2 lg:grid-rows-subgrid lg:row-span-2">
             {/* Cart Items */}
-            <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
+            <Card className="flex flex-col gap-2 overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 animate-pulse"></div>
@@ -164,63 +167,9 @@ export default function CheckoutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 pt-3 space-y-4">
-                {items.map((item) => {
-                  const media = item.product.image as Media
-                  const price = item.product.price || 0
-                  const sum = price * item.quantity
-
-                  return (
-                    <div
-                      key={item.product.id}
-                      className="flex gap-4 p-4 transition-all duration-200 border group bg-gradient-to-r from-gray-50/80 to-blue-50/50 rounded-2xl hover:shadow-md border-gray-100/50"
-                    >
-                      <div className="relative w-20 h-20 overflow-hidden transition-shadow duration-200 bg-white shadow-sm rounded-xl group-hover:shadow-md">
-                        <Image
-                          width={80}
-                          height={80}
-                          src={media?.url || "/placeholder.svg?height=80&width=80&query=product-thumbnail"}
-                          alt={media?.alt || item.product.title}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">{item.product.title}</h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {item.product.weight?.value} {item.product.weight?.unit}
-                        </p>
-                        <div className="flex items-center justify-between mt-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 p-1 bg-white rounded-lg shadow-sm">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => increment(item.product)}
-                                className="w-8 h-8 p-0 rounded-md hover:bg-gray-100"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </Button>
-                              <span className="font-medium text-gray-900 min-w-[2rem] text-center">
-                                {item.quantity}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => dicrement(item.product.id)}
-                                className="w-8 h-8 p-0 rounded-md hover:bg-gray-100"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </div>
-                            <span className="font-medium text-gray-600">× {price} ₽</span>
-                          </div>
-                          <span className="text-xl font-bold text-transparent bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text">
-                            {sum} ₽
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+                {items.map((item) => (
+                  <OrderItem key={item.product.id} item={item} />
+                ))}
               </CardContent>
             </Card>
 

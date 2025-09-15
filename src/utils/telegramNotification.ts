@@ -45,21 +45,56 @@ export function formatOrderMessage(orderData: Partial<OrderData>): string {
     address?.floor && `этаж ${address.floor}`
   ].filter(Boolean).join(', ')
 
-  return `🛒 *Новый заказ!*
+  // Get backend URL from environment
+  const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
+  const orderId = (orderData as any).id || 'unknown'
+  
+  // Ensure URL is properly formatted for Telegram
+  let adminOrderUrl = `${backendUrl}/admin/collections/orders/${orderId}`
+  
+  // For localhost or non-HTTPS URLs, we'll just show the URL as text
+  const isLocalhost = adminOrderUrl.includes('localhost') || adminOrderUrl.includes('127.0.0.1')
+  const isHttps = adminOrderUrl.startsWith('https://')
 
-📋 *Номер заказа:* ${orderData.orderNumber || 'Не указан'}
-👤 *Покупатель:* ${userName}
-📞 *Телефон:* ${orderData.customerPhone || 'Не указан'}
+  console.log('Backend URL:', backendUrl);
+  console.log('Order ID:', orderId);
+  console.log('Admin Order URL:', adminOrderUrl);
+  console.log('Is localhost:', isLocalhost);
+  console.log('Is HTTPS:', isHttps);
+
+  // Format the link based on URL type
+  let linkText = ''
+  if (isLocalhost || !isHttps) {
+    // For localhost or HTTP URLs, show as plain text
+    linkText = `🔗 *Ссылка на заказ:* ${adminOrderUrl}`
+  } else {
+    // For HTTPS URLs, show as clickable link
+    linkText = `🔗 [Открыть заказ в админке](${adminOrderUrl})`
+  }
+
+  // Escape special characters for MarkdownV2
+  const escapeMarkdown = (text: string) => {
+    return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&')
+  }
+
+  return `🛒 *Новый заказ\\!*
+
+📋 *Номер заказа:* ${escapeMarkdown(orderData.orderNumber || 'Не указан')}
+👤 *Покупатель:* ${escapeMarkdown(userName)}
+📞 *Телефон:* ${escapeMarkdown(orderData.customerPhone || 'Не указан')}
 
 📦 *Товары:*
-${itemsText}
+${escapeMarkdown(itemsText)}
 
-📍 *Адрес доставки:* ${fullAddress}
-${address?.comment ? `💬 *Комментарий:* ${address.comment}` : ''}
+📍 *Адрес доставки:* ${escapeMarkdown(fullAddress)}
+${address?.comment ? `💬 *Комментарий:* ${escapeMarkdown(address.comment)}` : ''}
 
 💰 *Сумма заказа:* ${orderData.totalAmount || 0}₽
 🚚 *Доставка:* ${orderData.deliveryFee || 0}₽
-${orderData.notes ? `📝 *Примечания:* ${orderData.notes}` : ''}
+${orderData.notes ? `📝 *Примечания:* ${escapeMarkdown(orderData.notes)}` : ''}
 
-🕐 *Время заказа:* ${new Date().toLocaleString('ru-RU')}`
+🕐 *Время заказа:* ${escapeMarkdown(new Date().toLocaleString('ru-RU'))}
+
+${linkText}`
+
 }

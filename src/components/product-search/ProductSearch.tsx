@@ -98,7 +98,7 @@ const ProductSearch = ({ onProductSelect }: ProductSearchProps) => {
       </div>
 
       {isOpen && (
-        <Card className="absolute py-0 w-[calc(100vw-40px)] md:min-w-[350px] md:w-[100%] lg:w-[200%] top-full left-0 lg:left-[-50%] mt-1 bg-white border border-gray-200 shadow-lg z-[200] max-h-96 overflow-y-auto">
+        <Card className="absolute py-2 px-2 w-[calc(100vw-40px)] md:min-w-[350px] md:w-[100%] lg:w-[170%] top-full left-0 lg:left-[-40%] mt-1 bg-white border border-gray-200 shadow-lg z-[200] max-h-96 overflow-y-auto">
           {isLoading ? (
             <div className="p-4 text-center text-gray-500">Поиск...</div>
           ) : results.length > 0 ? (

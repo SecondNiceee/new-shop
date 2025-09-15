@@ -2,17 +2,16 @@
 
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react"
+import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react"
 import { useCartStore } from "@/entities/cart/cartStore"
-import type { Media } from "@/payload-types"
 import { useRouter } from "next/navigation"
 import { routerConfig } from "@/config/router.config"
-import { getDiscountInfo, formatPrice } from "@/utils/discountUtils"
+import {  formatPrice } from "@/utils/discountUtils"
+import OrderItem from "@/components/order-item/OrderItem"
 
 export default function MobileCartPage() {
   const router = useRouter()
-  const { items, totalCount, totalPrice, remove, clear, loadServer, increment, dicrement } = useCartStore()
+  const { items, totalCount, totalPrice,clear, loadServer } = useCartStore()
 
   useEffect(() => {
     loadServer().catch(() => {})
@@ -43,7 +42,7 @@ export default function MobileCartPage() {
         </div>
       </div>
 
-      <div className="flex flex-col h-[calc(100vh-140px)]">
+      <div className="flex flex-col h-[calc(100vh-200px)]">
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
           {items.length === 0 ? (
@@ -56,85 +55,8 @@ export default function MobileCartPage() {
             </div>
           ) : (
             items.map((it) => {
-              const media = it.product.image as Media
-              const discountInfo = getDiscountInfo(it.product)
-
               return (
-                <div key={it.product.id} className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                  <div className="flex gap-2">
-                    {/* Image */}
-                    <div className="relative w-16 h-16 overflow-hidden rounded-lg bg-gray-50 flex-shrink-0">
-                      <Image
-                        width={64}
-                        height={64}
-                        src={media?.url || "/placeholder.svg?height=64&width=64&query=product-thumbnail"}
-                        alt={media?.alt || it.product.title}
-                        className="object-cover w-full h-full"
-                      />
-                      {discountInfo.hasDiscount && (
-                        <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded text-[10px]">
-                          -{discountInfo.discountPercentage}%
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <h3 className="font-medium text-sm text-gray-900 mb-1 line-clamp-2 leading-tight">
-                        {it.product.title}
-                      </h3>
-                      <p className="text-xs text-gray-500 mb-2">
-                        {it.product.weight?.value} {it.product.weight?.unit}
-                      </p>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-base text-green-600">
-                              {formatPrice(discountInfo.discountedPrice)}
-                            </span>
-                            {discountInfo.hasDiscount && (
-                              <span className="text-xs text-gray-400 line-through">
-                                {formatPrice(discountInfo.originalPrice)}
-                              </span>
-                            )}
-                          </div>
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
-                            onClick={() => remove(it.product.id)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-center">
-                          <div className="flex items-center bg-gray-50 rounded-lg p-0.5">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 w-7 p-0 hover:bg-gray-200"
-                              onClick={() => dicrement(it.product.id as number)}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="w-8 text-center text-sm font-medium">{it.quantity}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 w-7 p-0 hover:bg-gray-200"
-                              onClick={() => increment(it.product)}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <OrderItem item={it} />
               )
             })
           )}

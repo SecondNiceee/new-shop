@@ -18,9 +18,10 @@ const Orders: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async ({ data, operation }) => {
+      async ({  operation, doc }) => {
+        console.log("Выполняется после изменения");
         // Send Telegram notification only for new orders
-        if (operation === 'create' && data) {
+        if (operation === 'create' && doc) {
           try {
             const botToken = process.env.TELEGRAM_BOT_TOKEN
             const channelId = process.env.TELEGRAM_CHANNEL_ID
@@ -30,7 +31,7 @@ const Orders: CollectionConfig = {
               return
             }
 
-            const message = formatOrderMessage(data)
+            const message = formatOrderMessage(doc)
             const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`
             
             const response = await fetch(telegramUrl, {
@@ -41,7 +42,7 @@ const Orders: CollectionConfig = {
               body: JSON.stringify({
                 chat_id: channelId,
                 text: message,
-                parse_mode: 'Markdown',
+                parse_mode: 'MarkdownV2',
               }),
             })
 
