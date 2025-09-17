@@ -1,23 +1,22 @@
-import { revalidatePages } from "@/utils/revalidate"
-import { revalidatePath, revalidateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import type { GlobalConfig } from "payload"
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
-  access : {
-    read : () => true,
-    update : () => true
+  access: {
+    read: () => true,
+    update: () => true,
   },
   admin: {
     group: "Настройки сайта",
     description: "Основные настройки сайта и контактная информация",
   },
-  hooks : {
-    afterChange : [
+  hooks: {
+    afterChange: [
       ({}) => {
-        revalidateTag("site-settings");
-      }
-    ]
+        revalidateTag("site-settings")
+      },
+    ],
   },
   fields: [
     {
@@ -27,9 +26,9 @@ export const SiteSettings: GlobalConfig = {
       admin: {
         description: "Основная информация о вашей компании",
       },
-      required:true,
+      required: true,
       fields: [
-        { 
+        {
           name: "legalName",
           type: "text",
           label: "Юридическое название",
@@ -50,15 +49,46 @@ export const SiteSettings: GlobalConfig = {
           },
         },
         {
-          name:"phone",
-          required : true,
-          type : 'text',
+          name: "phone",
+          required: true,
+          type: "text",
           label: "Телефон",
-          defaultValue : "+7 968 784 58 54",
+          defaultValue: "+7 968 784 58 54",
           admin: {
             description: "Основной контактный телефон компании",
           },
-        }
+        },
+      ],
+    },
+    {
+      name: "orderSettings",
+      type: "group",
+      label: "Настройки заказов и доставки",
+      admin: {
+        description: "Настройки минимальной суммы заказа и стоимости доставки",
+      },
+      required: true,
+      fields: [
+        {
+          name: "minOrderAmount",
+          type: "number",
+          label: "Минимальная сумма заказа (₽)",
+          required: true,
+          defaultValue: 500,
+          admin: {
+            description: "Минимальная сумма заказа для оформления",
+          },
+        },
+        {
+          name: "deliveryFee",
+          type: "number",
+          label: "Стоимость доставки (₽)",
+          required: true,
+          defaultValue: 199,
+          admin: {
+            description: "Стоимость доставки заказа",
+          },
+        },
       ],
     },
     {
@@ -68,27 +98,27 @@ export const SiteSettings: GlobalConfig = {
       admin: {
         description: "Ссылки на ваши социальные сети и мессенджеры",
       },
-      required:true,
+      required: true,
       fields: [
         {
-            name: "email",
-            type: "text",
-            label: "Email",
-            required: false,
-            defaultValue: "Ваш Email",
-            admin: {
-              description: "Контактный email адрес",
-            },         
+          name: "email",
+          type: "text",
+          label: "Email",
+          required: false,
+          defaultValue: "Ваш Email",
+          admin: {
+            description: "Контактный email адрес",
+          },
         },
         {
-            name: "whatsApp",
-            type: "text",
-            label: "WhatsApp",
-            required: false,
-            defaultValue: "ссылка на ваш ватсапп акк",
-            admin: {
-              description: "Ссылка на WhatsApp (номер телефона или ссылка)",
-            },  
+          name: "whatsApp",
+          type: "text",
+          label: "WhatsApp",
+          required: false,
+          defaultValue: "ссылка на ваш ватсапп акк",
+          admin: {
+            description: "Ссылка на WhatsApp (номер телефона или ссылка)",
+          },
         },
         {
           name: "vk",

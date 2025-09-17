@@ -6,16 +6,17 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useCartStore } from "@/entities/cart/cartStore"
 import { useAddressStore } from "@/entities/address/addressStore"
 import { useOrdersStore } from "@/entities/orders/ordersStore"
+import { useSiteSettings } from "@/entities/siteSettings/SiteSettingsStore"
 import AddressPopup from "@/components/address-popup/address-popup"
-import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save } from "lucide-react"
+import { ArrowLeft, MapPin, Phone, CreditCard, Edit3, Save, AlertTriangle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/entities/auth/authStore"
 import { toast } from "sonner"
 import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
-import { DELIVERY_FEE } from "@/constants/dynamic-constants"
 import { routerConfig } from "@/config/router.config"
 import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
 import OrderItem from "@/components/order-item/OrderItem"
@@ -25,13 +26,15 @@ export default function CheckoutPage() {
   const { items, totalPrice, totalCount, clear } = useCartStore()
   const { currentAddress, getFullAddress, loadAddress, openDialog } = useAddressStore()
   const { addOrder } = useOrdersStore()
-  const { user } = useAuthStore();
+  const { user } = useAuthStore()
   const { updateProfile } = useAuthStore()
   const { openDialog: openGuestDialog } = useGuestBenefitsStore()
+  const { siteSettings } = useSiteSettings()
   const [phone, setPhone] = useState("")
   const [originalPhone, setOriginalPhone] = useState("")
   const [isSaving, setIsSaving] = useState(false)
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false)
+  const [showMinOrderDialog, setShowMinOrderDialog] = useState(false)
 
   useEffect(() => {
     loadAddress()
@@ -50,10 +53,10 @@ export default function CheckoutPage() {
   }
 
   const handleSavePhone = async () => {
-    const validation = validatePhone(phone);
-    if (!user){
-      toast("Войдите в аккаунт или зарегестрируйтесь для сохранения телефона.");
-      return;
+    const validation = validatePhone(phone)
+    if (!user) {
+      toast("Войдите в аккаунт или зарегестрируйтесь для сохранения телефона.")
+      return
     }
     if (!validation.isValid) {
       toast.error(validation.error || "Неверный номер телефона")
@@ -82,10 +85,16 @@ export default function CheckoutPage() {
       return
     }
 
+    const minOrderAmount = siteSettings?.orderSettings?.minOrderAmount || 500
+    if (totalPrice < minOrderAmount) {
+      setShowMinOrderDialog(true)
+      return
+    }
+
     setIsProcessingOrder(true)
 
     try {
-      // Создаем заказ
+      const deliveryFee = siteSettings?.orderSettings?.deliveryFee || 199
       const orderData = {
         items: items.map((item) => ({
           product: item.product.id,
@@ -100,8 +109,8 @@ export default function CheckoutPage() {
           comment: currentAddress.comment || "",
         },
         customerPhone: normalizePhone(phone),
-        totalAmount: totalPrice + DELIVERY_FEE,
-        deliveryFee: DELIVERY_FEE, // По умолчанию наличными
+        totalAmount: totalPrice + deliveryFee,
+        deliveryFee: deliveryFee,
         status: "pending",
       }
       await addOrder(orderData)
@@ -131,10 +140,12 @@ export default function CheckoutPage() {
 
   const isOrderValid = isPhoneValid() && currentAddress && items.length > 0
 
+  const deliveryFee = siteSettings?.orderSettings?.deliveryFee || 199
+  const minOrderAmount = siteSettings?.orderSettings?.minOrderAmount || 500
+
   return (
     <div className="min-h-screen p-4 bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button
             variant="ghost"
@@ -153,9 +164,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 lg:grid-rows-[auto_1fr] lg:items-start">
-          {/* Left Column - Order Details */}
           <div className="grid gap-6 lg:col-span-2 lg:grid-rows-subgrid lg:row-span-2">
-            {/* Cart Items */}
             <Card className="flex flex-col gap-2 overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
@@ -173,7 +182,6 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Address */}
             <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
@@ -213,9 +221,7 @@ export default function CheckoutPage() {
             </Card>
           </div>
 
-          {/* Right Column - Payment */}
           <div className="grid gap-6 lg:grid-rows-subgrid lg:row-span-2">
-            {/* Phone Input */}
             <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
@@ -263,7 +269,6 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Order Summary */}
             <Card className="flex flex-col overflow-hidden text-white border-0 shadow-2xl bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-xl">
@@ -279,12 +284,12 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-lg text-white/90">
                     <span>Доставка</span>
-                    <span className="font-semibold">199 ₽</span>
+                    <span className="font-semibold">{deliveryFee} ₽</span>
                   </div>
                   <div className="pt-3 border-t border-white/30">
                     <div className="flex justify-between text-2xl font-bold">
                       <span>Итого</span>
-                      <span>{totalPrice + 199} ₽</span>
+                      <span>{totalPrice + deliveryFee} ₽</span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +305,7 @@ export default function CheckoutPage() {
                       Оформляем заказ...
                     </div>
                   ) : (
-                    `Оформить заказ ${totalPrice + 199} ₽`
+                    `Оформить заказ ${totalPrice + deliveryFee} ₽`
                   )}
                 </Button>
               </CardContent>
@@ -310,6 +315,52 @@ export default function CheckoutPage() {
       </div>
 
       <AddressPopup />
+
+      <Dialog open={showMinOrderDialog} onOpenChange={setShowMinOrderDialog}>
+        <DialogContent className="max-w-md mx-auto bg-white border-0 shadow-2xl rounded-2xl p-6">
+          <DialogHeader className="text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="p-4 bg-orange-100 rounded-full">
+                <AlertTriangle className="w-10 h-10 text-orange-500" />
+              </div>
+            </div>
+            <DialogTitle className="text-2xl font-bold text-gray-900 leading-tight">
+              Минимальная сумма заказа
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 text-base leading-relaxed space-y-2">
+              <p>
+                Минимальная сумма заказа составляет{" "}
+                <span className="font-semibold text-orange-600">{minOrderAmount} ₽</span>.
+              </p>
+              <p>
+                Текущая сумма вашего заказа: <span className="font-semibold">{totalPrice} ₽</span>.
+              </p>
+              <p>
+                Добавьте товаров еще на{" "}
+                <span className="font-semibold text-emerald-600">{minOrderAmount - totalPrice} ₽</span>.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowMinOrderDialog(false)}
+              className="flex-1 py-3 text-base border-gray-200 hover:bg-gray-50"
+            >
+              Понятно
+            </Button>
+            <Button
+              onClick={() => {
+                setShowMinOrderDialog(false)
+                router.push("/")
+              }}
+              className="flex-1 py-3 text-base bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
+            >
+              Добавить товары
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

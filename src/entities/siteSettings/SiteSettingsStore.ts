@@ -16,6 +16,7 @@ export const useSiteSettings = create<SiteSettingsState>()((set, get) => ({
     async getSiteSettings(){
         set({isLoading : true})
         const siteSettings = await getSiteSettings();
+        console.log(siteSettings);
         if (!siteSettings){
             set({error : {message : "Internal Error", status : 500}, isLoading : false, siteSettings : null})
         }

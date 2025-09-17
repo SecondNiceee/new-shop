@@ -1,10 +1,13 @@
-import { DELIVERY_FEE, MIN_ORDER } from '@/constants/dynamic-constants'
-import { useCartStore } from '@/entities/cart/cartStore'
-import { Loader2, ShoppingCart } from 'lucide-react'
-import React, { FC } from 'react'
+"use client"
+
+import { useSiteSettings } from "@/entities/siteSettings/SiteSettingsStore"
+import { useCartStore } from "@/entities/cart/cartStore"
+import { Loader2, ShoppingCart } from "lucide-react"
+import type { FC } from "react"
 
 const Cart: FC = () => {
   const { open, totalPrice, isCartLoaded, isHydrated } = useCartStore()
+  const { siteSettings } = useSiteSettings()
 
   if (!isCartLoaded || !isHydrated) {
     return (
@@ -13,12 +16,14 @@ const Cart: FC = () => {
       </div>
     )
   }
+
   const isProducts = totalPrice > 0
-  const isLess = totalPrice < MIN_ORDER
+  const isLess = totalPrice < (siteSettings?.orderSettings?.minOrderAmount || 500)
+
   return (
     <div
       onClick={open}
-      className={`${isProducts ? (isLess ? 'bg-orange-400' : 'bg-green-500') : 'bg-white'}  cursor-pointer md:flex  lg:items-center gap-2 px-4  border-black border-solid md:border-2 md:border-none rounded-lg p-2 flex-shrink-0`}
+      className={`${isProducts ? (isLess ? "bg-orange-400" : "bg-green-500") : "bg-white"}  cursor-pointer md:flex  lg:items-center gap-2 px-4  border-black border-solid md:border-2 md:border-none rounded-lg p-2 flex-shrink-0`}
     >
       <div className="text-right">
         {totalPrice > 0 ? (
@@ -28,9 +33,11 @@ const Cart: FC = () => {
           </div>
         ) : (
           <>
-            <p className="text-sm whitespace-nowrap">Мин. сумма заказа {MIN_ORDER} ₽</p>
+            <p className="text-sm whitespace-nowrap">
+              Мин. сумма заказа {siteSettings?.orderSettings?.minOrderAmount || 500} ₽
+            </p>
             <p className="text-xs text-gray-500 text-left whitespace-nowrap">
-              Доставим за {DELIVERY_FEE} ₽
+              Доставим за {siteSettings?.orderSettings?.deliveryFee || 199} ₽
             </p>
           </>
         )}

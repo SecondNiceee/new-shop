@@ -3,20 +3,20 @@
 import { useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
+import { ShoppingBag, ArrowRight } from "lucide-react"
 import { useCartStore } from "@/entities/cart/cartStore"
-import type { Media, Product } from "@/payload-types"
+import { useSiteSettings } from "@/entities/siteSettings/SiteSettingsStore"
 import { useRouter } from "next/navigation"
 import { routerConfig } from "@/config/router.config"
-import { getDiscountInfo, formatPrice } from "@/utils/discountUtils"
-import OrderItem from "../order-item/OrderItem"
+import { formatPrice } from "@/utils/discountUtils"
 import OrderItemMobile from "../order-item/OrderItemMobile"
 
 export default function CartDrawer() {
   const router = useRouter()
   const { isOpen, toggle, items, totalCount, totalPrice, remove, clear, loadServer, increment, dicrement } =
     useCartStore()
+
+  const { siteSettings } = useSiteSettings()
 
   useEffect(() => {
     loadServer().catch(() => {})
@@ -26,6 +26,8 @@ export default function CartDrawer() {
     toggle() // Close cart
     router.push(routerConfig.checkout)
   }
+
+  const deliveryFee = siteSettings?.orderSettings?.deliveryFee || 199
 
   return (
     <Dialog open={isOpen} onOpenChange={toggle}>
@@ -55,9 +57,7 @@ export default function CartDrawer() {
               </div>
             ) : (
               items.map((it, id) => {
-                return (
-                  <OrderItemMobile item={it} key={id} />
-                )
+                return <OrderItemMobile item={it} key={id} />
               })
             )}
           </div>
@@ -73,12 +73,12 @@ export default function CartDrawer() {
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>Доставка</span>
-                  <span>199 ₽</span>
+                  <span>{deliveryFee} ₽</span>
                 </div>
                 <div className="border-t border-gray-200 mt-2 pt-2">
                   <div className="flex items-center justify-between text-lg font-bold">
                     <span>Итого</span>
-                    <span className="text-green-600">{formatPrice(totalPrice + 199)}</span>
+                    <span className="text-green-600">{formatPrice(totalPrice + deliveryFee)}</span>
                   </div>
                 </div>
               </div>

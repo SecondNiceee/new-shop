@@ -857,6 +857,19 @@ export interface SiteSetting {
     phone: string;
   };
   /**
+   * Настройки минимальной суммы заказа и стоимости доставки
+   */
+  orderSettings: {
+    /**
+     * Минимальная сумма заказа для оформления
+     */
+    minOrderAmount: number;
+    /**
+     * Стоимость доставки заказа
+     */
+    deliveryFee: number;
+  };
+  /**
    * Ссылки на ваши социальные сети и мессенджеры
    */
   socialLinks: {
@@ -899,6 +912,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         legalName?: T;
         year?: T;
         phone?: T;
+      };
+  orderSettings?:
+    | T
+    | {
+        minOrderAmount?: T;
+        deliveryFee?: T;
       };
   socialLinks?:
     | T
