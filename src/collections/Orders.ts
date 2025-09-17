@@ -1,4 +1,5 @@
-import { isAccess, isAdmin, isLoggedIn, isOwn } from "@/utils/accessUtils"
+import { isAccess, isLoggedIn, isOwn } from "@/utils/accessUtils"
+import { generateOrderEmailHTML } from "@/utils/generateOrderEmail";
 import { formatOrderMessage } from "@/utils/telegramNotification"
 import type { CollectionConfig } from "payload"
 
@@ -10,7 +11,7 @@ const Orders: CollectionConfig = {
     group : "Заказы(Важно)",
     defaultColumns: ["orderNumber", "user", "status", "totalAmount", "createdAt"],
   },
-  access: {
+  access: { 
     read: isOwn,
     create: isLoggedIn,
     update: isAccess("orders"),
@@ -18,7 +19,7 @@ const Orders: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async ({  operation, doc }) => {
+      async ({ operation, doc, req }) => {
         console.log("Выполняется после изменения");
         // Send Telegram notification only for new orders
         if (operation === 'create' && doc) {
@@ -31,8 +32,8 @@ const Orders: CollectionConfig = {
               return
             }
 
-            const message = formatOrderMessage(doc)
-            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`
+            const message = formatOrderMessage({...doc, adminOrderUrl : `${process.env.BACKEND_URL}/admin/collections/orders/${doc.id}`})
+            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
             
             const response = await fetch(telegramUrl, {
               method: 'POST',
@@ -42,7 +43,7 @@ const Orders: CollectionConfig = {
               body: JSON.stringify({
                 chat_id: channelId,
                 text: message,
-                parse_mode: 'MarkdownV2',
+                parse_mode: 'HTML',
               }),
             })
 
@@ -53,6 +54,64 @@ const Orders: CollectionConfig = {
             }
           } catch (error) {
             console.error('Error sending Telegram notification:', error)
+          }
+
+          // Send Email notification
+          try {
+            if (!req?.payload) {
+              console.warn('Payload instance not available on req for sending email')
+            } else {
+              // Get destination email from SiteSettings
+              const siteSettings = await req.payload.findGlobal({ slug: 'site-settings' }) as any
+              const adminEmail: string | undefined = siteSettings?.socialLinks?.email
+
+              if (!adminEmail) {
+                console.warn('Admin email is not configured in SiteSettings')
+              } else {
+                const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
+                const orderId = (doc as any).id
+                const adminOrderUrl = `${backendUrl}/admin/collections/orders/${orderId}`
+
+                const itemsHtml = (doc.items || [])
+                  .map((it: any) => {
+                    const productTitle = typeof it.product === 'object' ? it.product?.title : 'Товар'
+                    return `<li>${productTitle} × ${it.quantity} — ${it.price}₽</li>`
+                  })
+                  .join('')
+
+                const address = doc.deliveryAddress || {}
+                const fullAddress = [
+                  address.address,
+                  address.apartment && `кв. ${address.apartment}`,
+                  address.entrance && `подъезд ${address.entrance}`,
+                  address.floor && `этаж ${address.floor}`
+                ]
+                  .filter(Boolean)
+                  .join(', ');
+
+
+                const emailHtml = generateOrderEmailHTML({adminOrderUrl, 
+                  customerPhone : doc.customerPhone,
+                  deliveryFee : doc.dedeliveryFee,
+                  fullAddress,
+                  itemsHtml,
+                  orderNumber : doc.orderNumber,
+                  totalAmount : doc.totalAmount,
+                  addressComment : address.comment,
+                  notes : doc.notes
+                })
+
+                await req.payload.sendEmail({
+                  to: adminEmail,
+                  subject: `Новый заказ: ${doc.orderNumber || ''}`,
+                  html: emailHtml,
+                })
+
+                console.log('Order email sent to:', adminEmail)
+              }
+            }
+          } catch (error) {
+            console.error('Error sending order email:', error)
           }
         }
       }

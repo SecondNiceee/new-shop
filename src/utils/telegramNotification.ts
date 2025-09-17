@@ -1,13 +1,17 @@
 interface OrderData {
   orderNumber: string
-  user?: {
-    email?: string
-  } | string
+  user?:
+    | {
+        email?: string
+      }
+    | string
   customerPhone: string
   items?: Array<{
-    product?: {
-      title?: string
-    } | string
+    product?:
+      | {
+          title?: string
+        }
+      | string
     quantity: number
     price: number
   }>
@@ -21,80 +25,78 @@ interface OrderData {
   totalAmount: number
   deliveryFee: number
   notes?: string
+  adminOrderUrl?: string // 👈 Добавлено
 }
 
-export function formatOrderMessage(orderData: Partial<OrderData>): string {
-  // Get user info if available
-  let userName = 'Неизвестный пользователь'
-  if (orderData.user && typeof orderData.user === 'object' && orderData.user.email) {
-    userName = orderData.user.email
+const escapeHtml = (text: string | null | undefined): string => {
+  if (!text) return ""
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+}
+
+export function formatOrderMessage(data: OrderData): string {
+  // Форматируем список товаров
+  const itemsText = data.items && data.items.length > 0
+    ? data.items.map(item => {
+        const productTitle =
+          typeof item.product === "string"
+            ? item.product
+            : item.product?.title || "Без названия"
+        return `- ${escapeHtml(productTitle)} ×${item.quantity} (${item.price}₽)`
+      }).join("\n")
+    : "Нет товаров"
+
+  // Форматируем адрес доставки
+  const addressParts = []
+  if (data.deliveryAddress?.address) addressParts.push(`Адрес: ${data.deliveryAddress.address}`)
+  if (data.deliveryAddress?.apartment) addressParts.push(`Кв.: ${data.deliveryAddress.apartment}`)
+  if (data.deliveryAddress?.entrance) addressParts.push(`Подъезд: ${data.deliveryAddress.entrance}`)
+  if (data.deliveryAddress?.floor) addressParts.push(`Этаж: ${data.deliveryAddress.floor}`)
+  const deliveryAddressText = addressParts.length > 0
+    ? escapeHtml(addressParts.join(", "))
+    : "Не указан"
+
+  // Комментарий к адресу
+  const addressComment = data.deliveryAddress?.comment
+
+  // 👇 Формируем блок "Ссылка на админку" с проверкой на http(s)
+  let adminLink = ""
+  if (data.adminOrderUrl) {
+    const url = data.adminOrderUrl
+    if (url.includes("https://")) {
+      // Это полный URL — делаем ссылку
+      adminLink = `\n<b>🔗 Ссылка на админку:</b> <a href="${escapeHtml(url)}">${url}</a>`
+    } else {
+      // Это не URL — выводим как обычный текст
+      adminLink = `\n<b>🔗 Ссылка на админку:</b> ${(url)}`
+    }
   }
 
-  // Format order items
-  const itemsText = orderData.items?.map((item) => {
-    const productName = typeof item.product === 'object' ? item.product.title : 'Товар'
-    return `• ${productName} x${item.quantity} - ${item.price}₽`
-  }).join('\n') || 'Нет товаров'
+  return `<b>🛒 Новый заказ!</b>
 
-  // Format delivery address
-  const address = orderData.deliveryAddress
-  const fullAddress = [
-    address?.address,
-    address?.apartment && `кв. ${address.apartment}`,
-    address?.entrance && `подъезд ${address.entrance}`,
-    address?.floor && `этаж ${address.floor}`
-  ].filter(Boolean).join(', ')
+<b>📋 Номер заказа:</b> ${escapeHtml(data.orderNumber)}
+<b>📞 Телефон:</b> ${escapeHtml(data.customerPhone)}
 
-  // Get backend URL from environment
-  const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
-  const orderId = (orderData as any).id || 'unknown'
-  
-  // Ensure URL is properly formatted for Telegram
-  let adminOrderUrl = `${backendUrl}/admin/collections/orders/${orderId}`
-  
-  // For localhost or non-HTTPS URLs, we'll just show the URL as text
-  const isLocalhost = adminOrderUrl.includes('localhost') || adminOrderUrl.includes('127.0.0.1')
-  const isHttps = adminOrderUrl.startsWith('https://')
+<b>📦 Товары:</b>
+${itemsText}
 
-  console.log('Backend URL:', backendUrl);
-  console.log('Order ID:', orderId);
-  console.log('Admin Order URL:', adminOrderUrl);
-  console.log('Is localhost:', isLocalhost);
-  console.log('Is HTTPS:', isHttps);
-
-  // Format the link based on URL type
-  let linkText = ''
-  if (isLocalhost || !isHttps) {
-    // For localhost or HTTP URLs, show as plain text
-    linkText = `🔗 *Ссылка на заказ:* ${adminOrderUrl}`
-  } else {
-    // For HTTPS URLs, show as clickable link
-    linkText = `🔗 [Открыть заказ в админке](${adminOrderUrl})`
+<b>📍 Адрес доставки:</b> ${deliveryAddressText}${
+    addressComment
+      ? `\n<b>💬 Комментарий к адресу:</b> ${escapeHtml(addressComment)}`
+      : ""
   }
 
-  // Escape special characters for MarkdownV2
-  const escapeMarkdown = (text: string) => {
-    return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&')
+<b>💰 Сумма заказа:</b> ${data.totalAmount - data.deliveryFee}₽
+<b>🚚 Доставка:</b> ${data.deliveryFee}₽
+<b>💳 Итого:</b> ${data.totalAmount}₽${
+    data.notes
+      ? `\n<b>📝 Примечания:</b> ${escapeHtml(data.notes)}`
+      : ""
   }
 
-  return `🛒 *Новый заказ\\!*
-
-📋 *Номер заказа:* ${escapeMarkdown(orderData.orderNumber || 'Не указан')}
-👤 *Покупатель:* ${escapeMarkdown(userName)}
-📞 *Телефон:* ${escapeMarkdown(orderData.customerPhone || 'Не указан')}
-
-📦 *Товары:*
-${escapeMarkdown(itemsText)}
-
-📍 *Адрес доставки:* ${escapeMarkdown(fullAddress)}
-${address?.comment ? `💬 *Комментарий:* ${escapeMarkdown(address.comment)}` : ''}
-
-💰 *Сумма заказа:* ${orderData.totalAmount || 0}₽
-🚚 *Доставка:* ${orderData.deliveryFee || 0}₽
-${orderData.notes ? `📝 *Примечания:* ${escapeMarkdown(orderData.notes)}` : ''}
-
-🕐 *Время заказа:* ${escapeMarkdown(new Date().toLocaleString('ru-RU'))}
-
-${linkText}`
-
+<b>🕐 Время заказа:</b> ${escapeHtml(new Date().toLocaleString("ru-RU"))}${adminLink}`
 }

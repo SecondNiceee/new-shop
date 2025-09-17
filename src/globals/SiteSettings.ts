@@ -1,3 +1,5 @@
+import { revalidatePages } from "@/utils/revalidate"
+import { revalidatePath, revalidateTag } from "next/cache"
 import type { GlobalConfig } from "payload"
 
 export const SiteSettings: GlobalConfig = {
@@ -9,6 +11,13 @@ export const SiteSettings: GlobalConfig = {
   admin: {
     group: "Настройки сайта",
     description: "Основные настройки сайта и контактная информация",
+  },
+  hooks : {
+    afterChange : [
+      ({}) => {
+        revalidateTag("site-settings");
+      }
+    ]
   },
   fields: [
     {

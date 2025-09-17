@@ -5,9 +5,7 @@ import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 import { getDelivery } from '@/actions/server/pages/getDelivery';
 
-export const dynamic = 'auto';
-export const revalidate = 120;
-
+export const revalidate = 31536000; // 1 год
 export default async function AboutPage() {
   try {
     const delivery = await getDelivery();

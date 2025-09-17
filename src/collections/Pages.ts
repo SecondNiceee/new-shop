@@ -1,4 +1,5 @@
 import { isAccess } from "@/utils/accessUtils"
+import { revalidatePath } from "next/cache"
 import type { CollectionConfig } from "payload"
 
 export const Pages: CollectionConfig = {
@@ -25,9 +26,10 @@ export const Pages: CollectionConfig = {
   hooks: {
     afterChange: [
       ({ data }) => {
+        revalidatePath(`/${data.slug}`)
         return data
       }
-    ]
+    ] 
   },
   versions: {
     drafts: {

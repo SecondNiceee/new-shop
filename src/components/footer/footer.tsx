@@ -2,7 +2,8 @@ import { getSiteSettings } from "@/actions/server/globals/getSiteSettings"
 import Image from "next/image"
 import Link from "next/link";
 export const dynamic = 'auto';
-export const revalidate = 3600;
+
+export const revalidate = 31536000; // 1 год
 export async function Footer() {
   const siteSettings = await getSiteSettings()
   return (

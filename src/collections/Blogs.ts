@@ -1,3 +1,4 @@
+import { routerConfig } from "@/config/router.config";
 import { ContactsBlock } from "@/lib/payload-blocks/ContactsBlock";
 import { HeaderBlock } from "@/lib/payload-blocks/HeaderBlock";
 import { ImageBlock } from "@/lib/payload-blocks/ImageBlock";
@@ -6,6 +7,7 @@ import { PararaphBlock } from "@/lib/payload-blocks/ParagraphBlock";
 import { TextWithImageBlock } from "@/lib/payload-blocks/TextWithImageBlock";
 import { isAccess } from "@/utils/accessUtils";
 import { BlocksFeature, HeadingFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
+import { revalidatePath } from "next/cache";
 import { CollectionConfig } from "payload";
 
 export const Blogs:CollectionConfig = {
@@ -19,6 +21,14 @@ export const Blogs:CollectionConfig = {
     admin : {
         useAsTitle : "title",
         group : "Страницы"
+    },
+    hooks : {
+        afterChange : [
+            ({doc}) => {
+                revalidatePath(routerConfig.blog);
+                revalidatePath(`${routerConfig.blog}/${doc.slug}`)
+            }
+        ]
     },
     fields : [
         {

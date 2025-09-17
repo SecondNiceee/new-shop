@@ -16,6 +16,7 @@ type AuthDialogStore = {
 export const useAuthDialogStore = create<AuthDialogStore>((set, get) => ({
   open: false,
   mode: "login",
+  isRedirect : true,
   openDialog: (mode = "login", isRedirect = true) => {
     set({ open: true, mode,  isRedirect})
   } ,

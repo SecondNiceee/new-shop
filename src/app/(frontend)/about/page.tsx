@@ -5,10 +5,7 @@ import jsxConverters from '@/utils/jsx-converters';
 import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 
-// Принудительно динамический рендеринг
-export const dynamic = 'auto';
-export const revalidate = 120;
-
+export const revalidate = 31536000; // 1 год
 export default async function AboutPage() {
   try {
     const about = await getAbout();
@@ -33,7 +30,8 @@ export default async function AboutPage() {
 // Метаданные для SEO
 export async function generateMetadata() {
   try {
-    const aboutData = await getAbout()
+    const aboutData = await getAbout();
+    console.log(aboutData);
     return {
       title: aboutData.title || "О нас",
       description: aboutData?.description || "Узнайте больше о нашей компании ГрандБАЗАР",
