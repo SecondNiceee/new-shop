@@ -87,7 +87,7 @@ export default function ProductPage() {
       <RelatedProducts product={currentProduct} />
 
       {/* Nutrition Information */}
-      <NutrientInformation />
+      <NutrientInformation product={currentProduct} />
 
       {/* Custom scrollbar styles */}
       <style jsx>{`
