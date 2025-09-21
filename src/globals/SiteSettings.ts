@@ -9,7 +9,8 @@ export const SiteSettings: GlobalConfig = {
   },
   admin: {
     group: "Настройки сайта",
-    description: "Основные настройки сайта и контактная информация. Если вы ставите изображение (в слайдере) сразу с текстом, то не добавляйте просто текст. Но будьте аккуратны, проверьте как ваш текст (на картинке) выглядит на мобилках и на пк.",
+    description:
+      "Основные настройки сайта и контактная информация. Если вы ставите изображение (в слайдере) сразу с текстом, то не добавляйте просто текст. Но будьте аккуратны, проверьте как ваш текст (на картинке) выглядит на мобилках и на пк.",
   },
   hooks: {
     afterChange: [
@@ -103,57 +104,27 @@ export const SiteSettings: GlobalConfig = {
               },
             },
             {
-              name: "button",
-              type: "group",
-              label: "Кнопка",
-              admin: {
-                description: "Настройки кнопки на слайде",
-              },
-              fields: [
-                {
-                  name: "text",
-                  type: "text",
-                  label: "Текст кнопки",
-                  required: false,
-                  admin: {
-                    description: "Текст, который будет отображаться на кнопке",
-                  },
-                },
-                {
-                  name: "link",
-                  type: "text",
-                  label: "Ссылка",
-                  required: false,
-                  admin: {
-                    description: "URL, на который будет вести кнопка",
-                  },
-                },
-                {
-                  name: "style",
-                  type: "select",
-                  label: "Стиль кнопки",
-                  required: false,
-                  defaultValue: "primary",
-                  options: [
-                    {
-                      label: "Основная",
-                      value: "primary",
-                    },
-                    {
-                      label: "Вторичная",
-                      value: "secondary",
-                    },
-                    {
-                      label: "Контурная",
-                      value: "outline",
-                    },
-                  ],
-                  admin: {
-                    description: "Выберите стиль кнопки",
-                  },
-                },
+              name: "imageOverlay",
+              type: "select",
+              label: "Затемнение изображения",
+              required: false,
+              defaultValue: "none",
+              options: [
+                { label: "Без затемнения", value: "none" },
+                { label: "Легкое затемнение", value: "light" },
+                { label: "Среднее затемнение", value: "medium" },
+                { label: "Сильное затемнение", value: "dark" },
               ],
+              admin: {
+                description: "Уровень затемнения изображения для лучшей читаемости текста",
+              },
             },
+            {
+               name: "link",
+               type : "text",
+               required : false,
+               label : "Ссылка у слайда(куда ведет при нажатии) (Если ссылка внутри сайта, не пишите ссылку полностью лишь /meal или что-то такое.)",
+            }
           ],
         },
       ],

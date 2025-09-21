@@ -869,22 +869,10 @@ export interface SiteSetting {
            */
           subtitleColor?: ('black' | 'white' | 'gray' | 'red' | 'blue' | 'green' | 'yellow') | null;
           /**
-           * Настройки кнопки на слайде
+           * Уровень затемнения изображения для лучшей читаемости текста
            */
-          button?: {
-            /**
-             * Текст, который будет отображаться на кнопке
-             */
-            text?: string | null;
-            /**
-             * URL, на который будет вести кнопка
-             */
-            link?: string | null;
-            /**
-             * Выберите стиль кнопки
-             */
-            style?: ('primary' | 'secondary' | 'outline') | null;
-          };
+          imageOverlay?: ('none' | 'light' | 'medium' | 'dark') | null;
+          link?: string | null;
           id?: string | null;
         }[]
       | null;
@@ -967,13 +955,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               subtitle?: T;
               titleColor?: T;
               subtitleColor?: T;
-              button?:
-                | T
-                | {
-                    text?: T;
-                    link?: T;
-                    style?: T;
-                  };
+              imageOverlay?: T;
+              link?: T;
               id?: T;
             };
       };

@@ -1,0 +1,165 @@
+"use client"
+
+import useEmblaCarousel from "embla-carousel-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useCallback, useEffect, useState, useRef } from "react"
+import Autoplay from "embla-carousel-autoplay"
+import { useSiteSettings } from "@/entities/siteSettings/SiteSettingsStore"
+import type { Media } from "@/payload-types"
+import { getTextColorClass } from "./utils/getTextColorClass"
+import { getOverlayClass } from "./utils/getOverlayClass"
+import { useRouter } from "next/navigation"
+
+export default function HeroSlider() {
+  const siteSettings = useSiteSettings((state) => state.siteSettings)
+  const slides = siteSettings?.slider?.slides || []
+
+  const autoplayRef = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
+
+  const router = useRouter();
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      align: "center",
+      containScroll: "trimSnaps",
+      skipSnaps: false,
+      dragFree: false,
+    },
+    [autoplayRef.current],
+  )
+
+  const [prevBtnDisabled, setPrevBtnDisabled] = useState(false)
+  const [nextBtnDisabled, setNextBtnDisabled] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) {
+      autoplayRef.current.reset()
+      emblaApi.scrollPrev()
+    }
+  }, [emblaApi])
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) {
+      autoplayRef.current.reset()
+      emblaApi.scrollNext()
+    }
+  }, [emblaApi])
+
+  const scrollTo = useCallback(
+    (index: number) => {
+      if (emblaApi) {
+        autoplayRef.current.reset()
+        emblaApi.scrollTo(index)
+      }
+    },
+    [emblaApi],
+  )
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return
+    setSelectedIndex(emblaApi.selectedScrollSnap())
+    setPrevBtnDisabled(!emblaApi.canScrollPrev())
+    setNextBtnDisabled(!emblaApi.canScrollNext())
+  }, [emblaApi, setSelectedIndex])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onSelect()
+    emblaApi.on("select", onSelect)
+    emblaApi.on("reInit", onSelect)
+  }, [emblaApi, onSelect])
+
+  if (!slides || slides.length === 0) {
+    return null
+  }
+
+
+  return (
+    <section className="relative max-w-7xl mx-auto px-4 md:py-4 py-2 w-full overflow-hidden">
+      <div className="embla w-full overflow-hidden" ref={emblaRef}>
+        <div className="embla__container w-full flex">
+          {slides.map((slide, index) => {
+            const imageUrl = (slide.image as Media).url
+            const titleColor = getTextColorClass(slide.titleColor || "white")
+            const subtitleColor = getTextColorClass(slide.subtitleColor || "white")
+            const hasContent = slide.title || slide.subtitle
+            const overlayClass = getOverlayClass(slide.imageOverlay || "none")
+            const clickHandler = () => {
+              if (slide.link) router.push(slide.link)
+            }
+            return (
+              <div key={index} onClick={clickHandler} className="embla__slide cursor-pointer flex-[0_0_100%] min-w-0 relative">
+                <img
+                  src={imageUrl || "/placeholder.svg"}
+                  alt={(slide.image as Media).alt}
+                  className="w-full rounded-lg  h-[150px] md:h-[200px] object-cover"
+                />
+
+                {overlayClass && <div className={`absolute z-20 inset-0 rounded-lg ${overlayClass}`} />}
+
+                {hasContent && (
+                  <div className="absolute z-50 inset-0 flex items-center justify-start">
+                    <div className="px-4 sm:px-6 md:px-12 max-w-4xl">
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+                        <div className="flex flex-col">
+                          {slide.title && (
+                            <h2
+                              className={`text-2xl md:text-4xl lg:text-6xl font-bold mb-2 ${titleColor} leading-tight tracking-tight drop-shadow-2xl`}
+                            >
+                              {slide.title}
+                            </h2>
+                          )}
+
+                          {slide.subtitle && (
+                            <p
+                              className={`text-xl md:text-2xl lg:text-3xl font-bold mb-4  lg:mb-0 ${subtitleColor}  max-w-2xl drop-shadow-2xl`}
+                            >
+                              {slide.subtitle}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Custom Navigation Arrows */}
+      <button
+        className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={scrollPrev}
+        disabled={prevBtnDisabled}
+      >
+        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:h-6 md:w-6 text-white group-hover:scale-110 transition-transform duration-200" />
+      </button>
+
+      <button
+        className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={scrollNext}
+        disabled={nextBtnDisabled}
+      >
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:h-6 md:w-6 text-white group-hover:scale-110 transition-transform duration-200" />
+      </button>
+
+      <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2 sm:gap-3">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${
+              index === selectedIndex
+                ? "bg-white border-white shadow-lg shadow-white/50 scale-110"
+                : "bg-white/30 border-white/50 hover:bg-white/50 hover:border-white/70 hover:scale-105"
+            }`}
+            onClick={() => scrollTo(index)}
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
