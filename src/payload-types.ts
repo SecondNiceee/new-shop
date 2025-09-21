@@ -832,13 +832,63 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Основные настройки сайта и контактная информация
+ * Основные настройки сайта и контактная информация. Если вы ставите изображение (в слайдере) сразу с текстом, то не добавляйте просто текст. Но будьте аккуратны, проверьте как ваш текст (на картинке) выглядит на мобилках и на пк.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
   id: number;
+  /**
+   * Изображения для слайдера на главной странице
+   */
+  slider?: {
+    /**
+     * Добавьте изображения для слайдера
+     */
+    slides?:
+      | {
+          /**
+           * Изображение для слайда (рекомендуемый размер: 1280x200px)
+           */
+          image: number | Media;
+          /**
+           * Основной заголовок слайда
+           */
+          title?: string | null;
+          /**
+           * Дополнительный текст под заголовком
+           */
+          subtitle?: string | null;
+          /**
+           * Выберите цвет заголовка для лучшей читаемости
+           */
+          titleColor?: ('black' | 'white' | 'gray' | 'red' | 'blue' | 'green' | 'yellow') | null;
+          /**
+           * Выберите цвет подзаголовка для лучшей читаемости
+           */
+          subtitleColor?: ('black' | 'white' | 'gray' | 'red' | 'blue' | 'green' | 'yellow') | null;
+          /**
+           * Настройки кнопки на слайде
+           */
+          button?: {
+            /**
+             * Текст, который будет отображаться на кнопке
+             */
+            text?: string | null;
+            /**
+             * URL, на который будет вести кнопка
+             */
+            link?: string | null;
+            /**
+             * Выберите стиль кнопки
+             */
+            style?: ('primary' | 'secondary' | 'outline') | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
   /**
    * Основная информация о вашей компании
    */
@@ -906,6 +956,27 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  slider?:
+    | T
+    | {
+        slides?:
+          | T
+          | {
+              image?: T;
+              title?: T;
+              subtitle?: T;
+              titleColor?: T;
+              subtitleColor?: T;
+              button?:
+                | T
+                | {
+                    text?: T;
+                    link?: T;
+                    style?: T;
+                  };
+              id?: T;
+            };
+      };
   companyInfo?:
     | T
     | {

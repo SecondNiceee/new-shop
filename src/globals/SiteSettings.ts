@@ -9,7 +9,7 @@ export const SiteSettings: GlobalConfig = {
   },
   admin: {
     group: "Настройки сайта",
-    description: "Основные настройки сайта и контактная информация",
+    description: "Основные настройки сайта и контактная информация. Если вы ставите изображение (в слайдере) сразу с текстом, то не добавляйте просто текст. Но будьте аккуратны, проверьте как ваш текст (на картинке) выглядит на мобилках и на пк.",
   },
   hooks: {
     afterChange: [
@@ -19,6 +19,145 @@ export const SiteSettings: GlobalConfig = {
     ],
   },
   fields: [
+    {
+      name: "slider",
+      type: "group",
+      label: "Слайдер на главной странице",
+      admin: {
+        description: "Изображения для слайдера на главной странице",
+      },
+      fields: [
+        {
+          name: "slides",
+          type: "array",
+          label: "Слайды",
+          required: false,
+          admin: {
+            description: "Добавьте изображения для слайдера",
+          },
+          fields: [
+            {
+              name: "image",
+              type: "upload",
+              relationTo: "media",
+              label: "Изображение",
+              required: true,
+              admin: {
+                description: "Изображение для слайда (рекомендуемый размер: 1280x200px)",
+              },
+            },
+            {
+              name: "title",
+              type: "text",
+              label: "Заголовок",
+              required: false,
+              admin: {
+                description: "Основной заголовок слайда",
+              },
+            },
+            {
+              name: "subtitle",
+              type: "text",
+              label: "Подзаголовок",
+              required: false,
+              admin: {
+                description: "Дополнительный текст под заголовком",
+              },
+            },
+            {
+              name: "titleColor",
+              type: "select",
+              label: "Цвет заголовка",
+              required: false,
+              defaultValue: "white",
+              options: [
+                { label: "Черный", value: "black" },
+                { label: "Белый", value: "white" },
+                { label: "Серый", value: "gray" },
+                { label: "Красный", value: "red" },
+                { label: "Синий", value: "blue" },
+                { label: "Зеленый", value: "green" },
+                { label: "Желтый", value: "yellow" },
+              ],
+              admin: {
+                description: "Выберите цвет заголовка для лучшей читаемости",
+              },
+            },
+            {
+              name: "subtitleColor",
+              type: "select",
+              label: "Цвет подзаголовка",
+              required: false,
+              defaultValue: "white",
+              options: [
+                { label: "Черный", value: "black" },
+                { label: "Белый", value: "white" },
+                { label: "Серый", value: "gray" },
+                { label: "Красный", value: "red" },
+                { label: "Синий", value: "blue" },
+                { label: "Зеленый", value: "green" },
+                { label: "Желтый", value: "yellow" },
+              ],
+              admin: {
+                description: "Выберите цвет подзаголовка для лучшей читаемости",
+              },
+            },
+            {
+              name: "button",
+              type: "group",
+              label: "Кнопка",
+              admin: {
+                description: "Настройки кнопки на слайде",
+              },
+              fields: [
+                {
+                  name: "text",
+                  type: "text",
+                  label: "Текст кнопки",
+                  required: false,
+                  admin: {
+                    description: "Текст, который будет отображаться на кнопке",
+                  },
+                },
+                {
+                  name: "link",
+                  type: "text",
+                  label: "Ссылка",
+                  required: false,
+                  admin: {
+                    description: "URL, на который будет вести кнопка",
+                  },
+                },
+                {
+                  name: "style",
+                  type: "select",
+                  label: "Стиль кнопки",
+                  required: false,
+                  defaultValue: "primary",
+                  options: [
+                    {
+                      label: "Основная",
+                      value: "primary",
+                    },
+                    {
+                      label: "Вторичная",
+                      value: "secondary",
+                    },
+                    {
+                      label: "Контурная",
+                      value: "outline",
+                    },
+                  ],
+                  admin: {
+                    description: "Выберите стиль кнопки",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
     {
       name: "companyInfo",
       type: "group",

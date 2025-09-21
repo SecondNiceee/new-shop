@@ -99,7 +99,7 @@ export function Categories() {
   }
 
   return (
-    <div className="bg-white py-4">
+    <div className="bg-white md:py-4 py-2">
       <div className="max-w-7xl mx-auto px-4 relative">
         {/* Кнопка прокрутки влево */}
         {canScrollLeft && (
