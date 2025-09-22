@@ -17,6 +17,7 @@ export default function HeroSlider() {
   const slides = siteSettings?.slider?.slides || []
 
   const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({})
+  const [firstImageLoaded, setFirstImageLoaded] = useState(false)
   const [allImagesLoaded, setAllImagesLoaded] = useState(false)
 
   const autoplayRef = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }))
@@ -41,6 +42,9 @@ export default function HeroSlider() {
   const handleImageLoad = useCallback((index: number) => {
     setImagesLoaded((prev) => {
       const newState = { ...prev, [index]: true }
+      if (index === 0) {
+        setFirstImageLoaded(true)
+      }
       return newState
     })
   }, [])
@@ -48,6 +52,9 @@ export default function HeroSlider() {
   const handleImageError = useCallback((index: number) => {
     setImagesLoaded((prev) => {
       const newState = { ...prev, [index]: true } // Consider error as "loaded" to not block UI
+      if (index === 0) {
+        setFirstImageLoaded(true)
+      }
       return newState
     })
   }, [])
@@ -103,7 +110,7 @@ export default function HeroSlider() {
     return null
   }
 
-  if (!allImagesLoaded) {
+  if (!firstImageLoaded) {
     return (
       <section className="relative max-w-7xl mx-auto px-4 md:py-4 py-2 w-full overflow-hidden">
         <ImageLoader />
@@ -143,11 +150,20 @@ export default function HeroSlider() {
                 onClick={clickHandler}
                 className="embla__slide cursor-pointer flex-[0_0_100%] min-w-0 relative"
               >
-                <img
-                  src={imageUrl || "/placeholder.svg"}
-                  alt={(slide.image as Media).alt}
-                  className="w-full rounded-lg  h-[150px] md:h-[200px] object-cover"
-                />
+                <div className="relative w-full h-[150px] md:h-[200px] rounded-lg overflow-hidden">
+                  <img
+                    src={imageUrl || "/placeholder.svg"}
+                    alt={(slide.image as Media).alt}
+                    className="w-full h-full object-cover"
+                    onLoad={() => handleImageLoad(index)}
+                    onError={() => handleImageError(index)}
+                  />
+                  {!imagesLoaded[index] && (
+                    <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </div>
 
                 {overlayClass && <div className={`absolute z-20 inset-0 rounded-lg ${overlayClass}`} />}
 
