@@ -10,18 +10,18 @@ import { getTextColorClass } from "./utils/getTextColorClass"
 import { getOverlayClass } from "./utils/getOverlayClass"
 import { useRouter } from "next/navigation"
 import { ImageLoader } from "./image-loader"
-import { Cinzel, Montserrat } from "next/font/google"
+import { Lobster, Comfortaa } from "next/font/google"
 
-// Fonts specifically for the hero slider: strong serif title + clean sans subtitle
-const heroTitleFont = Cinzel({
-  subsets: ["latin"],
-  weight: ["700", "800"],
+// Fonts for the hero slider: stylish script title + rounded modern subtitle (both with Cyrillic)
+const heroTitleFont = Lobster({
+  subsets: ["latin", "cyrillic"],
+  weight: "400",
   display: "swap",
 })
 
-const heroSubtitleFont = Montserrat({
+const heroSubtitleFont = Comfortaa({
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "700"],
   display: "swap",
 })
 
@@ -245,7 +245,7 @@ export default function HeroSlider() {
                         <div className="flex flex-col">
                           {slide.title && (
                             <h2
-                              className={`${heroTitleFont.className} text-2xl md:text-4xl lg:text-5xl font-bold mb-2 ${titleColor} leading-tight md:leading-[1.1] tracking-wider drop-shadow-2xl`}
+                              className={`${heroTitleFont.className} text-2xl md:text-4xl lg:text-6xl font-bold mb-2 ${titleColor} leading-tight md:leading-[1.1] tracking-wider drop-shadow-2xl`}
                               style={{ fontFamily: heroTitleFont.style.fontFamily }}
                             >
                               {slide.title}
@@ -254,7 +254,7 @@ export default function HeroSlider() {
 
                           {slide.subtitle && (
                             <p
-                              className={`${heroSubtitleFont.className} text-xl md:text-2xl lg:text-3xl font-normal md:font-medium mb-0 ${subtitleColor} max-w-2xl tracking-normal drop-shadow-2xl`}
+                              className={`${heroSubtitleFont.className} text-xl md:text-2xl lg:text-3xl font-normal mb-0 ${subtitleColor} max-w-2xl tracking-normal drop-shadow-2xl`}
                               style={{ fontFamily: heroSubtitleFont.style.fontFamily }}
                             >
                               {slide.subtitle}
