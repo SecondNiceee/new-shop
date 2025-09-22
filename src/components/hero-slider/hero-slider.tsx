@@ -254,7 +254,7 @@ export default function HeroSlider() {
 
                           {slide.subtitle && (
                             <p
-                              className={`${heroSubtitleFont.className} text-xl md:text-2xl lg:text-3xl font-normal md:font-medium mb-4 lg:mb-0 ${subtitleColor} max-w-2xl tracking-normal drop-shadow-2xl`}
+                              className={`${heroSubtitleFont.className} text-xl md:text-2xl lg:text-3xl font-normal md:font-medium mb-0 ${subtitleColor} max-w-2xl tracking-normal drop-shadow-2xl`}
                               style={{ fontFamily: heroSubtitleFont.style.fontFamily }}
                             >
                               {slide.subtitle}
