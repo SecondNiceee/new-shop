@@ -6,12 +6,12 @@ export default async function MainLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <>
+    <div>
       <ConditionalHeroSlider />
       <div className="sticky z-50 flex flex-col  md:top-[83px] top-[72px]">
         <Categories />
       </div>
       {children}
-    </>
+    </div>
   )
 }

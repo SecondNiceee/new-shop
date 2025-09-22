@@ -8,12 +8,25 @@ import { Toaster } from "sonner"
 import { BottomNavigation } from "@/components/bottom-navigation/BottomNavigation"
 import { Footer } from "@/components/footer/footer"
 import { ContactWidget } from "@/components/contact-widget/contact-widget"
+import { Poppins, Inter } from "next/font/google"
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+})
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+})
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${poppins.variable} ${inter.variable}`}>
       <head></head>
       <body className="min-h-screen bg-background">
         <PopupProvider>
