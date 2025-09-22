@@ -9,14 +9,19 @@ import type { Media } from "@/payload-types"
 import { getTextColorClass } from "./utils/getTextColorClass"
 import { getOverlayClass } from "./utils/getOverlayClass"
 import { useRouter } from "next/navigation"
+import { ImageLoader } from "./image-loader"
+
 
 export default function HeroSlider() {
   const siteSettings = useSiteSettings((state) => state.siteSettings)
   const slides = siteSettings?.slider?.slides || []
 
-  const autoplayRef = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
+  const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({})
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false)
 
-  const router = useRouter();
+  const autoplayRef = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }))
+
+  const router = useRouter()
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -32,6 +37,28 @@ export default function HeroSlider() {
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(false)
   const [nextBtnDisabled, setNextBtnDisabled] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const handleImageLoad = useCallback((index: number) => {
+    setImagesLoaded((prev) => {
+      const newState = { ...prev, [index]: true }
+      return newState
+    })
+  }, [])
+
+  const handleImageError = useCallback((index: number) => {
+    setImagesLoaded((prev) => {
+      const newState = { ...prev, [index]: true } // Consider error as "loaded" to not block UI
+      return newState
+    })
+  }, [])
+
+  useEffect(() => {
+    if (slides.length === 0) return
+
+    const loadedCount = Object.keys(imagesLoaded).length
+    const allLoaded = loadedCount === slides.length && Object.values(imagesLoaded).every(Boolean)
+    setAllImagesLoaded(allLoaded)
+  }, [imagesLoaded, slides.length])
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) {
@@ -71,11 +98,32 @@ export default function HeroSlider() {
     emblaApi.on("reInit", onSelect)
   }, [emblaApi, onSelect])
 
+
   if (!slides || slides.length === 0) {
     return null
   }
 
-
+  if (!allImagesLoaded) {
+    return (
+      <section className="relative max-w-7xl mx-auto px-4 md:py-4 py-2 w-full overflow-hidden">
+        <ImageLoader />
+        <div className="hidden">
+          {slides.map((slide, index) => {
+            const imageUrl = (slide.image as Media).url
+            return (
+              <img
+                key={index}
+                src={imageUrl || "/placeholder.svg"}
+                alt={(slide.image as Media).alt}
+                onLoad={() => handleImageLoad(index)}
+                onError={() => handleImageError(index)}
+              />
+            )
+          })}
+        </div>
+      </section>
+    )
+  }
   return (
     <section className="relative max-w-7xl mx-auto px-4 md:py-4 py-2 w-full overflow-hidden">
       <div className="embla w-full overflow-hidden" ref={emblaRef}>
@@ -90,7 +138,11 @@ export default function HeroSlider() {
               if (slide.link) router.push(slide.link)
             }
             return (
-              <div key={index} onClick={clickHandler} className="embla__slide cursor-pointer flex-[0_0_100%] min-w-0 relative">
+              <div
+                key={index}
+                onClick={clickHandler}
+                className="embla__slide cursor-pointer flex-[0_0_100%] min-w-0 relative"
+              >
                 <img
                   src={imageUrl || "/placeholder.svg"}
                   alt={(slide.image as Media).alt}
@@ -151,11 +203,10 @@ export default function HeroSlider() {
         {slides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${
-              index === selectedIndex
+            className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${index === selectedIndex
                 ? "bg-white border-white shadow-lg shadow-white/50 scale-110"
                 : "bg-white/30 border-white/50 hover:bg-white/50 hover:border-white/70 hover:scale-105"
-            }`}
+              }`}
             onClick={() => scrollTo(index)}
           />
         ))}

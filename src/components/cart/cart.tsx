@@ -7,9 +7,9 @@ import type { FC } from "react"
 
 const Cart: FC = () => {
   const { open, totalPrice, isCartLoaded, isHydrated } = useCartStore()
-  const { siteSettings } = useSiteSettings()
+  const { siteSettings, isLoading } = useSiteSettings()
 
-  if (!isCartLoaded || !isHydrated) {
+  if (!isCartLoaded || !isHydrated || isLoading) {
     return (
       <div className="flex justify-center p-4 bg-white rounded-2xl min-w-[150px]">
         <Loader2 className="h-8 w-8 animate-spin text-green-600" />
@@ -34,10 +34,10 @@ const Cart: FC = () => {
         ) : (
           <>
             <p className="text-sm whitespace-nowrap">
-              Мин. сумма заказа {siteSettings?.orderSettings?.minOrderAmount || 500} ₽
+              Мин. сумма заказа {siteSettings?.orderSettings?.minOrderAmount || "-"} ₽
             </p>
             <p className="text-xs text-gray-500 text-left whitespace-nowrap">
-              Доставим за {siteSettings?.orderSettings?.deliveryFee || 199} ₽
+              Доставим за {siteSettings?.orderSettings?.deliveryFee || "-"} ₽
             </p>
           </>
         )}

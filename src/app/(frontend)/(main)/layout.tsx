@@ -8,7 +8,7 @@ export default async function MainLayout(props: { children: React.ReactNode }) {
   return (
     <>
       <ConditionalHeroSlider />
-      <div className="sticky z-50 flex flex-col  lg:top-[84px] top-[72px]">
+      <div className="sticky z-50 flex flex-col  md:top-[90px] top-[72px]">
         <Categories />
       </div>
       {children}

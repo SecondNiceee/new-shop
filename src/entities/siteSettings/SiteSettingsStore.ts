@@ -7,16 +7,17 @@ type SiteSettingsState = {
     siteSettings:SiteSetting | null,
     isLoading : boolean,
     error : RequestError | null,
-    getSiteSettings : () => Promise<void>
+    getSiteSettings : () => Promise<void>,
 }
-export const useSiteSettings = create<SiteSettingsState>()((set, get) => ({
+export const useSiteSettings = create<SiteSettingsState>()((set) => ({
     error : null,
-    isLoading : false,
+    isLoading : true,
     siteSettings : null,
+    isReady : false,
     async getSiteSettings(){
         set({isLoading : true})
         const siteSettings = await getSiteSettings();
-        console.log(siteSettings);
+
         if (!siteSettings){
             set({error : {message : "Internal Error", status : 500}, isLoading : false, siteSettings : null})
         }

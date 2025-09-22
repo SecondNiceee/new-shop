@@ -9,12 +9,7 @@ import { BottomNavigation } from "@/components/bottom-navigation/BottomNavigatio
 import { Footer } from "@/components/footer/footer"
 import { ContactWidget } from "@/components/contact-widget/contact-widget"
 
-export const metadata = {
-  description: "A blank template using Payload in a Next.js app.",
-  title: "Payload Blank Template",
-}
-
-export default async function RootLayout(props: { children: React.ReactNode }) {
+export default function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
@@ -23,14 +18,14 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body className="min-h-screen bg-background">
         <PopupProvider>
           <AppInit />
-          <Header />
-          <main className="mx-auto min-h-[60vh]">
-            {children}
+            <Header />
+            <main className="mx-auto min-h-[60vh]">
+              {children}
               <BottomNavigation />
-          </main>
-          <Footer />
-          <Toaster />
-          <ContactWidget />
+            </main>
+            <Footer />
+            <Toaster />
+            <ContactWidget />
         </PopupProvider>
       </body>
     </html>
