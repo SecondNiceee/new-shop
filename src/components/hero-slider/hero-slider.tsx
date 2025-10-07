@@ -245,7 +245,7 @@ export default function HeroSlider() {
                         <div className="flex flex-col">
                           {slide.title && (
                             <h2
-                              className={`${heroTitleFont.className} text-2xl md:text-4xl lg:text-6xl font-bold mb-2 ${titleColor} leading-tight md:leading-[1.1] tracking-wider drop-shadow-2xl`}
+                              className={`${heroTitleFont.className} text-3xl md:text-4xl lg:text-6xl font-bold mb-2 ${titleColor} leading-tight md:leading-[1.1] tracking-wider drop-shadow-2xl`}
                               style={{ fontFamily: heroTitleFont.style.fontFamily }}
                             >
                               {slide.title}
@@ -254,7 +254,7 @@ export default function HeroSlider() {
 
                           {slide.subtitle && (
                             <p
-                              className={`${heroSubtitleFont.className} text-xl md:text-2xl lg:text-3xl font-normal mb-0 ${subtitleColor} max-w-2xl tracking-normal drop-shadow-2xl`}
+                              className={`${heroSubtitleFont.className} text-base md:text-2xl lg:text-3xl font-normal mb-0 ${subtitleColor} max-w-2xl tracking-normal drop-shadow-2xl`}
                               style={{ fontFamily: heroSubtitleFont.style.fontFamily }}
                             >
                               {slide.subtitle}
