@@ -1,96 +1,93 @@
-"use client"
-import { getCategoriesWithProducts } from "@/actions/server/categories/getCategoriesWithProducts"
-import ErrorAlert from "@/components/error-alert/ErrorAlert"
-import { ProductCard } from "@/components/product-card/ProductCard"
-import { Badge } from "@/components/ui/badge"
-import type { Category, Product } from "@/payload-types"
-import { Loader2, MoveRight } from "lucide-react"
-import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+// src/app/(main)/page.tsx
+import React from 'react';
+import GrandBazarClientApp from './main-client-page';
+import Script from 'next/script';
 
-type TCategoryWithProducts = {
-  category: Category
-  products: Product[]
-  productsCounter: number
+
+// SEO: генерация метаданных для продуктового магазина
+export async function generateMetadata() {
+  const siteUrl = process.env.NEXT_PUBLIC_URL
+  return {
+    title: 'ГрандБАЗАР — Интернет-магазин продуктов с доставкой на дом',
+    description:
+      'Свежие овощи, фрукты, молочка, мясо, выпечка и всё для дома — с доставкой в день заказа! Низкие цены, акции, гарантия качества. Закажите онлайн в ГрандБАЗАР!',
+    keywords:
+      'купить продукты онлайн, доставка продуктов, интернет-магазин продуктов, свежие овощи, молочные продукты, мясо, хлеб, ГрандБАЗАР, продукты с доставкой',
+
+    // Open Graph (для WhatsApp, Telegram, соцсетей)
+    openGraph: {
+      title: 'ГрандБАЗАР — Продукты с доставкой на дом',
+      description: 'Свежие продукты каждый день. Быстро, удобно, по выгодным ценам!',
+      url: siteUrl,
+      siteName: 'ГрандБАЗАР',
+      locale: 'ru_RU',
+      type: 'website',
+    },
+
+    // Twitter
+    twitter: {
+      card: 'summary_large_image',
+      title: 'ГрандБАЗАР — Продукты онлайн',
+      description: 'Свежие продукты с доставкой в день заказа. Закажите сейчас!',
+    },
+
+    // Canonical URL
+    alternates: {
+      canonical: siteUrl,
+    },
+  };
 }
-export default function GrandBazarApp() {
-  const [productsAndCategories, setProductsWithCategories] = useState<TCategoryWithProducts[] | null>()
-  const [error, setError] = useState<Error | null>(null)
-  const [isLoading, setLoading] = useState<boolean>(false)
 
-  // Функция получение данных с сервреа
-  const getProductsWithCategories = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const rezult = await getCategoriesWithProducts()
-      setProductsWithCategories(rezult)
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(e)
-      } else {
-        setError({ message: "Internal Server Error", name: "Uncaught Error" })
-      }
-    }
-    setLoading(false)
-  }, [setLoading, setError, setProductsWithCategories])
+const GrandBazarApp = () => {
+  const siteUrl = process.env.NEXT_PUBLIC_URL
 
-  // Получение данных с сервреа
-  useEffect(() => {
-    getProductsWithCategories()
-  }, [getProductsWithCategories])
-
-  // UI ошибки в случае ошибки загрузка с сервера
-  if (error) {
-    console.log(error)
-    return (
-      <ErrorAlert
-        buttonAction={() => getProductsWithCategories()}
-        errorMessage="Не удалось загрузить товары, проверьте подключение к интернету."
-      />
-    )
-  }
-
-  // UI загрузки
-  if (isLoading || !productsAndCategories) {
-    return (
-      <div className="flex justify-center py-8">
-        <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
-      </div>
-    )
-  }
   return (
     <>
+      <GrandBazarClientApp />
 
-      <section className="products bg-gray-50">
-        <div className="flex flex-col gap-3 px-4 mx-auto mt-1 mb-4 rounded-md bg-gray-50 max-w-7xl">
-          {productsAndCategories.map((item) => (
-            <div key={item.category.id} className="flex flex-col gap-4">
-              {item.products.length ? (
-                <>
-                  <div className="flex items-start justify-between w-full">
-                    <h2 className="text-lg font-bold text-black md:text-2xl">{item.category.title}</h2>
-                    <Link href={`/${item.category.value}`} className="flex items-center self-end">
-                      <Badge className="flex items-center gap-2 bg-green-400 cursor-pointer hover:bg-green-400">
-                        <p className="text-sm text-white">Еще {item.productsCounter - 6}</p>
-                        <MoveRight color="white" size={15} />
-                      </Badge>
-                    </Link>
-                  </div>
-                  <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                    {item.products.map((product) => (
-                      <ProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* JSON-LD: WebSite + Organization (для Google) */}
+      <Script id="home-json-ld" type="application/ld+json">
+        {JSON.stringify([
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'ГрандБАЗАР',
+            url: siteUrl,
+            description: 'Интернет-магазин свежих продуктов с доставкой на дом.',
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'ГрандБАЗАР',
+            url: siteUrl,
+            logo: `${siteUrl}/logo.svg`,
+            sameAs: [
+              // Добавь, если есть: ВК, Telegram, Instagram
+              // "https://vk.com/grandbazar",
+            ],
+            contactPoint: {
+              '@type': 'ContactPoint',
+              telephone: '+74951234567', // ← замени на реальный номер
+              contactType: 'customer support',
+              availableLanguage: 'Russian',
+            },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Store',
+            name: 'ГрандБАЗАР',
+            description: 'Онлайн-магазин продуктов питания с доставкой.',
+            url: siteUrl,
+            // Если есть регионы доставки:
+            areaServed: {
+              '@type': 'Place',
+              name: 'Россия',
+            },
+          },
+        ])}
+      </Script>
     </>
-  )
-}
+  );
+};
+
+export default GrandBazarApp;

@@ -4,6 +4,7 @@ import jsxConverters from '@/utils/jsx-converters';
 import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 import { getDelivery } from '@/actions/server/pages/getDelivery';
+import { DeliverySchema } from './deliverySchema';
 
 export const revalidate = 31536000; // 1 год
 export default async function AboutPage() {
@@ -13,11 +14,16 @@ export default async function AboutPage() {
     if (!delivery) {
       notFound()
     }
+    const title = delivery.title || "Доставка | ГрандБАЗАР";
+    const description = delivery.description || "Условия доставки в ГрандБАЗАР";
     return (
-      <div className="rich-container">
-        <RefreshRouteOnSave route='/delivery'   />
-        <RichText converters={jsxConverters} data={delivery.content} />
-      </div>
+      <>
+       <DeliverySchema title={title} description={description} />
+        <div className="rich-container">
+          <RefreshRouteOnSave route='/delivery'   />
+          <RichText converters={jsxConverters} data={delivery.content} />
+        </div>
+      </>
     )
   } catch (error) {
     console.error("Error loading about page:", error)
@@ -28,15 +34,33 @@ export default async function AboutPage() {
 // Метаданные для SEO
 export async function generateMetadata() {
   try {
-    const deliveryData = await getDelivery()
+    const deliveryData = await getDelivery();
+    const title = deliveryData.title;
+    const description = deliveryData.description
     return {
       title: deliveryData.title || "Доставка",
       description: deliveryData?.description || "Узнайте больше о нашей доставке в компании ГрандБАЗАР",
+      keywords: ["доставка", "условия доставки", "сроки доставки", "ГрандБАЗАР", "интернет-магазин доставка"],
+      openGraph : {
+        title,
+        description,
+        type : "website",
+        url: `${process.env.NEXT_PUBLIC_URL}/delivery`
+      }
     }
   } catch (error) {
+    const title = "Доставка"
+    const description = "Узнайте больше о нашей доставке в компании ГрандБАЗАР"
     return {
-      title: "Доставка",
-      description: "Узнайте больше о нашей доставке в компании ГрандБАЗАР",
+      title,
+      description,
+      keywords: ["доставка", "условия доставки", "сроки доставки", "ГрандБАЗАР", "интернет-магазин доставка"],
+      openGraph: {
+        title,
+        description,
+        type: "website",
+        url: `${process.env.NEXT_PUBLIC_URL}/delivery`, 
+      },
     }
   }
 }

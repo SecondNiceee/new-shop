@@ -1,15 +1,24 @@
 import { getPayload } from "payload"
-import config from "@payload-config";
+import config from "@payload-config"
 import Link from "next/link"
 import { CheckCircle2, XCircle, Home, Mail } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { routerConfig } from "@/config/router.config";
-import { Button } from "@/components/ui/button";
+import { routerConfig } from "@/config/router.config"
+import { Button } from "@/components/ui/button"
+import type { Metadata } from "next"
 
+export const metadata: Metadata = {
+  title: "Подтверждение email",
+  description: "Подтверждение email адреса",
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
-const VerifyEmailPage = async ({ searchParams } : {searchParams : Promise<any> | undefined} ) => {
+const VerifyEmailPage = async ({ searchParams }: { searchParams: Promise<any> | undefined }) => {
   const payload = await getPayload({ config })
-  const token = (await searchParams)?.token;
+  const token = (await searchParams)?.token
 
   // Нет токена
   if (!token) {
@@ -39,7 +48,7 @@ const VerifyEmailPage = async ({ searchParams } : {searchParams : Promise<any> |
   }
 
   try {
-    await payload.verifyEmail({ collection: "users", token });
+    await payload.verifyEmail({ collection: "users", token })
     return (
       <main className="h-[90vh] bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-xl border-0">

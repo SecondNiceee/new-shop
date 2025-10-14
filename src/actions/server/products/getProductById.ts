@@ -9,6 +9,7 @@ type Result =
   | { product: Product; error: null }
   | { product: null; error: { message: string } };
 
+
 export const getProductById = async (id: number | string): Promise<Result> => {
   try {
     // Приводим id к строке (на всякий случай)
@@ -21,7 +22,8 @@ export const getProductById = async (id: number | string): Promise<Result> => {
     const result = await payload.findByID({
       collection: 'products',
       id: idStr,
-      depth: 2, // подгружаем изображения, категории и т.д.
+      depth: 2,
+       // подгружаем изображения, категории и т.д.
     });
 
     // Если товар не найден

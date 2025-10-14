@@ -45,7 +45,7 @@ const OrderItemDesktop:FC<IOrderItemDesktop> = ({item}) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => increment(item.product)}
+                    onClick={() => dicrement(item.product.id)}
                     className="w-8 h-8 p-0 rounded-md hover:bg-gray-100"
                   >
                     <Minus className="w-4 h-4" />
@@ -56,7 +56,7 @@ const OrderItemDesktop:FC<IOrderItemDesktop> = ({item}) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => dicrement(item.product.id)}
+                    onClick={() => increment(item.product)}
                     className="w-8 h-8 p-0 rounded-md hover:bg-gray-100"
                   >
                     <Plus className="w-4 h-4" />
