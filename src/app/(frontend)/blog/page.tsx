@@ -69,7 +69,7 @@ const BlogsPage = async () => {
 };
 
 // ✅ Полные метаданные
-export const meta:Metadata = {
+export const metadata:Metadata = {
   title: "Блог | ГрандБАЗАР",
   description: "Полезные статьи о покупках, доставке, лайфхаках и новинках в интернет-магазине ГрандБАЗАР. Читайте и делитесь!",
   keywords: [

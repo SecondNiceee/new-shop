@@ -22,6 +22,7 @@ const Categories: CollectionConfig = {
       unique: true,
       label: 'Уникальный ключ (label)',
       required: true,
+      index : true,
       admin: {
         description:
           'Уникальное значение (английское) для категории. Используется внутри кода. ДОЛЖНО БЫТЬ ОДНО СЛОВО! НЕЛЬЗЯ ПРОБЕЛОВ',

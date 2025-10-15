@@ -4,7 +4,7 @@ import CatalogClientPage from './catalog-client-page';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
-export const meta:Metadata = {
+export const metadata:Metadata = {
   title: "Каталог товаров | ГрандБАЗАР",
   description: "Полный каталог товаров интернет-магазина ГрандБАЗАР: электроника, бытовая техника, товары для дома и дачи. Выбирайте категории и находите нужные товары легко!",
   keywords: [

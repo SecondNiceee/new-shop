@@ -4,7 +4,7 @@ import OrdersClientPage from './order-client';
 import { Metadata } from 'next';
 
 // 🔒 Приватная страница — не индексировать!
-export const meta:Metadata = {
+export const metadata:Metadata = {
   title: 'Мои заказы — ГрандБАЗАР',
   description: 'Отслеживайте статусы ваших заказов в интернет-магазине ГрандБАЗАР',
   robots: {

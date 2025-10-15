@@ -1,9 +1,10 @@
 import { getSiteSettings } from "@/actions/server/globals/getSiteSettings"
+import { Media } from "@/payload-types"
 import Image from "next/image"
-import Link from "next/link";
-export const dynamic = 'auto';
+import Link from "next/link"
+export const dynamic = "auto"
 
-export const revalidate = 31536000; // 1 год
+export const revalidate = 31536000 // 1 год
 export async function Footer() {
   const siteSettings = await getSiteSettings()
   return (
@@ -15,28 +16,72 @@ export async function Footer() {
             <h2 className="mb-4 text-2xl font-bold text-green-600">ГрандБАЗАР</h2>
             <div className="flex mb-4 space-x-3">
               {/* VK Icon */}
-              <Link rel="noopener norreferrer" target="_blank" href={siteSettings?.socialLinks?.vk || "#"} className="text-gray-600 hover:text-gray-800">
+              <Link
+                rel="noopener norreferrer"
+                target="_blank"
+                href={siteSettings?.socialLinks?.vk || "#"}
+                className="text-gray-600 hover:text-gray-800"
+              >
                 <Image className="w-6 h-6" alt="Вк ГрнадБАЗАР" src={"/vk-icon.svg"} width={24} height={24} />
               </Link>
 
               {/* Telegram Icon */}
-              <Link rel="noopener norreferrer" target="_blank"  href={siteSettings?.socialLinks?.telegram || "#"} className="text-gray-600 hover:text-gray-800">
-                <Image width={24} height={24} className="w-6 h-6" alt="Telegram ГрандБАЗАР Icon" src={"/telegram-icon.svg"} />
+              <Link
+                rel="noopener norreferrer"
+                target="_blank"
+                href={siteSettings?.socialLinks?.telegram || "#"}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <Image
+                  width={24}
+                  height={24}
+                  className="w-6 h-6"
+                  alt="Telegram ГрандБАЗАР Icon"
+                  src={"/telegram-icon.svg"}
+                />
               </Link>
 
               {/* YouTube Icon */}
-              <Link rel="noopener norreferrer" target="_blank"  href={siteSettings?.socialLinks?.youtube || "#"} className="text-gray-600 hover:text-gray-800">
-                <Image className="w-6 h-6" width={24} height={24} alt="YOUTUBE ICON ГрандБАЗАР" src={"/youtube-icon.svg"} />
+              <Link
+                rel="noopener norreferrer"
+                target="_blank"
+                href={siteSettings?.socialLinks?.youtube || "#"}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <Image
+                  className="w-6 h-6"
+                  width={24}
+                  height={24}
+                  alt="YOUTUBE ICON ГрандБАЗАР"
+                  src={"/youtube-icon.svg"}
+                />
               </Link>
 
               {/* Instagram Icon */}
-              <Link rel="noopener norreferrer" target="_blank"  href={siteSettings?.socialLinks?.instagram || "#"} className="text-gray-600 hover:text-gray-800">
-                <Image className="w-6 h-6" width={24} height={24} alt="Instagram ICON ГрандБАЗАР" src={"/instagram-icon.svg"} />
+              <Link
+                rel="noopener norreferrer"
+                target="_blank"
+                href={siteSettings?.socialLinks?.instagram || "#"}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <Image
+                  className="w-6 h-6"
+                  width={24}
+                  height={24}
+                  alt="Instagram ICON ГрандБАЗАР"
+                  src={"/instagram-icon.svg"}
+                />
               </Link>
             </div>
             <p className="text-sm text-gray-500">
-              © {siteSettings?.companyInfo?.year} "{siteSettings?.companyInfo?.legalName}"
+              © {siteSettings?.companyInfo?.year} {siteSettings?.companyInfo?.legalName}
             </p>
+            {siteSettings?.companyInfo?.inn && (
+              <p className="text-sm text-gray-500 mt-1">ИНН: {siteSettings.companyInfo.inn}</p>
+            )}
+            {siteSettings?.companyInfo?.legalAddress && (
+              <p className="text-sm text-gray-500 mt-1">{siteSettings.companyInfo.legalAddress}</p>
+            )}
           </div>
 
           {/* Navigation Links */}
@@ -71,9 +116,38 @@ export async function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/offer" className="text-sm text-gray-600 hover:text-gray-800">
-                    Оферта
-                  </Link>
+                  {siteSettings?.companyInfo?.offerDocument &&
+                  typeof siteSettings.companyInfo.offerDocument !== "string" ? (
+                    <a
+                      href={(siteSettings.companyInfo.offerDocument as Media).url || ""}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 hover:text-gray-800"
+                    >
+                      Оферта
+                    </a>
+                  ) : (
+                    <Link href="/offer" className="text-sm text-gray-600 hover:text-gray-800">
+                      Оферта
+                    </Link>
+                  )}
+                </li>
+                <li>
+                  {siteSettings?.companyInfo?.privacyPolicyDocument &&
+                  typeof siteSettings.companyInfo.privacyPolicyDocument !== "string" ? (
+                    <a
+                      href={(siteSettings.companyInfo.privacyPolicyDocument as Media).url as string}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 hover:text-gray-800"
+                    >
+                      Политика конфиденциальности
+                    </a>
+                  ) : (
+                    <Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-800">
+                      Политика конфиденциальности
+                    </Link>
+                  )}
                 </li>
                 <li>
                   <Link href="/contacts" className="text-sm text-gray-600 hover:text-gray-800">

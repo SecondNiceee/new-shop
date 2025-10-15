@@ -19,6 +19,8 @@ import { toast } from "sonner"
 import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
 import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
 import OrderItem from "@/components/order-item/OrderItem"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Media } from "@/payload-types"
 
 export default function CheckoutClientPage() {
   const router = useRouter()
@@ -34,6 +36,7 @@ export default function CheckoutClientPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isProcessingOrder, setIsProcessingOrder] = useState(false)
   const [showMinOrderDialog, setShowMinOrderDialog] = useState(false)
+  const [privacyPolicyAccepted, setPrivacyPolicyAccepted] = useState(false)
 
   useEffect(() => {
     loadAddress()
@@ -81,6 +84,11 @@ export default function CheckoutClientPage() {
 
     if (!isPhoneValid() || !currentAddress || items.length === 0) {
       toast.error("Заполните все обязательные поля")
+      return
+    }
+
+    if (!privacyPolicyAccepted) {
+      toast.error("Дайте согласие на обработку персональных данных")
       return
     }
 
@@ -151,10 +159,11 @@ export default function CheckoutClientPage() {
 
   const hasPhoneChanged = normalizePhone(phone) !== originalPhone && phone.trim() !== ""
 
-  const isOrderValid = isPhoneValid() && currentAddress && items.length > 0
+  const isOrderValid = isPhoneValid() && currentAddress && items.length > 0 && privacyPolicyAccepted
 
   const deliveryFee = siteSettings?.orderSettings?.deliveryFee || 199
   const minOrderAmount = siteSettings?.orderSettings?.minOrderAmount || 500
+  const privacyPolicyUrl = (siteSettings?.companyInfo?.privacyPolicyDocument as Media)?.url
 
   return (
     <div className="min-h-screen p-4 bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50">
@@ -305,6 +314,31 @@ export default function CheckoutClientPage() {
                       <span>{totalPrice + deliveryFee} ₽</span>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                  <Checkbox
+                    id="privacy-policy"
+                    checked={privacyPolicyAccepted}
+                    onCheckedChange={(checked) => setPrivacyPolicyAccepted(checked === true)}
+                    className="mt-0.5 border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
+                  />
+                  <label htmlFor="privacy-policy" className="text-sm leading-relaxed text-white/95 cursor-pointer">
+                    Я даю согласие на обработку моих персональных данных в соответствии с{" "}
+                    {privacyPolicyUrl ? (
+                      <a
+                        href={privacyPolicyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-white transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Политикой конфиденциальности
+                      </a>
+                    ) : (
+                      <span className="underline">Политикой конфиденциальности</span>
+                    )}
+                  </label>
                 </div>
 
                 <Button

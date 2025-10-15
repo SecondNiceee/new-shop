@@ -120,11 +120,12 @@ export const SiteSettings: GlobalConfig = {
               },
             },
             {
-               name: "link",
-               type : "text",
-               required : false,
-               label : "Ссылка у слайда(куда ведет при нажатии) (Если ссылка внутри сайта, не пишите ссылку полностью лишь /meal или что-то такое.)",
-            }
+              name: "link",
+              type: "text",
+              required: false,
+              label:
+                "Ссылка у слайда(куда ведет при нажатии) (Если ссылка внутри сайта, не пишите ссылку полностью лишь /meal или что-то такое.)",
+            },
           ],
         },
       ],
@@ -166,6 +167,44 @@ export const SiteSettings: GlobalConfig = {
           defaultValue: "+7 968 784 58 54",
           admin: {
             description: "Основной контактный телефон компании",
+          },
+        },
+        {
+          name: "inn",
+          type: "text",
+          label: "ИНН",
+          required: false,
+          admin: {
+            description: "ИНН компании (налоговый идентификационный номер)",
+          },
+        },
+        {
+          name: "legalAddress",
+          type: "text",
+          label: "Юридический адрес",
+          required: false,
+          admin: {
+            description: "Юридический адрес компании",
+          },
+        },
+        {
+          name: "offerDocument",
+          type: "upload",
+          relationTo: "media",
+          label: "Документ оферты (PDF)",
+          required: false,
+          admin: {
+            description: "Загрузите документ оферты в формате PDF",
+          },
+        },
+        {
+          name: "privacyPolicyDocument",
+          type: "upload",
+          relationTo: "media",
+          label: "Политика конфиденциальности (PDF)",
+          required: false,
+          admin: {
+            description: "Загрузите политику конфиденциальности в формате PDF",
           },
         },
       ],

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import CheckoutClientPage from './checkout-client-page';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
   title: "Оформление заказа | ГрандБАЗАР",
   description: "Проверьте состав заказа, укажите адрес доставки и способ оплаты в интернет-магазине ГрандБАЗАР.",
   
@@ -12,18 +13,14 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL 
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/checkout` 
-      : undefined,
+    canonical: `${process.env.NEXT_PUBLIC_URL}/checkout` 
   },
 
   openGraph: {
     title: "Оформление заказа | ГрандБАЗАР",
     description: "Завершите покупку в интернет-магазине ГрандБАЗАР",
     type: "website",
-    url: process.env.NEXT_PUBLIC_SITE_URL 
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/checkout` 
-      : undefined
+    url: `${process.env.NEXT_PUBLIC_URL}/checkout` 
   },
 
   twitter: {

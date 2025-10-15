@@ -39,7 +39,8 @@ export const Blogs:CollectionConfig = {
                 description : "SLUG на англ.языке без пробелов, для пути странички"
             },
             required : true,
-            unique : true
+            unique : true,
+            index : true
         },
         {
             name : "title",

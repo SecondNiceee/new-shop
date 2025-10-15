@@ -893,6 +893,22 @@ export interface SiteSetting {
      * Основной контактный телефон компании
      */
     phone: string;
+    /**
+     * ИНН компании (налоговый идентификационный номер)
+     */
+    inn?: string | null;
+    /**
+     * Юридический адрес компании
+     */
+    legalAddress?: string | null;
+    /**
+     * Загрузите документ оферты в формате PDF
+     */
+    offerDocument?: (number | null) | Media;
+    /**
+     * Загрузите политику конфиденциальности в формате PDF
+     */
+    privacyPolicyDocument?: (number | null) | Media;
   };
   /**
    * Настройки минимальной суммы заказа и стоимости доставки
@@ -966,6 +982,10 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         legalName?: T;
         year?: T;
         phone?: T;
+        inn?: T;
+        legalAddress?: T;
+        offerDocument?: T;
+        privacyPolicyDocument?: T;
       };
   orderSettings?:
     | T
