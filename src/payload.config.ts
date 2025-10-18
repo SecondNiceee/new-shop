@@ -35,8 +35,8 @@ const MAIL_PASSWORD = process.env.MAIL_PASSWORD || ""
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || "http://5.35.90.170:3000",
-  cors: [process.env.PAYLOAD_PUBLIC_URL || "http://5.35.90.170:3000"],
-  csrf: [process.env.PAYLOAD_PUBLIC_URL || "http://5.35.90.170:3000"],
+  cors: [process.env.PAYLOAD_PUBLIC_URL || "http://5.35.90.170:3000", process.env.NEXT_PUBLIC_URL || ''],
+  csrf: [process.env.PAYLOAD_PUBLIC_URL || "http://5.35.90.170:3000", process.env.NEXT_PUBLIC_URL || ''],
   admin: {
     user: Users.slug,
     importMap: {
