@@ -1,5 +1,5 @@
-// tailwind.config.js
-export default {
+// tailwind.config.cjs
+module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}', './node_modules/@payloadcms/ui/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -62,5 +62,8 @@ export default {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('tailwindcss-animate'),
+  ],
 }
