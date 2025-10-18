@@ -42,10 +42,6 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    livePreview : {
-      url : `${process.env.PAYLOAD_PUBLIC_URL}/about`,
-      collections : ['pages']
-    }
   },
   collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites, Pages, Blogs],
   globals : [SiteSettings],
