@@ -2,7 +2,6 @@ import { RichText } from '@payloadcms/richtext-lexical/react';
 import { notFound } from 'next/navigation';
 import { getAbout } from '@/actions/server/pages/getAbout';
 import jsxConverters from '@/utils/jsx-converters';
-import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import '@/styles/richText.scss';
 import Script from 'next/script';
 
@@ -18,7 +17,6 @@ export default async function AboutPage() {
     return (
       <>
         <div className="rich-container">
-          <RefreshRouteOnSave route="/about" />
           {/* SEO: добавляем <h1> */}
           <h1 className="visually-hidden">{about.title || 'О нас'}</h1>
           <RichText converters={jsxConverters} data={about.content} />

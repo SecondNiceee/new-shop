@@ -2,7 +2,6 @@
 import { RichText } from '@payloadcms/richtext-lexical/react';
 import { notFound } from "next/navigation";
 import jsxConverters from '@/utils/jsx-converters';
-import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 import { getPayment } from '@/actions/server/pages/getPayment';
 
@@ -46,7 +45,6 @@ export default async function PaymentPage() {
       <>
         <PaymentSchema title={title} description={description} />
         <div className="rich-container">
-          <RefreshRouteOnSave route="/payment" />
           <RichText converters={jsxConverters} data={payment.content} />
         </div>
       </>

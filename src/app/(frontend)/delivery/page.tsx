@@ -1,7 +1,6 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { notFound } from "next/navigation"
 import jsxConverters from '@/utils/jsx-converters';
-import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 import { getDelivery } from '@/actions/server/pages/getDelivery';
 import { DeliverySchema } from './deliverySchema';
@@ -20,7 +19,6 @@ export default async function AboutPage() {
       <>
        <DeliverySchema title={title} description={description} />
         <div className="rich-container">
-          <RefreshRouteOnSave route='/delivery'   />
           <RichText converters={jsxConverters} data={delivery.content} />
         </div>
       </>

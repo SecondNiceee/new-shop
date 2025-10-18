@@ -2,7 +2,6 @@
 import { RichText } from '@payloadcms/richtext-lexical/react';
 import { notFound } from "next/navigation";
 import jsxConverters from '@/utils/jsx-converters';
-import { RefreshRouteOnSave } from '@/utils/RefreshRouteOnSave';
 import "@/styles/richText.scss";
 import { getContacts } from '@/actions/server/pages/getContacts';
 
@@ -65,7 +64,6 @@ export default async function ContactsPage() {
           description={description}
         />
         <div className="rich-container">
-          <RefreshRouteOnSave route="/contacts" />
           <RichText converters={jsxConverters} data={contacts.content} />
         </div>
       </>
