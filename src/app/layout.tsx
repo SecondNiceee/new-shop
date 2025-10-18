@@ -1,5 +1,5 @@
 import type React from "react"
-import "../globals.css"
+import "./globals.css"
 import AppInit from "@/components/app-init/app-init"
 import { Header } from "@/components/header/header"
 import { PopupProvider } from "@/components/popup/PopupProvider"
@@ -23,7 +23,7 @@ const inter = Inter({
   variable: "--font-inter",
 })
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || 'https://grandbazarr.ru'),
   title: {
     default: "ГрандБАЗАР - Интернет-магазин продуктов с доставкой",
     template: "%s | ГрандБАЗАР",
