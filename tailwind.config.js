@@ -1,6 +1,13 @@
-// tailwind.config.cjs
-module.exports = {
-  content: ['./src/**/*.{js,ts,jsx,tsx}', './node_modules/@payloadcms/ui/**/*.{js,ts,jsx,tsx}'],
+// tailwind.config.js
+import forms from '@tailwindcss/forms'
+import animate from 'tailwindcss-animate'
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@payloadcms/ui/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
       screens: {
@@ -62,8 +69,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('tailwindcss-animate'),
-  ],
+  plugins: [forms, animate],
 }
