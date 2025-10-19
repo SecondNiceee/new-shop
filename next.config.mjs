@@ -2,6 +2,11 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental : {
+    serverActions : {
+      allowedOrigins: ['https://grandbazarr.ru'],
+    }
+  },
   async headers() {
     return [
       {
