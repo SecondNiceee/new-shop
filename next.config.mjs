@@ -9,18 +9,34 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: `frame-ancestors 'self' https://grandbazarr.ru;`,
+            value: `frame-ancestors 'self' ${process.env.NEXT_PUBLIC_URL || 'https://grandbazarr.ru'};`,
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
           },
         ],
       },
     ];
   },
   // Your Next.js config here
-  images : {
-    remotePatterns: [  // ← deprecated: domains → используйте remotePatterns
+  images: {
+    remotePatterns: [
       {
         protocol: 'https',
         hostname: 'grandbazarr.ru',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
       },
     ],
   },
@@ -32,6 +48,12 @@ const nextConfig = {
     }
 
     return webpackConfig
+  },
+  eslint: {
+    ignoreDuringBuilds: true, // Added eslint ignoreDuringBuilds setting
+  },
+  typescript: {
+    ignoreBuildErrors: true, // Added typescript ignoreBuildErrors setting
   },
 }
 

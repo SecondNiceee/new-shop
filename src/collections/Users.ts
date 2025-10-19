@@ -46,7 +46,7 @@ export const Users: CollectionConfig = {
     lockTime: 6000,
     cookies: {
       sameSite: "Lax",
-      secure: false,
+      secure: true,
       domain: process.env.DOMAIN,
     },
   },
