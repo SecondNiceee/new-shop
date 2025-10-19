@@ -9,7 +9,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: `frame-ancestors 'self' localhost:* ${process.env.PAYLOAD_PUBLIC_URL};`,
+            value: `frame-ancestors 'self' https://grandbazarr.ru;`,
           },
         ],
       },
@@ -17,8 +17,11 @@ const nextConfig = {
   },
   // Your Next.js config here
   images : {
-    domains: [
-      process.env.DOMAIN
+    remotePatterns: [  // ← deprecated: domains → используйте remotePatterns
+      {
+        protocol: 'https',
+        hostname: 'grandbazarr.ru',
+      },
     ],
   },
   webpack: (webpackConfig) => {

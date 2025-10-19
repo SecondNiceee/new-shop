@@ -34,9 +34,9 @@ const MAIL_USER = process.env.MAIL_USER || ""
 const MAIL_PASSWORD = process.env.MAIL_PASSWORD || ""
 
 export default buildConfig({
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || "http://5.35.90.170:3000",
-  cors: [process.env.PAYLOAD_PUBLIC_URL || "http://5.35.90.170:3000", process.env.NEXT_PUBLIC_URL || ''],
-  csrf: [process.env.PAYLOAD_PUBLIC_URL || "http://5.35.90.170:3000", process.env.NEXT_PUBLIC_URL || ''],
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || "https://grandbazarr.ru",
+  cors: [process.env.PAYLOAD_PUBLIC_URL || "https://grandbazarr.ru"],
+  csrf: [process.env.PAYLOAD_PUBLIC_URL || "https://grandbazarr.ru"],
   admin: {
     user: Users.slug,
     importMap: {
