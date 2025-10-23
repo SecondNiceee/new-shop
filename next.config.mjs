@@ -35,9 +35,13 @@ const nextConfig = {
   // Your Next.js config here
   images: {
     remotePatterns: [
+      // {
+      //   protocol: 'https',
+      //   hostname: 'grandbazarr.ru',
+      // },
       {
         protocol: 'https',
-        hostname: 'grandbazarr.ru',
+        hostname: 'grandbazar.smartcardio.ru',
       },
       {
         protocol: 'http',
