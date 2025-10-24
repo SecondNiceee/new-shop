@@ -41,7 +41,7 @@ const nextConfig = {
       // },
       {
         protocol: 'https',
-        hostname: 'grandbazar.smartcardio.ru',
+        hostname: 'https://grandbazarr.ru',
       },
       {
         protocol: 'http',
