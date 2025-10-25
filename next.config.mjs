@@ -35,17 +35,11 @@ const nextConfig = {
   // Your Next.js config here
   images: {
     remotePatterns: [
-      // {
-      //   protocol: 'https',
-      //   hostname: 'grandbazarr.ru',
-      // },
       {
         protocol: 'https',
-        hostname: 'https://grandbazarr.ru',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
+        hostname: 'grandbazarr.ru',
+        port: '',
+        pathname: '/api/media/file/**',
       },
     ],
   },

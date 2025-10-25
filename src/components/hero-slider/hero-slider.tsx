@@ -11,6 +11,7 @@ import { getOverlayClass } from "./utils/getOverlayClass"
 import { useRouter } from "next/navigation"
 import { ImageLoader } from "./image-loader"
 import { Lobster, Comfortaa } from "next/font/google"
+import Image from "next/image"
 
 // Fonts for the hero slider: stylish script title + rounded modern subtitle (both with Cyrillic)
 const heroTitleFont = Lobster({
@@ -171,7 +172,8 @@ export default function HeroSlider() {
         <ImageLoader />
         <div className="hidden">
           {slides.map((slide, index) => {
-            const imageUrl = (slide.image as Media).url
+            const imageUrl = (slide.image as Media).url;
+            console.log(imageUrl);
             // Загружаем только первое изображение сразу, остальные по требованию
             if (index === 0) {
               return (
@@ -216,13 +218,15 @@ export default function HeroSlider() {
               >
                 <div className="relative w-full h-[150px] md:h-[200px] rounded-lg overflow-hidden">
                   {shouldLoadImage ? (
-                    <img
+                    <Image
                       src={imageUrl || "/placeholder.svg"}
                       alt={(slide.image as Media).alt}
                       className="w-full h-full object-cover"
                       onLoad={() => handleImageLoad(index)}
                       onError={() => handleImageError(index)}
                       loading={index === 0 ? "eager" : "lazy"}
+                      width={960}
+                      height={300}
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
