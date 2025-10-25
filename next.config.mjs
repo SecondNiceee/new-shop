@@ -51,7 +51,7 @@ const nextConfig = {
     }
 
     return webpackConfig
-  },
+  },        
   eslint: {
     ignoreDuringBuilds: true, // Added eslint ignoreDuringBuilds setting
   },

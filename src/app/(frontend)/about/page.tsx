@@ -17,8 +17,6 @@ export default async function AboutPage() {
     return (
       <>
         <div className="rich-container">
-          {/* SEO: добавляем <h1> */}
-          <h1 className="visually-hidden">{about.title || 'О нас'}</h1>
           <RichText converters={jsxConverters} data={about.content} />
         </div>
 
