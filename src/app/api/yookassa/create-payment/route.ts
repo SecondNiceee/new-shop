@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
 
     const userData = await userRes.json()
     const userId = userData.user?.id;
+    
     console.log(userId);
     console.log(userData);
 
