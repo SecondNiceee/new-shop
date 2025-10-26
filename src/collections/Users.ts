@@ -1,4 +1,4 @@
-import { isAdmin } from "@/utils/accessUtils"
+import { isAdmin, isOwn } from "@/utils/accessUtils"
 import { createEmail } from "@/utils/createEmail"
 import type { CollectionConfig, PayloadRequest } from "payload"
 
@@ -19,7 +19,7 @@ export const Users: CollectionConfig = {
     },
     read: () => true,
     delete : isAdmin,
-    update : isAdmin
+    update : isOwn
   },
   auth: {
     forgotPassword: {
