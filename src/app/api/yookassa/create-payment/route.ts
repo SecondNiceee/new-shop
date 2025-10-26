@@ -12,30 +12,35 @@ export async function POST(req: NextRequest) {
 
     // 2. Получаем куки и извлекаем payload-token
     const cookieStore = await cookies()
-    const payloadCookie = cookieStore.get('payload-token')
+    const payloadCookie = cookieStore.get("payload-token")
 
     if (!payloadCookie) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // 3. Запрашиваем данные пользователя из Payload
-    const userRes = await fetch(`${process.env.BACKEND_URL}/api/users/me?select[id]=true`, {
-      method: "GET",
-      headers: {
-        Cookie: `payload-token=${payloadCookie.value}`,
+    // 3. Запрашиваем данные пользователя из Payload (включая email)
+    const userRes = await fetch(
+      `${process.env.BACKEND_URL}/api/users/me?select[id]=true&select[email]=true&select[phone]=true`,
+      {
+        method: "GET",
+        headers: {
+          Cookie: `payload-token=${payloadCookie.value}`,
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    })
+    )
 
     if (!userRes.ok) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const userData = await userRes.json()
-    const userId = userData.user?.id;
-    
-    console.log(userId);
-    console.log(userData);
+    const userId = userData.user?.id
+    const userEmail = userData.user?.email
+    const userPhone = userData.user?.phone
+
+    console.log(userId)
+    console.log(userData)
 
     if (!userId) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
@@ -44,13 +49,45 @@ export async function POST(req: NextRequest) {
     // 4. Добавляем userId в orderData
     const enrichedOrderData = {
       ...orderData,
-      user : userId, // ← вот он!
+      user: userId, // ← вот он!
     }
 
     // 5. Генерируем ключ идемпотентности
     const idempotenceKey = uuidv4()
 
-    // 6. Подготавливаем данные платежа
+    // 6. Подготавливаем items для чека (товары)
+    const receiptItems = enrichedOrderData.items.map((item: any) => ({
+      description: item.productTitle || `Товар #${item.product}`,
+      quantity: String(item.quantity),
+      amount: {
+        value: item.price.toFixed(2),
+        currency: "RUB",
+      },
+      vat_code: 1, // 1 = без НДС
+    }))
+
+    // Добавляем доставку в чек
+    if (enrichedOrderData.deliveryFee > 0) {
+      receiptItems.push({
+        description: "Доставка",
+        quantity: "1",
+        amount: {
+          value: enrichedOrderData.deliveryFee.toFixed(2),
+          currency: "RUB",
+        },
+        vat_code: 1, // 1 = без НДС
+      })
+    }
+
+    // 7. Формируем чек
+    const receipt = {
+      customer: userEmail ? { email: userEmail } : { phone: userPhone || enrichedOrderData.customerPhone },
+      items: receiptItems,
+    }
+
+    console.log(receipt);
+
+    // 8. Подготавливаем данные платежа
     const paymentData = {
       amount: {
         value: enrichedOrderData.totalAmount.toFixed(2),
@@ -62,12 +99,15 @@ export async function POST(req: NextRequest) {
       },
       capture: true,
       description: `Заказ на сумму ${enrichedOrderData.totalAmount} ₽`,
+      receipt, // Добавляем чек в платеж
       metadata: {
         orderData: JSON.stringify(enrichedOrderData), // ← теперь с userId
       },
     }
 
-    // 7. Отправляем в ЮKassa
+    console.log("[v0] Payment data:", JSON.stringify(paymentData, null, 2))
+
+    // 9. Отправляем в ЮKassa
     const response = await fetch("https://api.yookassa.ru/v3/payments", {
       method: "POST",
       headers: {
