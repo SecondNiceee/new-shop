@@ -22,8 +22,6 @@ export async function POST(req: NextRequest) {
         data: {
           ...orderData,
           status: "pending",
-          paymentId: paymentObject.id,
-          paymentStatus: "paid",
         },
         overrideAccess : true
       })
