@@ -185,7 +185,7 @@ export default function CheckoutClientPage() {
           </div>
         </div>
 
-        <div class="mb-8 rounded-2xl shadow-[0_0_20px_5px_rgba(34,197,94,0.25)]">
+        <div className="mb-8 rounded-2xl shadow-[0_0_20px_5px_rgba(34,197,94,0.25)]">
           <Card className="flex flex-col overflow-hidden text-gray-900 border-none bg-white">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-3 text-xl">
