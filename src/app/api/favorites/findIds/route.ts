@@ -1,27 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getUserFromCookie } from '@/utils/getUserFromCookie'
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   const payload = await getPayload({ config })
-  const headers = req.headers
-  const user = await payload.auth({ headers })
-  if (!user.user){
-    return NextResponse.json({message : "Not Authorized"}, {status : 403})
+  const user = await getUserFromCookie();
+
+  if (!user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
     const favoritiesIds = await payload.find({
       collection: 'favorites',
       depth: 0,
-      limit : 0,
+      limit: 0,
       select: {
         product: true,
       },
-      user : user.user,
-      where : {
-        user : {equals : user.user.id}
-      }
+      user: user.id,
+      where: {
+        user: { equals: user.id },
+      },
     })
+    console.log(favoritiesIds);
     return NextResponse.json({ docs: favoritiesIds.docs }, { status: 200 })
   } catch (e) {
     console.log(e)

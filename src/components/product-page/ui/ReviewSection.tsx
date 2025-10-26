@@ -231,7 +231,7 @@ const ReviewSection: FC<IReviewSection> = ({ product, id }) => {
         )}
       </div>
 
-      {showReviewForm && user && !userReview && !reviewsLoading && hasPurchased && (
+      {Boolean(showReviewForm && user && !userReview && !reviewsLoading && hasPurchased) && (
         <div className="bg-gray-50 rounded-xl p-3 sm:p-6 mb-4 sm:mb-6 animate-in slide-in-from-bottom-2 duration-300">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Оставить отзыв</h3>
           <form

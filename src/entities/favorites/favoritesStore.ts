@@ -52,8 +52,9 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
   },
 
   loadFavoritiesIds: async () => {
-    const user = useAuthStore().user;
+    const user = useAuthStore.getState().user;
     if (!user){
+      console.log("ЮЗЕР БЫЛ НЕ НАЙДЕН, СБРОС")
       return;
     }
     const favoritesIds = await favoritesService.getFavoritiesIds()

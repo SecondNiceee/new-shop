@@ -46,7 +46,9 @@ export default function AppInit() {
       } catch {}
       try{
         await loadFavoritiesIds();
-      } catch{}
+      } catch(e){
+        console.log(e);
+      }
       try{
         await loadSiteSettings();
       }catch{}

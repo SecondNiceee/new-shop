@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getPayload } from "payload"
 import config from "@payload-config"
+import { getUserFromCookie } from "@/utils/getUserFromCookie"
 
 // DELETE - удалить товар из избранного
 export async function DELETE(request: NextRequest) {
@@ -9,10 +10,10 @@ export async function DELETE(request: NextRequest) {
     const { productId } = await request.json()
 
     // Получаем пользователя из cookies
-    const { user } = await payload.auth({ headers: request.headers })
+    const user = await getUserFromCookie()
 
-    if (!user) {
-      return NextResponse.json({ error: "Необходимо войти в систему" }, { status: 401 })
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     if (!productId) {
