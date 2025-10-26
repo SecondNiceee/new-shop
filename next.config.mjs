@@ -2,10 +2,10 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental : {
-    serverActions : {
+  experimental: {
+    serverActions: {
       allowedOrigins: ['https://grandbazarr.ru'],
-    }
+    },
   },
   async headers() {
     return [
@@ -30,7 +30,7 @@ const nextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
   // Your Next.js config here
   images: {
@@ -38,6 +38,12 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'grandbazarr.ru',
+        port: '',
+        pathname: '/api/media/file/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
         port: '',
         pathname: '/api/media/file/**',
       },
@@ -51,7 +57,7 @@ const nextConfig = {
     }
 
     return webpackConfig
-  },        
+  },
   eslint: {
     ignoreDuringBuilds: true, // Added eslint ignoreDuringBuilds setting
   },

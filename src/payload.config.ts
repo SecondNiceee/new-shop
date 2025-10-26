@@ -31,7 +31,8 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const MAIL_NAME = process.env.MAIL_NAME || ""
 const MAIL_USER = process.env.MAIL_USER || ""
-const MAIL_PASSWORD = process.env.MAIL_PASSWORD || ""
+const MAIL_PASSWORD = process.env.MAIL_PASSWORD || "";
+const isDevelopment = process.env.NODE_ENV === "development"
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || "https://grandbazarr.ru",
@@ -77,15 +78,28 @@ export default buildConfig({
     defaultFromAddress: MAIL_NAME,
     defaultFromName: "ГРАНДБАЗАР",
     transport: nodemailer.createTransport({
-      service: "Mail.ru", // ✅ Работает стабильно,
+      service: "Mail.ru",
       host: "smtp.mail.ru",
       port: 587,
-      secure: false, // ❌ не используй true для порта 587
-      requireTLS: true, // ✅ обязателен для Mail.ru
+      secure: false, // false для порта 587 (STARTTLS)
+      requireTLS: true, // обязательно для Mail.ru
       auth: {
         user: MAIL_USER,
         pass: MAIL_PASSWORD,
       },
+      tls: {
+        // Не отклонять неавторизованные сертификаты (для production с самоподписанными сертификатами)
+        rejectUnauthorized: false,
+        // Минимальная версия TLS
+        minVersion: "TLSv1.2",
+      },
+      // Таймауты для лучшей обработки ошибок
+      connectionTimeout: 10000, // 10 секунд
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      // Логирование для отладки (можно включить при проблемах)
+      debug: isDevelopment, // включить debug только в dev режиме
+      logger: isDevelopment, // логирование только в dev режиме
     }),
   }),
 })
