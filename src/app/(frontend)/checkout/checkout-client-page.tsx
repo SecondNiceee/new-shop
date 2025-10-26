@@ -185,53 +185,53 @@ export default function CheckoutClientPage() {
           </div>
         </div>
 
-
-          <Card className="flex mb-8 flex-col overflow-hidden text-white border-0 shadow-2xl bg-gradient-to-br from-emerald-600 via-green-500 to-teal-700">
+        <div class="mb-8 rounded-2xl shadow-[0_0_20px_5px_rgba(34,197,94,0.25)]">
+          <Card className="flex flex-col overflow-hidden text-gray-900 border-none bg-white">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-3 text-xl">
-                <CreditCard className="w-6 h-6" />
+                <CreditCard className="w-6 h-6 text-emerald-600" />
                 Итого к оплате
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col justify-between flex-1 pt-3 space-y-6">
               <div className="space-y-3">
-                <div className="flex justify-between text-lg text-white/90">
+                <div className="flex justify-between text-lg text-gray-700">
                   <span>Товары ({totalCount})</span>
-                  <span className="font-semibold">{totalPrice} ₽</span>
+                  <span className="font-semibold text-gray-900">{totalPrice} ₽</span>
                 </div>
-                <div className="flex justify-between text-lg text-white/90">
+                <div className="flex justify-between text-lg text-gray-700">
                   <span>Доставка</span>
-                  <span className="font-semibold">{deliveryFee} ₽</span>
+                  <span className="font-semibold text-gray-900">{deliveryFee} ₽</span>
                 </div>
-                <div className="pt-3 border-t border-white/30">
-                  <div className="flex justify-between text-2xl font-bold">
+                <div className="pt-3 border-t border-gray-200">
+                  <div className="flex justify-between text-2xl font-bold text-gray-900">
                     <span>Итого</span>
                     <span>{totalPrice + deliveryFee} ₽</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-emerald-50">
                 <Checkbox
                   id="privacy-policy"
                   checked={privacyPolicyAccepted}
                   onCheckedChange={(checked) => setPrivacyPolicyAccepted(checked === true)}
-                  className="mt-0.5 border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
+                  className="mt-0.5 border-emerald-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:text-white"
                 />
-                <label htmlFor="privacy-policy" className="text-sm leading-relaxed text-white/95 cursor-pointer">
+                <label htmlFor="privacy-policy" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
                   Я даю согласие на обработку моих персональных данных в соответствии с{" "}
                   {privacyPolicyUrl ? (
                     <a
                       href={privacyPolicyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline hover:text-white transition-colors"
+                      className="underline text-emerald-600 hover:text-emerald-700 transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       Политикой конфиденциальности
                     </a>
                   ) : (
-                    <span className="underline">Политикой конфиденциальности</span>
+                    <span className="underline text-emerald-600">Политикой конфиденциальности</span>
                   )}
                 </label>
               </div>
@@ -239,11 +239,11 @@ export default function CheckoutClientPage() {
               <Button
                 onClick={handlePayment}
                 disabled={!isOrderValid || isProcessingOrder}
-                className="w-full bg-white text-emerald-700 hover:bg-gray-50 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 hover:scale-[1.02] mt-4"
+                className="w-full bg-green-500 text-white hover:bg-green-600 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 hover:scale-[1.02] mt-4"
               >
                 {isProcessingOrder ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 rounded-full border-emerald-700 border-t-transparent animate-spin" />
+                    <div className="w-5 h-5 border-2 rounded-full border-white border-t-transparent animate-spin" />
                     Переход к оплате...
                   </div>
                 ) : (
@@ -252,6 +252,8 @@ export default function CheckoutClientPage() {
               </Button>
             </CardContent>
           </Card>
+        </div>
+
         <div className="grid gap-8">
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
@@ -264,7 +266,7 @@ export default function CheckoutClientPage() {
               <CardContent className="flex-1 pt-3">
                 <div
                   onClick={handleEditAddress}
-                  className="group bg-gradient-to-r from-blue-50/80 to-purple-50/50 p-5 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-200 border border-blue-100/50 hover:border-blue-200 h-full flex flex-col justify-between min-h-[120px]"
+                  className="group bg-gradient-to-r from-blue-50/80 to-purple-50/50 p-5 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-200 border border-blue-100/50 group-hover:border-blue-200 h-full flex flex-col justify-between min-h-[120px]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -339,7 +341,6 @@ export default function CheckoutClientPage() {
               </CardContent>
             </Card>
           </div>
-
 
           <Card className="flex flex-col gap-2 overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
             <CardHeader>
