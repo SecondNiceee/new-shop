@@ -119,7 +119,7 @@ const Orders: CollectionConfig = {
     beforeValidate: [
       ({ data, req, operation }) => {
         if (!data) return data
-        if (!req.user) throw new Error("Not authorized")
+        if (!req.user) return data // Значит мы используем ovverideAccess (Возможно только  в хуке)
 
         // Auto-assign user on create
         if (operation === "create" && !data.user) {
