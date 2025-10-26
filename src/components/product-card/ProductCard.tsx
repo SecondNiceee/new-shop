@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import { useGuestBenefitsStore } from '../auth/guest-benefits-modal'
 import { formatPrice, getDiscountInfo } from '@/utils/discountUtils'
 import { routerConfig } from '@/config/router.config'
+import SmartImage from '../smart-image/SmartImage'
 
 interface IProductCard {
   product: Product
@@ -70,12 +71,12 @@ export function ProductCard({ product, clickHandler }: IProductCard) {
     >
       {/* Product Image with Heart Icon */}
       <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl bg-gray-50">
-        <Image
+        <SmartImage
           loading="lazy"
           width={400}
           height={300}
           src={(product?.image as Media).url || '/placeholder.svg'}
-          alt={(product?.image as Media).alt}
+          alt={(product?.image as Media).alt || 'Изображение товара'}
           className="object-cover w-full h-full"
         />
         {discountInfo.hasDiscount && (

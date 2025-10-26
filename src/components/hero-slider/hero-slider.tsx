@@ -1,29 +1,30 @@
-"use client"
+'use client'
 
-import useEmblaCarousel from "embla-carousel-react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useCallback, useEffect, useState, useRef } from "react"
-import Autoplay from "embla-carousel-autoplay"
-import { useSiteSettings } from "@/entities/siteSettings/SiteSettingsStore"
-import type { Media } from "@/payload-types"
-import { getTextColorClass } from "./utils/getTextColorClass"
-import { getOverlayClass } from "./utils/getOverlayClass"
-import { useRouter } from "next/navigation"
-import { ImageLoader } from "./image-loader"
-import { Lobster, Comfortaa } from "next/font/google"
-import Image from "next/image"
+import useEmblaCarousel from 'embla-carousel-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useCallback, useEffect, useState, useRef } from 'react'
+import Autoplay from 'embla-carousel-autoplay'
+import { useSiteSettings } from '@/entities/siteSettings/SiteSettingsStore'
+import type { Media } from '@/payload-types'
+import { getTextColorClass } from './utils/getTextColorClass'
+import { getOverlayClass } from './utils/getOverlayClass'
+import { useRouter } from 'next/navigation'
+import { ImageLoader } from './image-loader'
+import { Lobster, Comfortaa } from 'next/font/google'
+import Image from 'next/image'
+import SmartImage from '../smart-image/SmartImage'
 
 // Fonts for the hero slider: stylish script title + rounded modern subtitle (both with Cyrillic)
 const heroTitleFont = Lobster({
-  subsets: ["latin", "cyrillic"],
-  weight: "400",
-  display: "swap",
+  subsets: ['latin', 'cyrillic'],
+  weight: '400',
+  display: 'swap',
 })
 
 const heroSubtitleFont = Comfortaa({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "700"],
-  display: "swap",
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
 })
 
 export default function HeroSlider() {
@@ -42,8 +43,8 @@ export default function HeroSlider() {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
-      align: "center",
-      containScroll: "trimSnaps",
+      align: 'center',
+      containScroll: 'trimSnaps',
       skipSnaps: false,
       dragFree: false,
     },
@@ -98,22 +99,22 @@ export default function HeroSlider() {
     }
 
     updateVisibleSlides()
-    emblaApi.on("select", updateVisibleSlides)
+    emblaApi.on('select', updateVisibleSlides)
 
     return () => {
-      emblaApi.off("select", updateVisibleSlides)
+      emblaApi.off('select', updateVisibleSlides)
     }
   }, [emblaApi, slides.length])
 
   // Предзагрузка при наведении на кнопки навигации
   const handleNavHover = useCallback(
-    (direction: "prev" | "next") => {
+    (direction: 'prev' | 'next') => {
       if (!emblaApi) return
 
       const currentIndex = emblaApi.selectedScrollSnap()
       let targetIndex: number
 
-      if (direction === "prev") {
+      if (direction === 'prev') {
         targetIndex = currentIndex > 0 ? currentIndex - 1 : slides.length - 1
       } else {
         targetIndex = currentIndex < slides.length - 1 ? currentIndex + 1 : 0
@@ -158,8 +159,8 @@ export default function HeroSlider() {
   useEffect(() => {
     if (!emblaApi) return
     onSelect()
-    emblaApi.on("select", onSelect)
-    emblaApi.on("reInit", onSelect)
+    emblaApi.on('select', onSelect)
+    emblaApi.on('reInit', onSelect)
   }, [emblaApi, onSelect])
 
   if (!slides || slides.length === 0) {
@@ -172,14 +173,14 @@ export default function HeroSlider() {
         <ImageLoader />
         <div className="hidden">
           {slides.map((slide, index) => {
-            const imageUrl = (slide.image as Media).url;
-            console.log(imageUrl);
+            const imageUrl = (slide.image as Media).url
+            console.log(imageUrl)
             // Загружаем только первое изображение сразу, остальные по требованию
             if (index === 0) {
               return (
                 <img
                   key={index}
-                  src={imageUrl || "/placeholder.svg"}
+                  src={imageUrl || '/placeholder.svg'}
                   alt={(slide.image as Media).alt}
                   onLoad={() => handleImageLoad(index)}
                   onError={() => handleImageError(index)}
@@ -199,10 +200,10 @@ export default function HeroSlider() {
         <div className="embla__container w-full flex">
           {slides.map((slide, index) => {
             const imageUrl = (slide.image as Media).url
-            const titleColor = getTextColorClass(slide.titleColor || "white")
-            const subtitleColor = getTextColorClass(slide.subtitleColor || "white")
+            const titleColor = getTextColorClass(slide.titleColor || 'white')
+            const subtitleColor = getTextColorClass(slide.subtitleColor || 'white')
             const hasContent = slide.title || slide.subtitle
-            const overlayClass = getOverlayClass(slide.imageOverlay || "none")
+            const overlayClass = getOverlayClass(slide.imageOverlay || 'none')
             const clickHandler = () => {
               if (slide.link) router.push(slide.link)
             }
@@ -218,16 +219,18 @@ export default function HeroSlider() {
               >
                 <div className="relative w-full h-[150px] md:h-[200px] rounded-lg overflow-hidden">
                   {shouldLoadImage ? (
-                    <Image
-                      src={imageUrl || "/placeholder.svg"}
-                      alt={(slide.image as Media).alt}
-                      className="w-full h-full object-cover"
-                      onLoad={() => handleImageLoad(index)}
-                      onError={() => handleImageError(index)}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      width={960}
-                      height={300}
-                    />
+                    <>
+                      <SmartImage
+                        src={imageUrl || '/placeholder.svg'}
+                        alt={(slide.image as Media).alt || 'Изображение слайда'}
+                        className="w-full h-full object-cover"
+                        onLoad={() => handleImageLoad(index)}
+                        onError={() => handleImageError(index)}
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                        width={960}
+                        height={300}
+                      />
+                    </>
                   ) : (
                     <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
                       <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
@@ -240,7 +243,9 @@ export default function HeroSlider() {
                   )}
                 </div>
 
-                {overlayClass && <div className={`absolute z-20 inset-0 rounded-lg ${overlayClass}`} />}
+                {overlayClass && (
+                  <div className={`absolute z-20 inset-0 rounded-lg ${overlayClass}`} />
+                )}
 
                 {hasContent && (
                   <div className="absolute z-50 inset-0 flex items-center justify-start">
@@ -279,7 +284,7 @@ export default function HeroSlider() {
       <button
         className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={scrollPrev}
-        onMouseEnter={() => handleNavHover("prev")}
+        onMouseEnter={() => handleNavHover('prev')}
         disabled={prevBtnDisabled}
       >
         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:h-6 md:w-6 text-white group-hover:scale-110 transition-transform duration-200" />
@@ -288,7 +293,7 @@ export default function HeroSlider() {
       <button
         className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={scrollNext}
-        onMouseEnter={() => handleNavHover("next")}
+        onMouseEnter={() => handleNavHover('next')}
         disabled={nextBtnDisabled}
       >
         <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:h-6 md:w-6 text-white group-hover:scale-110 transition-transform duration-200" />
@@ -300,8 +305,8 @@ export default function HeroSlider() {
             key={index}
             className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${
               index === selectedIndex
-                ? "bg-white border-white shadow-lg shadow-white/50 scale-110"
-                : "bg-white/30 border-white/50 hover:bg-white/50 hover:border-white/70 hover:scale-105"
+                ? 'bg-white border-white shadow-lg shadow-white/50 scale-110'
+                : 'bg-white/30 border-white/50 hover:bg-white/50 hover:border-white/70 hover:scale-105'
             }`}
             onClick={() => scrollTo(index)}
           />

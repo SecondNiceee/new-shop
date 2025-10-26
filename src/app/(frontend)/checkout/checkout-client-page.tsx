@@ -20,7 +20,7 @@ import { formatPhoneNumber, normalizePhone, validatePhone } from "@/utils/phone"
 import { useGuestBenefitsStore } from "@/components/auth/guest-benefits-modal"
 import OrderItem from "@/components/order-item/OrderItem"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Media } from "@/payload-types"
+import type { Media } from "@/payload-types"
 
 export default function CheckoutClientPage() {
   const router = useRouter()
@@ -185,25 +185,75 @@ export default function CheckoutClientPage() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 lg:grid-rows-[auto_1fr] lg:items-start">
-          <div className="grid gap-6 lg:col-span-2 lg:grid-rows-subgrid lg:row-span-2">
-            <Card className="flex flex-col gap-2 overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-xl">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 animate-pulse"></div>
-                  Ваш заказ
-                  <span className="px-3 py-1 text-sm font-medium text-white rounded-full bg-gradient-to-r from-emerald-500 to-blue-500">
-                    {totalCount} товаров
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 pt-3 space-y-4">
-                {items.map((item) => (
-                  <OrderItem key={item.product.id} item={item} />
-                ))}
-              </CardContent>
-            </Card>
 
+          <Card className="flex mb-8 flex-col overflow-hidden text-white border-0 shadow-2xl bg-gradient-to-br from-emerald-600 via-green-500 to-teal-700">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <CreditCard className="w-6 h-6" />
+                Итого к оплате
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col justify-between flex-1 pt-3 space-y-6">
+              <div className="space-y-3">
+                <div className="flex justify-between text-lg text-white/90">
+                  <span>Товары ({totalCount})</span>
+                  <span className="font-semibold">{totalPrice} ₽</span>
+                </div>
+                <div className="flex justify-between text-lg text-white/90">
+                  <span>Доставка</span>
+                  <span className="font-semibold">{deliveryFee} ₽</span>
+                </div>
+                <div className="pt-3 border-t border-white/30">
+                  <div className="flex justify-between text-2xl font-bold">
+                    <span>Итого</span>
+                    <span>{totalPrice + deliveryFee} ₽</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                <Checkbox
+                  id="privacy-policy"
+                  checked={privacyPolicyAccepted}
+                  onCheckedChange={(checked) => setPrivacyPolicyAccepted(checked === true)}
+                  className="mt-0.5 border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
+                />
+                <label htmlFor="privacy-policy" className="text-sm leading-relaxed text-white/95 cursor-pointer">
+                  Я даю согласие на обработку моих персональных данных в соответствии с{" "}
+                  {privacyPolicyUrl ? (
+                    <a
+                      href={privacyPolicyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-white transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Политикой конфиденциальности
+                    </a>
+                  ) : (
+                    <span className="underline">Политикой конфиденциальности</span>
+                  )}
+                </label>
+              </div>
+
+              <Button
+                onClick={handlePayment}
+                disabled={!isOrderValid || isProcessingOrder}
+                className="w-full bg-white text-emerald-700 hover:bg-gray-50 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 hover:scale-[1.02] mt-4"
+              >
+                {isProcessingOrder ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 rounded-full border-emerald-700 border-t-transparent animate-spin" />
+                    Переход к оплате...
+                  </div>
+                ) : (
+                  `Оплатить ${totalPrice + deliveryFee} ₽`
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        <div className="grid gap-8">
+          <div className="grid gap-6 md:grid-cols-2">
             <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
@@ -241,9 +291,7 @@ export default function CheckoutClientPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          <div className="grid gap-6 lg:grid-rows-subgrid lg:row-span-2">
             <Card className="flex flex-col overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
@@ -290,74 +338,25 @@ export default function CheckoutClientPage() {
                 </div>
               </CardContent>
             </Card>
-
-            <Card className="flex flex-col overflow-hidden text-white border-0 shadow-2xl bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-3 text-xl">
-                  <CreditCard className="w-6 h-6" />
-                  Итого к оплате
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col justify-between flex-1 pt-3 space-y-6">
-                <div className="space-y-3">
-                  <div className="flex justify-between text-lg text-white/90">
-                    <span>Товары ({totalCount})</span>
-                    <span className="font-semibold">{totalPrice} ₽</span>
-                  </div>
-                  <div className="flex justify-between text-lg text-white/90">
-                    <span>Доставка</span>
-                    <span className="font-semibold">{deliveryFee} ₽</span>
-                  </div>
-                  <div className="pt-3 border-t border-white/30">
-                    <div className="flex justify-between text-2xl font-bold">
-                      <span>Итого</span>
-                      <span>{totalPrice + deliveryFee} ₽</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
-                  <Checkbox
-                    id="privacy-policy"
-                    checked={privacyPolicyAccepted}
-                    onCheckedChange={(checked) => setPrivacyPolicyAccepted(checked === true)}
-                    className="mt-0.5 border-white/50 data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
-                  />
-                  <label htmlFor="privacy-policy" className="text-sm leading-relaxed text-white/95 cursor-pointer">
-                    Я даю согласие на обработку моих персональных данных в соответствии с{" "}
-                    {privacyPolicyUrl ? (
-                      <a
-                        href={privacyPolicyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-white transition-colors"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Политикой конфиденциальности
-                      </a>
-                    ) : (
-                      <span className="underline">Политикой конфиденциальности</span>
-                    )}
-                  </label>
-                </div>
-
-                <Button
-                  onClick={handlePayment}
-                  disabled={!isOrderValid || isProcessingOrder}
-                  className="w-full bg-white text-emerald-600 hover:bg-gray-50 font-bold py-6 text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-200 hover:scale-[1.02] mt-4"
-                >
-                  {isProcessingOrder ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 rounded-full border-emerald-600 border-t-transparent animate-spin" />
-                      Переход к оплате...
-                    </div>
-                  ) : (
-                    `Оплатить ${totalPrice + deliveryFee} ₽`
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
           </div>
+
+
+          <Card className="flex flex-col gap-2 overflow-hidden border-0 shadow-xl bg-white/90 backdrop-blur-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 animate-pulse"></div>
+                Ваш заказ
+                <span className="px-3 py-1 text-sm font-medium text-white rounded-full bg-gradient-to-r from-emerald-500 to-blue-500">
+                  {totalCount} товаров
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 pt-3 space-y-4">
+              {items.map((item) => (
+                <OrderItem key={item.product.id} item={item} />
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </div>
 

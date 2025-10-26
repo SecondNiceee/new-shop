@@ -5,6 +5,7 @@ import Image from 'next/image';
 import React, { FC } from 'react';
 import { Button } from '../ui/button';
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import SmartImage from '../smart-image/SmartImage';
 
 
 interface IOrderItemDesktop{
@@ -19,13 +20,11 @@ const OrderItemMobile:FC<IOrderItemDesktop> = ({item}) => {
         <div className="flex gap-3">
           {/* Image */}
           <div className="relative w-16 h-16 overflow-hidden rounded-lg bg-gray-50 flex-shrink-0">
-            <Image
-              width={64}
+            <SmartImage width={64}
               height={64}
               src={media?.url || '/placeholder.svg?height=64&width=64&query=product-thumbnail'}
               alt={media?.alt || item.product.title}
-              className="object-cover w-full h-full"
-            />
+              className="object-cover w-full h-full"  />
             {discountInfo.hasDiscount && (
               <div className="absolute top-1 right-0 rounded-sm bg-red-500 text-white text-xs font-bold px-1 py-0.5 text-[10px]">
                 -{discountInfo.discountPercentage}%

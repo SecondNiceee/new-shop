@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import React, { FC } from 'react';
 import { Button } from '../ui/button';
+import SmartImage from '../smart-image/SmartImage';
 
 interface IOrderItemDesktop{
     item : CartItem
@@ -21,13 +22,13 @@ const OrderItemDesktop:FC<IOrderItemDesktop> = ({item}) => {
           className="flex gap-4 p-4 transition-all duration-200 border group bg-gradient-to-r from-gray-50/80 to-blue-50/50 rounded-2xl hover:shadow-md border-gray-100/50"
         >
           <div className="relative w-20 h-20 overflow-hidden transition-shadow duration-200 bg-white shadow-sm rounded-xl group-hover:shadow-md">
-            <Image
+            <SmartImage
               width={80}
               height={80}
               src={media?.url || "/placeholder.svg?height=80&width=80&query=product-thumbnail"}
               alt={media?.alt || item.product.title}
               className="object-cover w-full h-full"
-            />
+             />
             {discountInfo.hasDiscount && (
               <div className="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded text-[10px]">
                 -{discountInfo.discountPercentage}%

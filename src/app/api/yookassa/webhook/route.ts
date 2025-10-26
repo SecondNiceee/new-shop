@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
           paymentId: paymentObject.id,
           paymentStatus: "paid",
         },
+        overrideAccess : true
       })
 
       console.log("[v0] Order created:", order.id)
