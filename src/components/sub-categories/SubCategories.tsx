@@ -11,9 +11,11 @@ interface ISubCategories {
   activeSubCategory: string | null
   badgesRef: React.RefObject<(HTMLDivElement | null)[]>
   sectionsRef: React.RefObject<(HTMLDivElement | null)[]>
+  onSubCategoryClick?: (value: string) => void
 }
+
 const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(
-  ({ sortedProducts, activeSubCategory, badgesRef, sectionsRef }, ref) => {
+  ({ sortedProducts, activeSubCategory, badgesRef, sectionsRef, onSubCategoryClick }, ref) => {
     const localRef = useRef<HTMLDivElement | null>(null)
 
     const setCombinedRef = (el: HTMLDivElement | null) => {
@@ -32,25 +34,28 @@ const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
       localRef.current.scrollBy({ left: delta, behavior: 'smooth' })
     }
-    //  Прокрутка к секции при клике на бейдж
-    const scrollToSection = (value: string) => {
-      const index = sortedProducts.findIndex(
-        (item) => (item.subCategory as Category).value === value,
-      )
-      const section = sectionsRef.current[index]
-      if (section) {
-        const sectionRect = section.getBoundingClientRect()
-        const scrollTop = window.pageYOffset + sectionRect.top - 305
-        window.scrollTo({
-          top: scrollTop,
-          behavior: 'smooth',
-        })
+
+    const handleClick = (value: string, index: number) => {
+      if (onSubCategoryClick) {
+        // Если есть функция навигации - используем её
+        onSubCategoryClick(value)
+      } else {
+        // Иначе прокручиваем к секции (старое поведение)
+        const section = sectionsRef.current[index]
+        if (section) {
+          const sectionRect = section.getBoundingClientRect()
+          const scrollTop = window.pageYOffset + sectionRect.top - 305
+          window.scrollTo({
+            top: scrollTop,
+            behavior: 'smooth',
+          })
+        }
       }
     }
 
     return (
-      <div className="flex sticky z-20 top-[150px] sm:top-[173px] pb-3 pt-3 md:top-[200px] mx-auto bg-white ">
-        <div className="max-w-7xl w-full px-4 mx-auto">
+      <div className="flex z-20 pb-3 pt-0 mx-auto bg-gray-50 ">
+        <div className="max-w-7xl w-full pt-4 px-4 mx-auto">
           <div
             ref={setCombinedRef}
             className="flex gap-4 overflow-x-scroll overflow-y-hidden hide-scrollbar overscroll-x-contain overscroll-y-none touch-pan-x"
@@ -64,7 +69,7 @@ const SubCategories = forwardRef<HTMLDivElement, ISubCategories>(
                   ref={(el) => {
                     badgesRef.current[index] = el
                   }}
-                  onClick={() => scrollToSection((item.subCategory as Category).value)}
+                  onClick={() => handleClick((item.subCategory as Category).value, index)}
                   className="rounded-2xl cursor-pointer flex-shrink-0 whitespace-nowrap"
                 >
                   <Badge

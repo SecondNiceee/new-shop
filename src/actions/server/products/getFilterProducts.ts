@@ -42,9 +42,9 @@ export const getFilteredProducts = async (
           },
           depth: 1,
           limit: 0,
+          sort : "createdAt",
           select : {
             averageRating : true,
-            discount : true,
             image : true,
             price : true,
             title : true,

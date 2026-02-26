@@ -2,94 +2,61 @@ import type { MetadataRoute } from "next"
 import { getPayload } from "payload"
 import config from "@payload-config"
 
-// ✅ Защита от invalid дат
 function safeDate(dateString: string | null | undefined): Date {
   if (!dateString) return new Date()
   const date = new Date(dateString)
   return isNaN(date.getTime()) ? new Date() : date
 }
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 1.0,
-    },
-    {
-      url: `${siteUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/catalog`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: `${siteUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/contacts`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${siteUrl}/delivery`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${siteUrl}/payment`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-  ]
-
   const payload = await getPayload({ config })
 
-  let blogRoutes: MetadataRoute.Sitemap = []
+  let cities: any[] = []
   try {
-    const blogsResult = await payload.find({
-      collection: "blogs",
-      limit: 1000,
-      select: {
-        slug: true,
-        updatedAt: true,
-      },
+    const citiesGlobal = await payload.findGlobal({
+      slug: "cities",
     })
-
-    blogRoutes = blogsResult.docs.map((blog) => ({
-      url: `${siteUrl}/blog/${blog.slug}`,
-      lastModified: safeDate(blog.updatedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    }))
+    cities = citiesGlobal.cities || []
   } catch (e) {
-    console.error("Blogs sitemap error:", e)
+    console.error("Cities sitemap error:", e)
+    cities = [{ slug: "moskva", name: "Москва" }] // Fallback
   }
 
-  let categoryRoutes: MetadataRoute.Sitemap = []
+  const staticRoutes: MetadataRoute.Sitemap = []
+  for (const city of cities) {
+    staticRoutes.push(
+      {
+        url: `${siteUrl}/${city.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 1.0,
+      },
+      {
+        url: `${siteUrl}/${city.slug}/catalog`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 0.9,
+      },
+      {
+        url: `${siteUrl}/${city.slug}/contacts`,
+        lastModified: new Date(),
+        changeFrequency: "monthly",
+        priority: 0.6,
+      },
+    )
+  }
+
+  const subcategoryRoutes: MetadataRoute.Sitemap = []
   try {
-    const categoriesResult = await payload.find({
+    const subcategoriesResult = await payload.find({
       collection: "categories",
-      limit: 100,
+      limit: 1000,
       where: {
         parent: {
-          exists: false,
+          exists: true, // Only subcategories (those with a parent)
         },
       },
       select: {
@@ -98,17 +65,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     })
 
-    categoryRoutes = categoriesResult.docs.map((cat) => ({
-      url: `${siteUrl}/${cat.value}`,
-      lastModified: safeDate(cat.updatedAt),
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    }))
+    for (const city of cities) {
+      for (const subcat of subcategoriesResult.docs) {
+        subcategoryRoutes.push({
+          url: `${siteUrl}/${city.slug}/${subcat.value}`,
+          lastModified: safeDate(subcat.updatedAt),
+          changeFrequency: "daily" as const,
+          priority: 0.8,
+        })
+      }
+    }
   } catch (e) {
-    console.error("Categories sitemap error:", e)
+    console.error("Subcategories sitemap error:", e)
   }
 
-  let productRoutes: MetadataRoute.Sitemap = []
+  const productRoutes: MetadataRoute.Sitemap = []
   try {
     const productsResult = await payload.find({
       collection: "products",
@@ -119,15 +90,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     })
 
-    productRoutes = productsResult.docs.map((product) => ({
-      url: `${siteUrl}/product?id=${product.id}`,
-      lastModified: safeDate(product.updatedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    }))
+    for (const city of cities) {
+      for (const product of productsResult.docs) {
+        productRoutes.push({
+          url: `${siteUrl}/${city.slug}/product?id=${product.id}`,
+          lastModified: safeDate(product.updatedAt),
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        })
+      }
+    }
   } catch (e) {
     console.error("Products sitemap error:", e)
   }
 
-  return [...staticRoutes, ...blogRoutes, ...categoryRoutes, ...productRoutes]
+  const pageRoutes: MetadataRoute.Sitemap = []
+  try {
+    const pagesResult = await payload.find({
+      collection: "pages",
+      limit: 100,
+      where: {
+        _status: {
+          equals: "published",
+        },
+      },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+    })
+
+    for (const city of cities) {
+      for (const page of pagesResult.docs) {
+        pageRoutes.push({
+          url: `${siteUrl}/${city.slug}/${page.slug}`,
+          lastModified: safeDate(page.updatedAt),
+          changeFrequency: "monthly" as const,
+          priority: 0.6,
+        })
+      }
+    }
+  } catch (e) {
+    console.error("Pages sitemap error:", e)
+  }
+
+  return [...staticRoutes, ...subcategoryRoutes, ...productRoutes, ...pageRoutes]
 }

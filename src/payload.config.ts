@@ -12,8 +12,6 @@ import { Users } from "./collections/Users"
 import { Media } from "./collections/Media"
 import Categories from "./collections/Categories"
 import Products from "./collections/Products"
-import Carts from "./collections/Carts"
-import Addresses from "./collections/Addresses"
 import Orders from "./collections/Orders"
 import Reviews from "./collections/Reviews"
 import Favorites from "./collections/Favorites"
@@ -23,40 +21,37 @@ import { PararaphBlock } from "./lib/payload-blocks/ParagraphBlock"
 import { TextWithImageBlock } from "./lib/payload-blocks/TextWithImageBlock"
 import { HeaderBlock } from "./lib/payload-blocks/HeaderBlock"
 import { ImageGalleryBlock } from "./lib/payload-blocks/ImageGalleryBlock"
+import { ImageSliderBlock } from "./lib/payload-blocks/ImageSliderBlock"
 import { ContactsBlock } from "./lib/payload-blocks/ContactsBlock"
 import { SiteSettings } from "./globals/SiteSettings"
-import { Blogs } from "./collections/Blogs"
+import { Cities } from "./globals/Cities"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-const MAIL_NAME = process.env.MAIL_NAME || ""
 const MAIL_USER = process.env.MAIL_USER || ""
-const MAIL_PASSWORD = process.env.MAIL_PASSWORD || "";
-const isDevelopment = process.env.NODE_ENV === "development"
-
+const MAIL_PASSWORD = process.env.MAIL_PASSWORD || ""
 export default buildConfig({
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || "https://grandbazarr.ru",
-  cors: [process.env.PAYLOAD_PUBLIC_URL || "https://grandbazarr.ru"],
-  csrf: [process.env.PAYLOAD_PUBLIC_URL || "https://grandbazarr.ru"],
+  // serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || "https://grandbazarr.ru",
+  serverURL : "https://alexestetica.ru",
+  cors: ['http://localhost:3000', process.env.PAYLOAD_PUBLIC_URL || "https://grandbazarr.ru"],
+  csrf: ['http://localhost:3000', process.env.PAYLOAD_PUBLIC_URL || "https://grandbazarr.ru"],
   admin: {
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Carts, Addresses, Orders, Reviews, Favorites, Pages, Blogs],
-  globals : [SiteSettings],
+  collections: [Users, Media, Categories, Products, Orders, Reviews, Favorites, Pages],
+  globals: [SiteSettings, Cities],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       BlocksFeature({
-        blocks : [HeaderBlock, ImageBlock, PararaphBlock, TextWithImageBlock, ImageGalleryBlock, ContactsBlock]
+        blocks: [HeaderBlock, ImageBlock, PararaphBlock, TextWithImageBlock, ImageGalleryBlock, ImageSliderBlock, ContactsBlock],
       }),
       HeadingFeature({
-        enabledHeadingSizes : [
-          "h3", "h4", "h5", "h6"
-        ]
-      })
+        enabledHeadingSizes: ["h1", "h2", "h3", "h4"],
+      }),
     ],
   }),
   secret: process.env.PAYLOAD_SECRET || "",
@@ -75,8 +70,8 @@ export default buildConfig({
   ],
   endpoints: [],
   email: nodemailerAdapter({
-    defaultFromAddress: MAIL_NAME,
-    defaultFromName: "ГРАНДБАЗАР",
+    defaultFromAddress: "kolya.titov.05@inbox.ru",
+    defaultFromName: "Академия профессионального образования",
     transport: nodemailer.createTransport({
       service: "Mail.ru",
       host: "smtp.mail.ru",

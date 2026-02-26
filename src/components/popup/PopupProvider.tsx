@@ -1,21 +1,23 @@
-'use client';
-import { ReactNode } from 'react';
-import { useCatalogStore } from '@/entities/catalog/catalogStore'; // если есть
-import CategoryPopup from '@/components/category-popup/CategoryPopup';
-import { useAddressStore } from '@/entities/address/addressStore';
-import AddressPopup from '../address-popup/address-popup';
-import GuestBenefitsModal, { useGuestBenefitsStore } from '../auth/guest-benefits-modal';
+"use client"
+import type { ReactNode } from "react"
+import { useCatalogStore } from "@/entities/catalog/catalogStore"
+import CategoryPopup from "@/components/category-popup/CategoryPopup"
+import GuestBenefitsModal, { useGuestBenefitsStore } from "../auth/guest-benefits-modal"
+import { useBookingModalStore } from "@/entities/booking/bookingModalStore"
+import BookingModal from "@/components/product-page/ui/BookingModal"
+
 export const PopupProvider = ({ children }: { children: ReactNode }) => {
-  const {isCatalogPopupOpened} = useCatalogStore()
-   const { isOpen: isAddressPopupOpen } = useAddressStore()
-   const {open : isGuestPopupOpened} = useGuestBenefitsStore();
+  const { isCatalogPopupOpened } = useCatalogStore()
+  const { open: isGuestPopupOpened } = useGuestBenefitsStore()
+  const { isOpen: isBookingModalOpen } = useBookingModalStore()
+
   return (
     <>
       {children}
       {/* Глобальные попапы */}
       {isCatalogPopupOpened && <CategoryPopup />}
-       {isAddressPopupOpen && <AddressPopup />}
-       {isGuestPopupOpened && <GuestBenefitsModal />}
+      {isGuestPopupOpened && <GuestBenefitsModal />}
+      {isBookingModalOpen &&  <BookingModal  />}
     </>
-  );
-};
+  )
+}

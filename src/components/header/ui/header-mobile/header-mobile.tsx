@@ -1,44 +1,59 @@
-'use client'
-import { Button } from '../../../ui/button'
-import { Menu, ShoppingCart, MapPin } from 'lucide-react'
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../../../ui/sheet'
-import ProductSearch from '../../../product-search/ProductSearch'
-import CatalogButton from '../../../catalog-button/CatalogButton'
-import { useCartStore } from '@/entities/cart/cartStore'
-import { useMobileStore } from '@/entities/mobileMenu/mobileMenuStore'
-import UserLink from '../user-link/user-link'
-import AddressButton from '../address-button/address-button'
-import TopBar from '../top-bar/top-bar'
-import { useRouter } from 'next/navigation'
-import { routerConfig } from '@/config/router.config'
-import { useAuthDialogStore } from '@/entities/auth/authDialogStore'
-import { useAuthStore } from '@/entities/auth/authStore'
+"use client"
+import { Button } from "../../../ui/button"
+import { Menu, Home } from "lucide-react"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../../../ui/sheet"
+import ProductSearch from "../../../product-search/ProductSearch"
+import CatalogButton from "../../../catalog-button/CatalogButton"
+import { useMobileStore } from "@/entities/mobileMenu/mobileMenuStore"
+import UserLink from "../user-link/user-link"
+import { useRouter } from "next/navigation"
+import { routerConfig } from "@/config/router.config"
+import { useAuthDialogStore } from "@/entities/auth/authDialogStore"
+import { useAuthStore } from "@/entities/auth/authStore"
+import { useCity } from "@/lib/use-city"
+import { CitySelector } from "@/components/city-selector/city-selector"
+import Link from "next/link"
+import { AccessibilityDropdown } from "@/components/accessibility/AccessibilityDropdown"
 
 const HeaderMobile = () => {
-  const { open, totalCount } = useCartStore()
   const { isOpened, setOpened } = useMobileStore()
   const router = useRouter()
+  const city = useCity()
 
   const { user } = useAuthStore()
   const { openDialog } = useAuthDialogStore()
+
   const clickHandler = () => {
-    setOpened(false);
+    setOpened(false)
     if (user) {
-      router.push(`${routerConfig.profile}`)
+      router.push(routerConfig.getPath(city, "profile"))
     } else {
-      openDialog('login')
+      openDialog("login")
     }
   }
 
   return (
     <div className="md:hidden">
-      <div className="flex items-center gap-3">
-        {/* Search takes most space */}
-        <div className="flex-1">
+      <div className="text-center space-y-1 pb-3 pt-1">
+        <h2 className="text-sm font-semibold text-gray-800 leading-tight">
+          Академия профессионального Образования
+        </h2>
+        <p className="text-xs text-gray-600">Лицензия: Л035-01298-77/01010677</p>
+      </div>
+
+      <div className="flex items-center gap-2 mb-3">
+        <Link href={routerConfig.getPath(city, routerConfig.home)} className="shrink-0">
+          <Button variant="outline" size="sm" className="p-2 bg-transparent shrink-0">
+            <Home className="h-5 w-5" />
+            <span className="sr-only">На главную</span>
+          </Button>
+        </Link>
+        <div className="flex-1 min-w-0">
           <ProductSearch onProductSelect={() => {}} />
         </div>
 
-        {/* Menu button */}
+        <AccessibilityDropdown />
+
         <Sheet onOpenChange={setOpened} open={isOpened}>
           <SheetTrigger onClick={() => setOpened(true)} asChild>
             <Button variant="outline" size="sm" className="p-2 bg-transparent shrink-0">
@@ -47,44 +62,21 @@ const HeaderMobile = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-80 bg-white">
             <SheetTitle className="sr-only">Меню</SheetTitle>
-            <div className="space-y-4 mt-6">
+            <div className="space-y-3 mt-6 flex flex-col">
+              <div className="w-full">
+                <CitySelector className="w-full" />
+              </div>
               <CatalogButton />
               <Button
                 variant="outline"
-                className="w-full justify-start gap-3 p-4 h-auto bg-transparent"
-                onClick={() => {
-                  open()
-                  setOpened(false)
-                }}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <div className="flex flex-col items-start">
-                  <span>Корзина</span>
-                  {totalCount > 0 && (
-                    <span className="text-sm text-gray-500">{totalCount} товаров</span>
-                  )}
-                </div>
-                {totalCount > 0 && (
-                  <span className="ml-auto bg-green-500 text-white text-xs rounded-full px-2 py-1">
-                    {totalCount}
-                  </span>
-                )}
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full h-[53.6px] justify-start gap-3 p-4 bg-transparent"
+                className="w-full justify-start gap-3 p-4 bg-transparent items-center h-auto"
                 onClick={clickHandler}
               >
-                <UserLink />
+                <div className="shrink-0 flex items-center justify-center">
+                  <UserLink />
+                </div>
                 <p className="">Аккаунт</p>
               </Button>
-
-              <AddressButton className="w-full flex justify-start gap-3 p-4 h-auto border-2 border-gray-200 rounded-lg" />
-            </div>
-
-            <div className="mt-2">
-              <TopBar />
             </div>
           </SheetContent>
         </Sheet>

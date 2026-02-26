@@ -1,3 +1,15 @@
+import { AccordionBlock } from "@/lib/payload-blocks/AccordionBlock"
+import { BookingButtonBlock } from "@/lib/payload-blocks/BookingButtonBlock"
+import { BoxContentBlock } from "@/lib/payload-blocks/BoxContentBlock"
+import { HeaderBlock } from "@/lib/payload-blocks/HeaderBlock"
+import { IconCardsBlock } from "@/lib/payload-blocks/IconCardsBlock"
+import { ImageBlock } from "@/lib/payload-blocks/ImageBlock"
+import { ImageGalleryBlock } from "@/lib/payload-blocks/ImageGalleryBlock"
+import { ImageSliderBlock } from "@/lib/payload-blocks/ImageSliderBlock"
+import { PararaphBlock } from "@/lib/payload-blocks/ParagraphBlock"
+import { TextBlock } from "@/lib/payload-blocks/TextBlock"
+import { TextWithImageBlock } from "@/lib/payload-blocks/TextWithImageBlock"
+import { BlocksFeature, HeadingFeature, lexicalEditor } from "@payloadcms/richtext-lexical"
 import { revalidateTag } from "next/cache"
 import type { GlobalConfig } from "payload"
 
@@ -20,6 +32,28 @@ export const SiteSettings: GlobalConfig = {
     ],
   },
   fields: [
+    {
+      name: "homeContent",
+      type: "richText",
+      label: "Контент главной страницы",
+      required: false,
+      admin: {
+        description:
+          "Описание для главной страницы. Поддерживает переменные города: /city (именительный: Москва), /city/r (родительный: Москвы), /city/p (предложный: в Москве). Они автоматически заменятся на город пользователя.",
+      },
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          BlocksFeature({
+            blocks: [HeaderBlock, ImageBlock, PararaphBlock , TextWithImageBlock, ImageGalleryBlock, TextBlock, BoxContentBlock, AccordionBlock, BookingButtonBlock, IconCardsBlock, ImageSliderBlock],
+          }),
+          HeadingFeature({
+            enabledHeadingSizes: ["h1", "h2", "h3", "h4"],
+          }),
+        ],
+    }),
+      
+    },
     {
       name: "slider",
       type: "group",
@@ -53,7 +87,8 @@ export const SiteSettings: GlobalConfig = {
               label: "Заголовок",
               required: false,
               admin: {
-                description: "Основной заголовок слайда",
+                description:
+                  "Основной заголовок слайда. Можете использовать переменные города: /city (именительный: Москва), /city/r (родительный: Москвы), /city/p (предложный: в Москве). Они автоматически заменятся на город пользователя.",
               },
             },
             {
@@ -62,7 +97,8 @@ export const SiteSettings: GlobalConfig = {
               label: "Подзаголовок",
               required: false,
               admin: {
-                description: "Дополнительный текст под заголовком",
+                description:
+                  "Дополнительный текст под заголовком. Также поддерживает переменные города: /city, /city/r, /city/p - будут заменены на соответствующее склонение города.",
               },
             },
             {
@@ -123,8 +159,11 @@ export const SiteSettings: GlobalConfig = {
               name: "link",
               type: "text",
               required: false,
-              label:
-                "Ссылка у слайда(куда ведет при нажатии) (Если ссылка внутри сайта, не пишите ссылку полностью лишь /meal или что-то такое.)",
+              label: "Ссылка у слайда (куда ведет при нажатии)",
+              admin: {
+                description:
+                  "Если ссылка внутри сайта, напишите только относительный путь: /city, /city/p (для фильтра по цене), /city/r (для фильтра по рейтингу), /meal и т.п. Полные ссылки только для внешних сайтов.",
+              },
             },
           ],
         },
@@ -144,7 +183,7 @@ export const SiteSettings: GlobalConfig = {
           type: "text",
           label: "Юридическое название",
           required: true,
-          defaultValue: 'ООО "ГРАНДБАЗАР"',
+          defaultValue: 'ООО "Академия профессионального образования"',
           admin: {
             description: "Полное юридическое название компании",
           },
@@ -188,16 +227,6 @@ export const SiteSettings: GlobalConfig = {
           },
         },
         {
-          name: "offerDocument",
-          type: "upload",
-          relationTo: "media",
-          label: "Документ оферты (PDF)",
-          required: false,
-          admin: {
-            description: "Загрузите документ оферты в формате PDF",
-          },
-        },
-        {
           name: "privacyPolicyDocument",
           type: "upload",
           relationTo: "media",
@@ -214,7 +243,7 @@ export const SiteSettings: GlobalConfig = {
       type: "group",
       label: "Настройки заказов и доставки",
       admin: {
-        description: "Настройки минимальной суммы заказа и стоимости доставки",
+        description: "Настройки минимальной суммы заказа(Для физических товаров)",
       },
       required: true,
       fields: [
@@ -226,16 +255,6 @@ export const SiteSettings: GlobalConfig = {
           defaultValue: 500,
           admin: {
             description: "Минимальная сумма заказа для оформления",
-          },
-        },
-        {
-          name: "deliveryFee",
-          type: "number",
-          label: "Стоимость доставки (₽)",
-          required: true,
-          defaultValue: 199,
-          admin: {
-            description: "Стоимость доставки заказа",
           },
         },
       ],
@@ -260,16 +279,6 @@ export const SiteSettings: GlobalConfig = {
           },
         },
         {
-          name: "whatsApp",
-          type: "text",
-          label: "WhatsApp",
-          required: false,
-          defaultValue: "ссылка на ваш ватсапп акк",
-          admin: {
-            description: "Ссылка на WhatsApp (номер телефона или ссылка)",
-          },
-        },
-        {
           name: "vk",
           type: "text",
           label: "VK",
@@ -290,13 +299,13 @@ export const SiteSettings: GlobalConfig = {
           },
         },
         {
-          name: "youtube",
+          name: "whatsApp",
           type: "text",
-          label: "YouTube",
+          label: "WhatsApp",
           required: false,
-          defaultValue: "https://youtube.com/@grandbazar",
+          defaultValue: "",
           admin: {
-            description: "Ссылка на YouTube канал",
+            description: "Ссылка на whatsApp канал или бота.",
           },
         },
         {

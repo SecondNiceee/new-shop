@@ -71,13 +71,10 @@ export interface Config {
     media: Media;
     categories: Category;
     products: Product;
-    carts: Cart;
-    addresses: Address;
     orders: Order;
     reviews: Review;
     favorites: Favorite;
     pages: Page;
-    blogs: Blog;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -88,13 +85,10 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
-    carts: CartsSelect<false> | CartsSelect<true>;
-    addresses: AddressesSelect<false> | AddressesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     favorites: FavoritesSelect<false> | FavoritesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    blogs: BlogsSelect<false> | BlogsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -104,9 +98,11 @@ export interface Config {
   };
   globals: {
     'site-settings': SiteSetting;
+    cities: City;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    cities: CitiesSelect<false> | CitiesSelect<true>;
   };
   locale: null;
   user: User & {
@@ -141,6 +137,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name?: string | null;
   /**
    * Phone number for delivery contact
    */
@@ -149,9 +146,7 @@ export interface User {
   /**
    * Выберите коллекции, к которым пользователь будет иметь доступ. Если не выбрано ничего, доступ ко всем коллекциям (только для админов).
    */
-  accessCollections?:
-    | ('users' | 'categories' | 'products' | 'media' | 'orders' | 'reviews' | 'pages' | 'blogs')[]
-    | null;
+  accessCollections?: ('users' | 'categories' | 'products' | 'media' | 'orders' | 'reviews' | 'pages')[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -203,6 +198,10 @@ export interface Category {
   value: string;
   title: string;
   /**
+   * Чем меньше число, тем выше в списке. По умолчанию 0. Можно использовать отрицательные числа.
+   */
+  order?: number | null;
+  /**
    * Если не выбрано — это основная категория
    */
   parent?: (number | null) | Category;
@@ -214,6 +213,50 @@ export interface Category {
    * Загрузите обложку для подкатегории (видны в каталоге)
    */
   coverImage?: (number | null) | Media;
+  /**
+   * SEO заголовок для подкатегории. Поддерживает переменные города: /city (именительный), /city/r (родительный), /city/p (предложный)
+   */
+  seoTitle?: string | null;
+  /**
+   * SEO описание для подкатегории. Поддерживает переменные города: /city, /city/r, /city/p
+   */
+  seoDescription?: string | null;
+  /**
+   * Подробное описание подкатегории с форматированием. Поддерживает переменные города: /city (именительный: Москва), /city/r (родительный: Москвы), /city/p (предложный: в Москве)
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Дополнительный контент, который будет отображаться после списка товаров. Поддерживает переменные города: /city, /city/r, /city/p
+   */
+  contentAfter?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -223,32 +266,15 @@ export interface Category {
  */
 export interface Product {
   id: number;
+  /**
+   * Название услуги. Поддерживает переменные города для автоматической замены: /city (Москва), /city/r (Москвы), /city/p (в Москве).
+   */
   title: string;
+  /**
+   * Название услуги на странице услуги и в SEO метаданных. Поддерживает переменные города: /city (Москва), /city/r (Москвы), /city/p (в Москве).
+   */
+  pageTitle?: string | null;
   price: number;
-  discount?: {
-    isActive?: boolean | null;
-    type?: ('percentage' | 'fixed') | null;
-    /**
-     * Для процентной скидки - число от 0.01 до 99.99. Для фиксированной - сумма в рублях (не более 99% от цены товара).
-     */
-    value?: number | null;
-    /**
-     * Оставьте пустым для немедленного начала. Дата не может быть в прошлом.
-     */
-    startDate?: string | null;
-    /**
-     * Оставьте пустым для бессрочной скидки. Должна быть позже даты начала.
-     */
-    endDate?: string | null;
-    /**
-     * Краткое описание акции или причины скидки (до 200 символов)
-     */
-    description?: string | null;
-  };
-  weight: {
-    value: number;
-    unit: 'кг' | 'г' | 'л' | 'мл';
-  };
   /**
    * Выберите только категорию, без подкатегорий
    */
@@ -258,20 +284,35 @@ export interface Product {
    */
   subCategory: number | Category;
   /**
-   * Загрузите основное изображение продукта
+   * Загрузите основное изображение товара (необязательно)
    */
-  image: number | Media;
+  image?: (number | null) | Media;
+  /**
+   * Описание для SEO. Также поддерживает переменные города: /city, /city/r, /city/p - они заменятся на город пользователя в соответствующем падеже.
+   */
   description?: string | null;
-  storageConditions?: string | null;
-  ingredients?: string | null;
-  recommendedProducts?: (number | Product)[] | null;
-  nutritionalValue?: {
-    calories?: number | null;
-    proteins?: number | null;
-    carbohydrates?: number | null;
-    fats?: number | null;
-    fiber?: number | null;
-  };
+  /**
+   * Если включено, товар будет иметь отдельную страницу. Если выключено, при клике на товар сразу откроется форма бронирования.
+   */
+  hasProductPage?: boolean | null;
+  /**
+   * Доступно только когда включена страничка товара
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Обновляется автоматически при добавлении отзыва
    */
@@ -282,98 +323,31 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "carts".
- */
-export interface Cart {
-  id: number;
-  /**
-   * Cart owner (auto-assigned)
-   */
-  user: number | User;
-  /**
-   * Items in cart
-   */
-  items?:
-    | {
-        product: number | Product;
-        quantity: number;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses".
- */
-export interface Address {
-  id: number;
-  /**
-   * Address owner (auto-assigned)
-   */
-  user?: (number | null) | User;
-  /**
-   * Полный адрес улицы
-   */
-  street: string;
-  apartment?: string | null;
-  entrance?: string | null;
-  floor?: string | null;
-  comment?: string | null;
-  coordinates?: {
-    lat?: number | null;
-    lng?: number | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
   id: number;
   /**
-   * Unique order identifier (auto-generated)
+   * Просто уникальный номер заказа(для разработки, можно не обращать внимания)
    */
   orderNumber: string;
   /**
-   * Order owner (auto-assigned)
+   * Услуга
    */
-  user: number | User;
-  status: 'pending' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
+  product: number | Product;
   /**
-   * Order items
+   * Имя клиента
    */
-  items: {
-    product: number | Product;
-    quantity: number;
-    /**
-     * Price at the time of order
-     */
-    price: number;
-    id?: string | null;
-  }[];
-  deliveryAddress: {
-    address: string;
-    apartment?: string | null;
-    entrance?: string | null;
-    floor?: string | null;
-    comment?: string | null;
-  };
+  customerName: string;
+  /**
+   * пользователь (если был зарегестрирован, то привязывается)
+   */
+  user?: (number | null) | User;
+  status: 'pending' | 'waiting_call' | 'cancelled';
   /**
    * Customer phone number
    */
   customerPhone: string;
-  /**
-   * Total order amount including delivery
-   */
-  totalAmount: number;
-  /**
-   * Delivery fee
-   */
-  deliveryFee: number;
   /**
    * Additional notes or comments
    */
@@ -447,49 +421,6 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blogs".
- */
-export interface Blog {
-  id: number;
-  /**
-   * SLUG на англ.языке без пробелов, для пути странички
-   */
-  slug: string;
-  /**
-   * Заголовок для SEO
-   */
-  title: string;
-  /**
-   * Описание для SEO
-   */
-  description: string;
-  /**
-   * Фоновое изображение для блога(на страничке выбора блогов)
-   */
-  background: number | Media;
-  /**
-   * Контент
-   */
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -512,14 +443,6 @@ export interface PayloadLockedDocument {
         value: number | Product;
       } | null)
     | ({
-        relationTo: 'carts';
-        value: number | Cart;
-      } | null)
-    | ({
-        relationTo: 'addresses';
-        value: number | Address;
-      } | null)
-    | ({
         relationTo: 'orders';
         value: number | Order;
       } | null)
@@ -534,10 +457,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
-      } | null)
-    | ({
-        relationTo: 'blogs';
-        value: number | Blog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -586,6 +505,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
   phone?: T;
   role?: T;
   accessCollections?: T;
@@ -633,9 +553,14 @@ export interface MediaSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   value?: T;
   title?: T;
+  order?: T;
   parent?: T;
   icon?: T;
   coverImage?: T;
+  seoTitle?: T;
+  seoDescription?: T;
+  content?: T;
+  contentAfter?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -645,77 +570,16 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
+  pageTitle?: T;
   price?: T;
-  discount?:
-    | T
-    | {
-        isActive?: T;
-        type?: T;
-        value?: T;
-        startDate?: T;
-        endDate?: T;
-        description?: T;
-      };
-  weight?:
-    | T
-    | {
-        value?: T;
-        unit?: T;
-      };
   category?: T;
   subCategory?: T;
   image?: T;
   description?: T;
-  storageConditions?: T;
-  ingredients?: T;
-  recommendedProducts?: T;
-  nutritionalValue?:
-    | T
-    | {
-        calories?: T;
-        proteins?: T;
-        carbohydrates?: T;
-        fats?: T;
-        fiber?: T;
-      };
+  hasProductPage?: T;
+  content?: T;
   averageRating?: T;
   reviewsCount?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "carts_select".
- */
-export interface CartsSelect<T extends boolean = true> {
-  user?: T;
-  items?:
-    | T
-    | {
-        product?: T;
-        quantity?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "addresses_select".
- */
-export interface AddressesSelect<T extends boolean = true> {
-  user?: T;
-  street?: T;
-  apartment?: T;
-  entrance?: T;
-  floor?: T;
-  comment?: T;
-  coordinates?:
-    | T
-    | {
-        lat?: T;
-        lng?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -725,28 +589,11 @@ export interface AddressesSelect<T extends boolean = true> {
  */
 export interface OrdersSelect<T extends boolean = true> {
   orderNumber?: T;
+  product?: T;
+  customerName?: T;
   user?: T;
   status?: T;
-  items?:
-    | T
-    | {
-        product?: T;
-        quantity?: T;
-        price?: T;
-        id?: T;
-      };
-  deliveryAddress?:
-    | T
-    | {
-        address?: T;
-        apartment?: T;
-        entrance?: T;
-        floor?: T;
-        comment?: T;
-      };
   customerPhone?: T;
-  totalAmount?: T;
-  deliveryFee?: T;
   notes?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -785,19 +632,6 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blogs_select".
- */
-export interface BlogsSelect<T extends boolean = true> {
-  slug?: T;
-  title?: T;
-  description?: T;
-  background?: T;
-  content?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -840,6 +674,24 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   /**
+   * Описание для главной страницы. Поддерживает переменные города: /city (именительный: Москва), /city/r (родительный: Москвы), /city/p (предложный: в Москве). Они автоматически заменятся на город пользователя.
+   */
+  homeContent?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
    * Изображения для слайдера на главной странице
    */
   slider?: {
@@ -853,11 +705,11 @@ export interface SiteSetting {
            */
           image: number | Media;
           /**
-           * Основной заголовок слайда
+           * Основной заголовок слайда. Можете использовать переменные города: /city (именительный: Москва), /city/r (родительный: Москвы), /city/p (предложный: в Москве). Они автоматически заменятся на город пользователя.
            */
           title?: string | null;
           /**
-           * Дополнительный текст под заголовком
+           * Дополнительный текст под заголовком. Также поддерживает переменные города: /city, /city/r, /city/p - будут заменены на соответствующее склонение города.
            */
           subtitle?: string | null;
           /**
@@ -872,6 +724,9 @@ export interface SiteSetting {
            * Уровень затемнения изображения для лучшей читаемости текста
            */
           imageOverlay?: ('none' | 'light' | 'medium' | 'dark') | null;
+          /**
+           * Если ссылка внутри сайта, напишите только относительный путь: /city, /city/p (для фильтра по цене), /city/r (для фильтра по рейтингу), /meal и т.п. Полные ссылки только для внешних сайтов.
+           */
           link?: string | null;
           id?: string | null;
         }[]
@@ -902,26 +757,18 @@ export interface SiteSetting {
      */
     legalAddress?: string | null;
     /**
-     * Загрузите документ оферты в формате PDF
-     */
-    offerDocument?: (number | null) | Media;
-    /**
      * Загрузите политику конфиденциальности в формате PDF
      */
     privacyPolicyDocument?: (number | null) | Media;
   };
   /**
-   * Настройки минимальной суммы заказа и стоимости доставки
+   * Настройки минимальной суммы заказа(Для физических товаров)
    */
   orderSettings: {
     /**
      * Минимальная сумма заказа для оформления
      */
     minOrderAmount: number;
-    /**
-     * Стоимость доставки заказа
-     */
-    deliveryFee: number;
   };
   /**
    * Ссылки на ваши социальные сети и мессенджеры
@@ -932,10 +779,6 @@ export interface SiteSetting {
      */
     email?: string | null;
     /**
-     * Ссылка на WhatsApp (номер телефона или ссылка)
-     */
-    whatsApp?: string | null;
-    /**
      * Ссылка на страницу ВКонтакте
      */
     vk?: string | null;
@@ -944,9 +787,9 @@ export interface SiteSetting {
      */
     telegram?: string | null;
     /**
-     * Ссылка на YouTube канал
+     * Ссылка на whatsApp канал или бота.
      */
-    youtube?: string | null;
+    whatsApp?: string | null;
     /**
      * Ссылка на Instagram профиль
      */
@@ -956,10 +799,67 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * Управление городами на сайте. Города используются в URL (например, /moscow/, /piter/)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities".
+ */
+export interface City {
+  id: number;
+  /**
+   * Список всех городов, доступных на сайте
+   */
+  cities?:
+    | {
+        /**
+         * Полное название города (например, Москва, Санкт-Петербург)
+         */
+        name: string;
+        /**
+         * Уникальный идентификатор для URL (например, moscow, piter). Только латинские буквы, без пробелов
+         */
+        slug: string;
+        /**
+         * Склонения названия города для правильного испо  льзования в тексте
+         */
+        declensions: {
+          /**
+           * Например: Москва, Санкт-Петербург
+           */
+          nominative: string;
+          /**
+           * Например: Москвы, Санкт-Петербурга
+           */
+          genitive: string;
+          /**
+           * Например: в Москве, в Санкт-Петербурге
+           */
+          prepositional: string;
+        };
+        /**
+         * Дополнительный текст для SEO заголовков (например, 'Москва и область')
+         */
+        seoTitle?: string | null;
+        /**
+         * Описание для мета-тегов (SEO)
+         */
+        metaDescription?: string | null;
+        /**
+         * Этот город будет использоваться при переходе на главную страницу без города в URL
+         */
+        isDefault?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  homeContent?: T;
   slider?:
     | T
     | {
@@ -984,24 +884,47 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         phone?: T;
         inn?: T;
         legalAddress?: T;
-        offerDocument?: T;
         privacyPolicyDocument?: T;
       };
   orderSettings?:
     | T
     | {
         minOrderAmount?: T;
-        deliveryFee?: T;
       };
   socialLinks?:
     | T
     | {
         email?: T;
-        whatsApp?: T;
         vk?: T;
         telegram?: T;
-        youtube?: T;
+        whatsApp?: T;
         instagram?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities_select".
+ */
+export interface CitiesSelect<T extends boolean = true> {
+  cities?:
+    | T
+    | {
+        name?: T;
+        slug?: T;
+        declensions?:
+          | T
+          | {
+              nominative?: T;
+              genitive?: T;
+              prepositional?: T;
+            };
+        seoTitle?: T;
+        metaDescription?: T;
+        isDefault?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;
