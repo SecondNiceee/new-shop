@@ -8,11 +8,24 @@ import { lexicalEditor, BlocksFeature, HeadingFeature } from "@payloadcms/richte
 import { revalidateTag } from "next/cache"
 import type { CollectionConfig } from "payload"
 
+export const PRODUCT_SECTIONS = [
+  { label: "Обучение", value: "education" },
+  { label: "Массаж", value: "massage" },
+  { label: "Косметология", value: "cosmetology" },
+  { label: "Спа", value: "spa" },
+  { label: "Тату", value: "tatu" },
+  { label: "Подарочные сертификаты", value: "gift_certificates" },
+] as const
+
 const Products: CollectionConfig = {
   slug: "products",
   admin: {
     useAsTitle: "title",
     group: "Категории, подкатегории, товары",
+    defaultColumns: ["title", "section", "price", "category"],
+    components: {
+      beforeList: ["@/collections/views/ProductsListView#ProductsSectionFilter"],
+    },
   },
   access: {
     read: () => true,
@@ -47,6 +60,17 @@ const Products: CollectionConfig = {
       admin: {
         description:
           "Название услуги на странице услуги и в SEO метаданных. Поддерживает переменные города: /city (Москва), /city/r (Москвы), /city/p (в Москве).",
+      },
+    },
+    {
+      name: "section",
+      type: "select",
+      label: "Раздел",
+      required: false,
+      options: PRODUCT_SECTIONS.map((s) => ({ label: s.label, value: s.value })),
+      admin: {
+        description: "Выберите раздел, к которому относится товар. Используется для группировки в админке.",
+        position: "sidebar",
       },
     },
     {
